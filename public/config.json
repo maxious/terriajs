@@ -2,10 +2,11 @@
     "proxyDomains" : [
         "nicta.com.au",
         "gov.au",
-        "arcgis.com"
+        "arcgis.com",
+        "unep.ch:8080"
     ],
     "initializationUrls" : [
-    	"init_nm.json"
+    	"init_un.json"
     ]
 }
 
