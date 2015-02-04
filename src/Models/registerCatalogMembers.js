@@ -17,6 +17,8 @@ var WebMapServiceCatalogItem = require('./WebMapServiceCatalogItem');
 var CsvCatalogItem = require('./CsvCatalogItem');
 var GpxCatalogItem = require('./GpxCatalogItem');
 var OgrCatalogItem = require('./OgrCatalogItem');
+var AbsIttCatalogGroup = require('./AbsIttCatalogGroup');
+var AbsIttCatalogItem = require('./AbsIttCatalogItem');
 
 var registerCatalogMembers = function() {
     createCatalogMemberFromType.register('ckan', CkanCatalogGroup);
@@ -32,6 +34,8 @@ var registerCatalogMembers = function() {
     createCatalogMemberFromType.register('wfs-getCapabilities', WebFeatureServiceCatalogGroup);
     createCatalogMemberFromType.register('wms', WebMapServiceCatalogItem);
     createCatalogMemberFromType.register('wms-getCapabilities', WebMapServiceCatalogGroup);
+    createCatalogMemberFromType.register('abs-itt', AbsIttCatalogItem);
+    createCatalogMemberFromType.register('abs-itt-by-concept', AbsIttCatalogGroup);
 
     createCatalogItemFromUrl.register(matchesExtension('csv'), CsvCatalogItem);
     createCatalogItemFromUrl.register(matchesExtension('czm'), CzmlCatalogItem);

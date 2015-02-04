@@ -14,6 +14,31 @@
     "services": [],
     "catalog": [
         {
+            "name": "Australian Bureau of Statistics",
+            "type": "group",
+            "items": [
+                {
+                    "name": "Type of educational institution",
+                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
+                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
+                    "rectangle": [
+                        "112.93529999999998",
+                        "-38.208809999082796",
+                        "152.06206",
+                        "-11.05104999964455"
+                    ],
+                    "type": "abs-itt-by-concept",
+                    "url": "http://stat.abs.gov.au/itt/query.jsp",
+                    "dataSetID": "ABS_CENSUS2011_B15",
+                    "regionType": "SA4",
+                    "filter": [
+                        "MEASURE.3"
+                    ],
+                    "queryConcept": "TYPP"
+                }
+            ]
+        },
+        {
             "name": "National Data Sets",
             "type": "group",
             "items": [
@@ -324,7 +349,6 @@
                                 "-10.687579999655679"
                             ],
                             "type": "wms",
-
                             "url": "http://geoserver-nm.nicta.com.au/geotopo_250k/ows",
                             "layers": "Framework:mainlands"
 
@@ -340,7 +364,6 @@
                                 "-8.93332999971015"
                             ],
                             "type": "wms",
-
                             "url": "http://geoserver-nm.nicta.com.au/geotopo_250k/ows",
                             "layers": "Framework:mapindexes"
 
@@ -356,7 +379,6 @@
                                 "-12.584149999598258"
                             ],
                             "type": "wms",
-
                             "url": "http://geoserver-nm.nicta.com.au/geotopo_250k/ows",
                             "layers": "Framework:prohibitedareas"
 
