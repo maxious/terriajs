@@ -125,7 +125,7 @@ CsvCatalogItem.prototype._load = function() {
                 return readText(data).then(function(text) {
                     return loadTable(that, text);
                 });
-            } else if (data instanceof String) {
+            } else if (typeof data === 'string') {
                 return loadTable(that, data);
             } else {
                 throw new ModelError({
