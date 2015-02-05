@@ -37,6 +37,25 @@
                     "queryConcept": "TYPP"
                 },
                 {
+                    "name": "Type of educational institution - LGA",
+                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
+                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
+                    "rectangle": [
+                        "112.93529999999998",
+                        "-38.208809999082796",
+                        "152.06206",
+                        "-11.05104999964455"
+                    ],
+                    "type": "abs-itt-by-concept",
+                    "url": "http://stat.abs.gov.au/itt/query.jsp",
+                    "dataSetID": "ABS_CENSUS2011_B15_LGA",
+                    "regionType": "LGA",
+                    "filter": [
+                        "MEASURE.3"
+                    ],
+                    "queryConcept": "TYPP"
+                },
+                {
                     "name": "Total personal income",
                     "type": "abs-itt-by-concept",
                     "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
