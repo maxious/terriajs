@@ -128,13 +128,13 @@ AbsIttCatalogItem.prototype._load = function() {
         // Rename the 'REGION' column to the region type.
         text = text.replace(',REGION,', ',' + that.regionType + ',');
         that._csvCatalogItem.data = text;
-        that.legendUrl = that._csvCatalogItem.legendUrl;
         return that._csvCatalogItem.load();
     });
 };
 
 AbsIttCatalogItem.prototype._enable = function() {
     if (defined(this._csvCatalogItem)) {
+        this.legendUrl = this._csvCatalogItem.legendUrl;
         this._csvCatalogItem._enable();
     }
 };
@@ -147,6 +147,7 @@ AbsIttCatalogItem.prototype._disable = function() {
 
 AbsIttCatalogItem.prototype._show = function() {
     if (defined(this._csvCatalogItem)) {
+        this.legendUrl = this._csvCatalogItem.legendUrl;
         this._csvCatalogItem._show();
     }
 };

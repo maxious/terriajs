@@ -30,7 +30,7 @@
                     "type": "abs-itt-by-concept",
                     "url": "http://stat.abs.gov.au/itt/query.jsp",
                     "dataSetID": "ABS_CENSUS2011_B15",
-                    "regionType": "SA4",
+                    "regionType": "SA2",
                     "filter": [
                         "MEASURE.3"
                     ],
