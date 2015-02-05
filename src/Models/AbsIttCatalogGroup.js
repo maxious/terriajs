@@ -108,6 +108,18 @@ defineProperties(AbsIttCatalogGroup.prototype, {
     },
 
     /**
+     * Gets a value indicating whether the items in this group (and their sub-items, if any) should be sorted when
+     * {@link CatalogGroup#load} is complete.
+     * @memberOf CatalogGroup.prototype
+     * @type {Boolean}
+     */
+    sortItemsOnLoad : {
+        get : function() {
+            return false;
+        }
+    },
+    
+    /**
      * Gets the set of functions used to serialize individual properties in {@link CatalogMember#serializeToJson}.
      * When a property name on the model matches the name of a property in the serializers object lieral,
      * the value will be called as a function and passed a reference to the model, a reference to the destination
