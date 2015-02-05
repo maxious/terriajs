@@ -123,13 +123,13 @@ defineProperties(AbsIttCatalogGroup.prototype, {
 });
 
 /**
- * Gets or sets the set of default serializer functions to use in {@link CatalogMemberViewModel#serializeToJson}.  Types derived from this type
- * should expose this instance - cloned and modified if necesary - through their {@link CatalogMemberViewModel#serializers} property.
+ * Gets or sets the set of default serializer functions to use in {@link CatalogMember#serializeToJson}.  Types derived from this type
+ * should expose this instance - cloned and modified if necesary - through their {@link CatalogMember#serializers} property.
  * @type {Object}
  */
 AbsIttCatalogGroup.defaultSerializers = clone(CatalogGroup.defaultSerializers);
 
-AbsIttCatalogGroup.defaultSerializers.items = function(viewModel, json, propertyName, options) {
+AbsIttCatalogGroup.defaultSerializers.items = function(absGroup, json, propertyName, options) {
     // Only serialize minimal properties in contained items, because other properties are loaded by querying ABS.Stat.
     var previousSerializeForSharing = options.serializeForSharing;
     options.serializeForSharing = true;
@@ -141,7 +141,7 @@ AbsIttCatalogGroup.defaultSerializers.items = function(viewModel, json, property
     var previousEnabledItemsOnly = options.enabledItemsOnly;
     options.enabledItemsOnly = true;
 
-    var result = CatalogGroup.defaultSerializers.items(viewModel, json, propertyName, options);
+    var result = CatalogGroup.defaultSerializers.items(absGroup, json, propertyName, options);
 
     options.enabledItemsOnly = previousEnabledItemsOnly;
     options.serializeForSharing = previousSerializeForSharing;
@@ -208,18 +208,18 @@ function cleanAndProxyUrl(application, url) {
     return cleanedUrl;
 }
 
-function createItemForCode(viewModel, code) {
-    var result = new AbsIttCatalogItem(viewModel.application);
+function createItemForCode(absGroup, code) {
+    var result = new AbsIttCatalogItem(absGroup.application);
 
     result.name = code.description;
     result.description = code.description;
-    result.dataCustodian = viewModel.dataCustodian;
-    result.url = viewModel.url;
-    result.dataSetID = viewModel.dataSetID;
-    result.regionType = viewModel.regionType;
-    result.filter = viewModel.filter.slice();
+    result.dataCustodian = absGroup.dataCustodian;
+    result.url = absGroup.url;
+    result.dataSetID = absGroup.dataSetID;
+    result.regionType = absGroup.regionType;
+    result.filter = absGroup.filter.slice();
 
-    result.filter.push(viewModel.queryConcept + '.' + code.code);
+    result.filter.push(absGroup.queryConcept + '.' + code.code);
 
     return result;
 }
