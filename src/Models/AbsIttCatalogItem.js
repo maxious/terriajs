@@ -128,6 +128,7 @@ AbsIttCatalogItem.prototype._load = function() {
         // Rename the 'REGION' column to the region type.
         text = text.replace(',REGION,', ',' + that.regionType + ',');
         that._csvCatalogItem.data = text;
+        that.legendUrl = that._csvCatalogItem.legendUrl;
         return that._csvCatalogItem.load();
     });
 };
