@@ -170,7 +170,7 @@ AbsIttCatalogItem.prototype._load = function() {
                     for (var i = 0; i < codes.length - 1; ++i) {
                         that.items.push(codes[i]);
                     }
-                    console.log(that.items);
+                    //TODO: recursive function to create heirarchy
                 });
             }
             promises.push(myFunc(url, concept));

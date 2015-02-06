@@ -161,9 +161,32 @@ AbsIttCatalogGroup.prototype._load = function() {
 
     return loadJson(url).then(function(json) {
         var datasets = json.datasets;
-        
+
+        var promises = [];
+
         for (var i = 0; i < datasets.length - 1; ++i) {
-            that.items.push(createItemForDataset(that, datasets[i]));
+            var dataset = datasets[i];
+
+            //TODO: consider blacklisting support
+
+            var parameters = {
+                method: 'GetDatasetConcepts',
+                datasetid: dataset.id,
+                format: 'json'
+            };
+
+            var url = baseUrl + '?' + objectToQuery(parameters);
+
+            var myFunc = function(url, dataset) {
+                return loadJson(url).then(function(json) {
+                    var concepts = json.concepts;
+
+                    if (concepts.indexOf('REGION') !== -1) {
+                        that.items.push(createItemForDataset(that, dataset));
+                    }
+                });
+            }
+            promises.push(myFunc(url, dataset));
         }
     }).otherwise(function(e) {
         console.log(e.message);
