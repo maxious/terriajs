@@ -139,6 +139,8 @@ AbsIttCatalogItem.prototype._load = function() {
 
     var url = baseUrl + '?' + objectToQuery(parameters);
 
+    this.filter = [];
+
     return loadJson(url).then(function(json) {
         var concepts = json.concepts;
 
@@ -162,11 +164,11 @@ AbsIttCatalogItem.prototype._load = function() {
 
             var myFunc = function(url, concept) {
                 return loadJson(url).then(function(json) {
-                    // TODO: Create items in a hierarchy that matches the code hierarchy.  The UI can't handle this right now.
                     that.items.push({description: 'Concept', code: concept});
 
                     // Skip the last code, it's just the name of the dataset.
                     var codes = json.codes;
+                    that.filter.push(concept + '.' + codes[0].code)
                     for (var i = 0; i < codes.length - 1; ++i) {
                         that.items.push(codes[i]);
                     }
