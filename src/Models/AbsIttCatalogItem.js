@@ -6,6 +6,9 @@ var defined = require('../../third_party/cesium/Source/Core/defined');
 var defineProperties = require('../../third_party/cesium/Source/Core/defineProperties');
 var knockout = require('../../third_party/cesium/Source/ThirdParty/knockout');
 var objectToQuery = require('../../third_party/cesium/Source/Core/objectToQuery');
+var loadJson = require('../../third_party/cesium/Source/Core/loadJson');
+var ModelError = require('./ModelError');
+var when = require('../../third_party/cesium/Source/ThirdParty/when');
 
 var CatalogItem = require('./CatalogItem');
 var CsvCatalogItem = require('./CsvCatalogItem');
@@ -109,27 +112,111 @@ AbsIttCatalogItem.prototype._getValuesThatInfluenceLoad = function() {
     return [this.url, this.dataSetID, this.regionType, this.filter];
 };
 
+function skipConcept(concept) {
+    var conceptMask = ["STATE","REGIONTYPE","REGION","FREQUENCY"];
+    for (var i = 0; i < conceptMask.length; i++) {
+        if (conceptMask[i] === concept) {
+            return true;
+        }
+    }
+    return false;
+}
+
 AbsIttCatalogItem.prototype._load = function() {
     this._csvCatalogItem = new CsvCatalogItem(this.application);
 
+    //get the GetDatasetConcepts and then the GetCodeListValue to build up heirarchical tree
+    this.items = [];
+
     var baseUrl = cleanAndProxyUrl(this.application, this.url);
     var parameters = {
-        method: 'GetGenericData',
+        method: 'GetDatasetConcepts',
         datasetid: this.dataSetID,
-        and: createAnd(this),
-        or: 'REGION',
-        format: 'csv'
+        format: 'json'
     };
+
+    var that = this;
 
     var url = baseUrl + '?' + objectToQuery(parameters);
 
-    var that = this;
-    return loadText(url).then(function(text) {
-        // Rename the 'REGION' column to the region type.
-        text = text.replace(',REGION,', ',' + that.regionType + ',');
-        that._csvCatalogItem.data = text;
-        return that._csvCatalogItem.load();
+    return loadJson(url).then(function(json) {
+        var concepts = json.concepts;
+
+        var promises = [];
+
+        for (var i = 0; i < concepts.length - 1; ++i) {
+            var concept = concepts[i];
+
+            if (skipConcept(concept)) {
+                continue;
+            }
+
+            var parameters = {
+                method: 'GetCodeListValue',
+                datasetid: that.dataSetID,
+                concept: concept,
+                format: 'json'
+            };
+
+            var url = baseUrl + '?' + objectToQuery(parameters);
+
+            var myFunc = function(url, concept) {
+                return loadJson(url).then(function(json) {
+                    // TODO: Create items in a hierarchy that matches the code hierarchy.  The UI can't handle this right now.
+                    that.items.push({description: 'Concept', code: concept});
+
+                    // Skip the last code, it's just the name of the dataset.
+                    var codes = json.codes;
+                    for (var i = 0; i < codes.length - 1; ++i) {
+                        that.items.push(codes[i]);
+                    }
+                    console.log(that.items);
+                });
+            }
+            promises.push(myFunc(url, concept));
+        }
+        return when.all(promises).then( function(results) {
+            var parameters = {
+                method: 'GetGenericData',
+                datasetid: that.dataSetID,
+                and: createAnd(that),
+                or: 'REGION',
+                format: 'csv'
+            };
+
+            var url = baseUrl + '?' + objectToQuery(parameters);
+
+            return loadText(url).then(function(text) {
+                // Rename the 'REGION' column to the region type.
+                text = text.replace(',REGION,', ',' + that.regionType + ',');
+                that._csvCatalogItem.data = text;
+                return that._csvCatalogItem.load();
+            });
+        });
+    }).otherwise(function(e) {
+        throw new ModelError({
+            sender: that,
+            title: 'Group is not available',
+            message: '\
+An error occurred while invoking GetCodeListValue on the ABS ITT server.  \
+<p>If you entered the link manually, please verify that the link is correct.</p>\
+<p>This error may also indicate that the server does not support <a href="http://enable-cors.org/" target="_blank">CORS</a>.  If this is your \
+server, verify that CORS is enabled and enable it if it is not.  If you do not control the server, \
+please contact the administrator of the server and ask them to enable CORS.  Or, contact the National \
+Map team by emailing <a href="mailto:nationalmap@lists.nicta.com.au">nationalmap@lists.nicta.com.au</a> \
+and ask us to add this server to the list of non-CORS-supporting servers that may be proxied by \
+National Map itself.</p>\
+<p>If you did not enter this link manually, this error may indicate that the group you opened is temporarily unavailable or there is a \
+problem with your internet connection.  Try opening the group again, and if the problem persists, please report it by \
+sending an email to <a href="mailto:nationalmap@lists.nicta.com.au">nationalmap@lists.nicta.com.au</a>.</p>'
+        });
     });
+
+
+    //TODO: filter creates a set of urls all of which are summed for final csv
+    //TODO: enforce policy in the ko ui tree
+    //TODO: auto update from ko bindings in editing dialog
+
 };
 
 AbsIttCatalogItem.prototype._enable = function() {

@@ -53,25 +53,6 @@ var AbsIttCatalogGroup = function(application) {
     this.regionType = undefined;
 
     /**
-     * Gets the list of additional concepts and values on which to filter the data.  You can obtain a list of all available
-     * concepts for a dataset by querying http://stat.abs.gov.au/itt/query.jsp?method=GetDatasetConcepts&datasetid=ABS_CENSUS2011_B25
-     * (or equivalent) and a list of the possible values for a concept by querying
-     * http://stat.abs.gov.au/itt/query.jsp?method=GetCodeListValue&datasetid=ABS_CENSUS2011_B25&concept=MEASURE&format=json.
-     * This property is observable.
-     * @type {String[]}
-     */
-    this.filter = [];
-
-    /**
-     * Gets or sets the concept to query.  Each code/value in this concept becomes an item in this group.
-     * You can obtain a list of all available concepts for a dataset by querying
-     * http://stat.abs.gov.au/itt/query.jsp?method=GetDatasetConcepts&datasetid=ABS_CENSUS2011_B25
-     * (or equivalent).  This property is observable.
-     * @type {String}
-     */
-    this.queryConcept = undefined;
-
-    /**
      * Gets or sets a description of the custodian of the data sources in this group.
      * This property is an HTML string that must be sanitized before display to the user.
      * This property is observable.
@@ -79,7 +60,7 @@ var AbsIttCatalogGroup = function(application) {
      */
     this.dataCustodian = undefined;
 
-    knockout.track(this, ['url', 'dataSetID', 'regionType', 'filter', 'queryConcept', 'dataCustodian']);
+    knockout.track(this, ['url', 'dataSetID', 'regionType', 'dataCustodian']);
 };
 
 inherit(CatalogGroup, AbsIttCatalogGroup);
@@ -92,7 +73,7 @@ defineProperties(AbsIttCatalogGroup.prototype, {
      */
     type : {
         get : function() {
-            return 'abs-itt-by-concept';
+            return 'abs-itt-dataset-list';
         }
     },
 
@@ -103,7 +84,7 @@ defineProperties(AbsIttCatalogGroup.prototype, {
      */
     typeName : {
         get : function() {
-            return 'ABS.Stat Concept Group';
+            return 'ABS.Stat Dataset List';
         }
     },
 
@@ -170,24 +151,22 @@ AbsIttCatalogGroup.prototype._getValuesThatInfluenceLoad = function() {
 AbsIttCatalogGroup.prototype._load = function() {
     var baseUrl = cleanAndProxyUrl(this.application, this.url);
     var parameters = {
-        method: 'GetCodeListValue',
-        datasetid: this.dataSetID,
-        concept: this.queryConcept,
+        method: 'GetDatasetList',
         format: 'json'
     };
 
+    var that = this;
+
     var url = baseUrl + '?' + objectToQuery(parameters);
 
-    var that = this;
     return loadJson(url).then(function(json) {
-        // TODO: Create items in a hierarchy that matches the code hierarchy.  The UI can't handle this right now.
-
-        // Skip the last code, it's just the name of the dataset.
-        var codes = json.codes;
-        for (var i = 0; i < codes.length - 1; ++i) {
-            that.items.push(createItemForCode(that, codes[i]));
+        var datasets = json.datasets;
+        
+        for (var i = 0; i < datasets.length - 1; ++i) {
+            that.items.push(createItemForDataset(that, datasets[i]));
         }
     }).otherwise(function(e) {
+        console.log(e.message);
         throw new ModelError({
             sender: that,
             title: 'Group is not available',
@@ -220,18 +199,15 @@ function cleanAndProxyUrl(application, url) {
     return cleanedUrl;
 }
 
-function createItemForCode(absGroup, code) {
+function createItemForDataset(absGroup, dataset) {
     var result = new AbsIttCatalogItem(absGroup.application);
 
-    result.name = code.description;
-    result.description = code.description;
+    result.name = dataset.description;
+    result.description = dataset.description;
     result.dataCustodian = absGroup.dataCustodian;
     result.url = absGroup.url;
-    result.dataSetID = absGroup.dataSetID;
+    result.dataSetID = dataset.id;
     result.regionType = absGroup.regionType;
-    result.filter = absGroup.filter.slice();
-
-    result.filter.push(absGroup.queryConcept + '.' + code.code);
 
     return result;
 }

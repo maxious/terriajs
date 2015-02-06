@@ -35,7 +35,7 @@ var registerCatalogMembers = function() {
     createCatalogMemberFromType.register('wms', WebMapServiceCatalogItem);
     createCatalogMemberFromType.register('wms-getCapabilities', WebMapServiceCatalogGroup);
     createCatalogMemberFromType.register('abs-itt', AbsIttCatalogItem);
-    createCatalogMemberFromType.register('abs-itt-by-concept', AbsIttCatalogGroup);
+    createCatalogMemberFromType.register('abs-itt-dataset-list', AbsIttCatalogGroup);
 
     createCatalogItemFromUrl.register(matchesExtension('csv'), CsvCatalogItem);
     createCatalogItemFromUrl.register(matchesExtension('czm'), CzmlCatalogItem);
