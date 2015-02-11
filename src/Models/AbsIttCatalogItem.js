@@ -15,6 +15,7 @@ var CsvCatalogItem = require('./CsvCatalogItem');
 var inherit = require('../Core/inherit');
 var loadText = require('../../third_party/cesium/Source/Core/loadText');
 var Metadata = require('./Metadata');
+var MetadataItem = require('./MetadataItem');
 
 /**
  * A {@link CatalogItem} representing region-mapped data obtained from the Australia Bureau of Statistics
@@ -30,6 +31,7 @@ var AbsIttCatalogItem = function(application) {
     CatalogItem.call(this, application);
 
     this._csvCatalogItem = undefined;
+    this._metadata = undefined;
 
     /**
      * Gets or sets the URL of the ABS ITT API, typically http://stat.abs.gov.au/itt/query.jsp.
@@ -99,11 +101,16 @@ defineProperties(AbsIttCatalogItem.prototype, {
      */
     metadata : {
         get : function() {
-            var result = new Metadata();
-            result.isLoading = false;
-            result.dataSourceErrorMessage = 'This data source does not have any details available.';
-            result.serviceErrorMessage = 'This service does not have any details available.';
-            return result;
+//            var result = new Metadata();
+//            result.isLoading = false;
+//            result.dataSourceErrorMessage = 'This data source does not have any details available.';
+//            result.serviceErrorMessage = 'This service does not have any details available.';
+//            return result;
+
+            if (!defined(this._metadata)) {
+                this._metadata = requestMetadata(this);
+            }
+            return this._metadata;
         }
     }
 });
@@ -136,6 +143,7 @@ AbsIttCatalogItem.prototype._load = function() {
     };
 
     var that = this;
+    that.data = {items: []};
 
     var url = baseUrl + '?' + objectToQuery(parameters);
 
@@ -164,17 +172,22 @@ AbsIttCatalogItem.prototype._load = function() {
 
             var myFunc = function(url, concept) {
                 return loadJson(url).then(function(json) {
-                    console.log(json);
-                    var newConcept = {name: concept, items: []};
-                    that.items.push(newConcept);
+                    var node = {description: concept, code: ''};
 
                     // Skip the last code, it's just the name of the dataset.
                     var codes = json.codes;
                     that.filter.push(concept + '.' + codes[0].code)
-                    for (var i = 0; i < codes.length - 1; ++i) {
-                        that.items.push(codes[i]);
+
+                    function addTree(parent, code, codes) {
+                        var node = {name: code.description, items: []};
+                        parent.items.push(node);
+                        for (var i = 0; i < codes.length - 1; ++i) {
+                            if (codes[i].parentCode === code.code) {
+                                addTree(node, codes[i], codes);
+                            }
+                        }
                     }
-                    //TODO: recursive function to create heirarchy
+                    addTree(that.data, node, codes);
                 });
             }
             promises.push(myFunc(url, concept));
@@ -190,7 +203,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
             var url = baseUrl + '?' + objectToQuery(parameters);
 
-            console.log(url);
+            console.log(that.data);
 
             return loadText(url).then(function(text) {
                 // Rename the 'REGION' column to the region type.
@@ -274,6 +287,24 @@ function createAnd(catalogItem) {
     var and = catalogItem.filter.slice();
     and.unshift('REGIONTYPE.' + catalogItem.regionType);
     return and.join(',');
+}
+
+function requestMetadata(absItem) {
+    var result = new Metadata();
+    result.isLoading = true;
+    function populateMetadata(metadataGroup, node) {
+        for (var i = 0; i < node.items.length; i++) {
+            var dest = new MetadataItem();
+            dest.name = node.items[i].name;
+            dest.value = 'temp';
+            metadataGroup.items.push(dest);
+            populateMetadata(dest, node.items[i])
+        }
+
+    }
+    populateMetadata(result.serviceMetadata, absItem.data);
+    result.isLoading = false;
+    return result;
 }
 
 module.exports = AbsIttCatalogItem;
