@@ -193,6 +193,15 @@ AbsIttCatalogItem.prototype._load = function() {
             promises.push(myFunc(url, concept));
         }
         return when.all(promises).then( function(results) {
+
+            //TODO: build query filter list
+
+            //TODO: if query not done yet,then call and set promise
+
+            //TODO: when promises all done then sum up date for final csv
+
+            //TODO: reload csv with new data
+
             var parameters = {
                 method: 'GetGenericData',
                 datasetid: that.dataSetID,
