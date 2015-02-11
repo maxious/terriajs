@@ -131,8 +131,11 @@ if (start) {
         var ui = document.getElementById('ui');
 
         BrandBarViewModel.create(ui, {
-            name: 'NATIONAL<br/><strong>MAP</strong> <small>beta</small>',
-            leftLogo: 'images/gov-brand.png'
+            elements: [
+                '<a target="_blank" href="http://www.gov.au/"><img src="images/gov-brand.png" height="52" /></a>',
+                '<div class="brand-bar-name"><a target="_blank" href="http://nicta.github.io/nationalmap/public/info.html">NATIONAL<br/><strong>MAP</strong> <small>beta</small></a></div>',
+                '<a target="_blank" href="http://www.nicta.com.au"><img src="images/nicta.png" height="52" /></a>'
+            ]
         });
 
         // Create the various base layer options.
@@ -147,7 +150,7 @@ if (start) {
 
         var australianTopoOverlay = new ArcGisMapServerCatalogItem(application);
         australianTopoOverlay.name = 'Australian Topography';
-        australianTopoOverlay.url = 'http://www.ga.gov.au/gis/rest/services/topography/Australian_Topography_2014_WM/MapServer';
+        australianTopoOverlay.url = 'http://www.ga.gov.au/gis/rest/services/topography/National_Map_Basemap_WM/MapServer';
         australianTopoOverlay.opacity = 1.0;
 
         var australianTopo = new CompositeCatalogItem(application, [naturalEarthII, australianTopoOverlay]);
