@@ -164,7 +164,9 @@ AbsIttCatalogItem.prototype._load = function() {
 
             var myFunc = function(url, concept) {
                 return loadJson(url).then(function(json) {
-                    that.items.push({description: 'Concept', code: concept});
+                    console.log(json);
+                    var newConcept = {name: concept, items: []};
+                    that.items.push(newConcept);
 
                     // Skip the last code, it's just the name of the dataset.
                     var codes = json.codes;
@@ -187,6 +189,8 @@ AbsIttCatalogItem.prototype._load = function() {
             };
 
             var url = baseUrl + '?' + objectToQuery(parameters);
+
+            console.log(url);
 
             return loadText(url).then(function(text) {
                 // Rename the 'REGION' column to the region type.
