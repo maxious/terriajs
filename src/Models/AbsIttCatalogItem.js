@@ -129,6 +129,8 @@ function skipConcept(concept) {
     return false;
 }
 
+//TODO: use region or regiontype to decide on region
+
 AbsIttCatalogItem.prototype._load = function() {
     this._csvCatalogItem = new CsvCatalogItem(this.application);
 
@@ -295,6 +297,28 @@ function requestMetadata(absItem) {
 
 
 function updateAbsResults(absItem) {
+
+    var queryFilters = [];   //
+
+
+/*
+    function buildFilter(idxConcept, filter) {
+        for (codes in concept[idxConcept]) {
+            if (code.active) {
+                if (filterList.length === 0) {
+                    queryFilters.push(filterList);
+                }
+                filterList.push(concept+'.'+code);
+                buildFilter(idxConcept+1, filterList);
+                continue;  //skip children
+            }
+            for (c in children) {
+                buildFilter(idxConcept, c, filterList);    
+            }
+        }
+    }
+*/
+
     //TODO: build query filter list
 
     //TODO: if query not done yet,then call and set promise

@@ -46,9 +46,12 @@
                     "url": "http://stat.abs.gov.au/itt/query.jsp",
                     "regionType": "SA4",
                     "blacklist": {
+                        "?LGA": true,
+                        "?SA1": true,
+                        "?GCCSA": true,
                         "Aboriginal and Torres Strait Islander Population Projections, Remoteness Area": true,
-                        "?(LGA)": true,
-                        "?(SA1 SA)": true
+                        "Annual Turnover Size Ranges": true,
+                        "Tourist Accommodation": true
                     }
                 }
             ]
