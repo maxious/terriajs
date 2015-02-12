@@ -164,6 +164,16 @@ AbsIttCatalogGroup.prototype._load = function() {
 
         var promises = [];
 
+        var myFunc = function(url, dataset) {
+            return loadJson(url).then(function(json) {
+                var concepts = json.concepts;
+
+                if (concepts.indexOf('REGION') !== -1) {
+                    that.items.push(createItemForDataset(that, dataset));
+                }
+            });
+        };
+
         for (var i = 0; i < datasets.length - 1; ++i) {
             var dataset = datasets[i];
 
@@ -177,15 +187,6 @@ AbsIttCatalogGroup.prototype._load = function() {
 
             var url = baseUrl + '?' + objectToQuery(parameters);
 
-            var myFunc = function(url, dataset) {
-                return loadJson(url).then(function(json) {
-                    var concepts = json.concepts;
-
-                    if (concepts.indexOf('REGION') !== -1) {
-                        that.items.push(createItemForDataset(that, dataset));
-                    }
-                });
-            }
             promises.push(myFunc(url, dataset));
         }
     }).otherwise(function(e) {
