@@ -182,12 +182,25 @@ AbsIttCatalogGroup.prototype._load = function() {
             });
         };
 
+        var wildcardTerms = [];
+        for (var p in that.blacklist) {
+            if (that.blacklist.hasOwnProperty(p)) {
+                if (p[0] === '?') {
+                    wildcardTerms.push(p.substring(1));
+                }
+            }
+        }
+
         for (var i = 0; i < datasets.length - 1; ++i) {
             var dataset = datasets[i];
 
-            //TODO: consider blacklisting support
-
-            if (that.blacklist && that.blacklist[dataset.description]) {
+            var blacklist = (that.blacklist && that.blacklist[dataset.description]);
+            for (var w = 0; w < wildcardTerms.length && !blacklist; w++) {
+                if (dataset.description.indexOf(wildcardTerms[w]) !== -1) {
+                    blacklist = true;
+                }
+            }
+            if (blacklist) {
                 console.log('Provider Feedback: Filtering out ' + dataset.description + ' (' + dataset.id + ') because it is blacklisted.');
                 continue;
             }

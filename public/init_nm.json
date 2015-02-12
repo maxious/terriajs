@@ -46,7 +46,9 @@
                     "url": "http://stat.abs.gov.au/itt/query.jsp",
                     "regionType": "SA4",
                     "blacklist": {
-                        "Aboriginal and Torres Strait Islander Population Projections, Remoteness Area": true
+                        "Aboriginal and Torres Strait Islander Population Projections, Remoteness Area": true,
+                        "?(LGA)": true,
+                        "?(SA1 SA)": true
                     }
                 }
             ]
