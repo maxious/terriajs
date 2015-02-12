@@ -60,7 +60,15 @@ var AbsIttCatalogGroup = function(application) {
      */
     this.dataCustodian = undefined;
 
-    knockout.track(this, ['url', 'dataSetID', 'regionType', 'dataCustodian']);
+    /**
+     * Gets or sets a hash of names of blacklisted datasets.  A dataset that appears in this hash
+     * will not be shown to the user.  In this hash, the keys should be the name of the dataset to blacklist,
+     * and the values should be "true".  This property is observable.
+     * @type {Object}
+     */
+    this.blacklist = undefined;
+
+    knockout.track(this, ['url', 'dataSetID', 'regionType', 'dataCustodian', 'blacklist']);
 };
 
 inherit(CatalogGroup, AbsIttCatalogGroup);
@@ -145,7 +153,7 @@ AbsIttCatalogGroup.defaultSerializers.items = function(absGroup, json, propertyN
 freezeObject(AbsIttCatalogGroup.defaultSerializers);
 
 AbsIttCatalogGroup.prototype._getValuesThatInfluenceLoad = function() {
-    return [this.url];
+    return [this.url, this.blacklist];
 };
 
 AbsIttCatalogGroup.prototype._load = function() {
@@ -178,6 +186,11 @@ AbsIttCatalogGroup.prototype._load = function() {
             var dataset = datasets[i];
 
             //TODO: consider blacklisting support
+
+            if (that.blacklist && that.blacklist[dataset.description]) {
+                console.log('Provider Feedback: Filtering out ' + dataset.description + ' (' + dataset.id + ') because it is blacklisted.');
+                continue;
+            }
 
             var parameters = {
                 method: 'GetDatasetConcepts',

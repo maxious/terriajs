@@ -158,13 +158,13 @@ AbsIttCatalogItem.prototype._load = function() {
             return loadJson(url).then(function(json) {
                 var node = {description: concept, code: ''};
 
-                // Skip the last code, it's just the name of the dataset.
                 var codes = json.codes;
                 that.filter.push(concept + '.' + codes[0].code);
 
                 function addTree(parent, code, codes) {
-                    var node = {name: code.description, items: []};
+                    var node = {name: code.description, code: code.code, items: []};
                     parent.items.push(node);
+                    // Skip the last code, it's just the name of the dataset.
                     for (var i = 0; i < codes.length - 1; ++i) {
                         if (codes[i].parentCode === code.code) {
                             addTree(node, codes[i], codes);
@@ -195,32 +195,8 @@ AbsIttCatalogItem.prototype._load = function() {
         }
         return when.all(promises).then( function(results) {
 
-            //TODO: build query filter list
+            return updateAbsResults(that);
 
-            //TODO: if query not done yet,then call and set promise
-
-            //TODO: when promises all done then sum up date for final csv
-
-            //TODO: reload csv with new data
-
-            var parameters = {
-                method: 'GetGenericData',
-                datasetid: that.dataSetID,
-                and: createAnd(that),
-                or: 'REGION',
-                format: 'csv'
-            };
-
-            var url = baseUrl + '?' + objectToQuery(parameters);
-
-            console.log(that.data);
-
-            return loadText(url).then(function(text) {
-                // Rename the 'REGION' column to the region type.
-                text = text.replace(',REGION,', ',' + that.regionType + ',');
-                that._csvCatalogItem.data = text;
-                return that._csvCatalogItem.load();
-            });
         });
     }).otherwise(function(e) {
         throw new ModelError({
@@ -306,7 +282,7 @@ function requestMetadata(absItem) {
         for (var i = 0; i < node.items.length; i++) {
             var dest = new MetadataItem();
             dest.name = node.items[i].name;
-            dest.value = 'temp';
+            dest.value = node.items[i].code;
             metadataGroup.items.push(dest);
             populateMetadata(dest, node.items[i]);
         }
@@ -316,5 +292,35 @@ function requestMetadata(absItem) {
     result.isLoading = false;
     return result;
 }
+
+
+function updateAbsResults(absItem) {
+    //TODO: build query filter list
+
+    //TODO: if query not done yet,then call and set promise
+
+    //TODO: when promises all done then sum up date for final csv
+
+    //TODO: reload csv with new data
+
+    var baseUrl = cleanAndProxyUrl(absItem.application, absItem.url);
+    var parameters = {
+        method: 'GetGenericData',
+        datasetid: absItem.dataSetID,
+        and: createAnd(absItem),
+        or: 'REGION',
+        format: 'csv'
+    };
+
+    var url = baseUrl + '?' + objectToQuery(parameters);
+
+    return loadText(url).then(function(text) {
+        // Rename the 'REGION' column to the region type.
+        text = text.replace(',REGION,', ',' + absItem.regionType + ',');
+        absItem._csvCatalogItem.data = text;
+        return absItem._csvCatalogItem.load();
+    });
+}
+
 
 module.exports = AbsIttCatalogItem;
