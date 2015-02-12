@@ -154,6 +154,27 @@ AbsIttCatalogItem.prototype._load = function() {
 
         var promises = [];
 
+        var myFunc = function(url, concept) {
+            return loadJson(url).then(function(json) {
+                var node = {description: concept, code: ''};
+
+                // Skip the last code, it's just the name of the dataset.
+                var codes = json.codes;
+                that.filter.push(concept + '.' + codes[0].code);
+
+                function addTree(parent, code, codes) {
+                    var node = {name: code.description, items: []};
+                    parent.items.push(node);
+                    for (var i = 0; i < codes.length - 1; ++i) {
+                        if (codes[i].parentCode === code.code) {
+                            addTree(node, codes[i], codes);
+                        }
+                    }
+                }
+                addTree(that.data, node, codes);
+            });
+        };
+
         for (var i = 0; i < concepts.length - 1; ++i) {
             var concept = concepts[i];
 
@@ -170,26 +191,6 @@ AbsIttCatalogItem.prototype._load = function() {
 
             var url = baseUrl + '?' + objectToQuery(parameters);
 
-            var myFunc = function(url, concept) {
-                return loadJson(url).then(function(json) {
-                    var node = {description: concept, code: ''};
-
-                    // Skip the last code, it's just the name of the dataset.
-                    var codes = json.codes;
-                    that.filter.push(concept + '.' + codes[0].code)
-
-                    function addTree(parent, code, codes) {
-                        var node = {name: code.description, items: []};
-                        parent.items.push(node);
-                        for (var i = 0; i < codes.length - 1; ++i) {
-                            if (codes[i].parentCode === code.code) {
-                                addTree(node, codes[i], codes);
-                            }
-                        }
-                    }
-                    addTree(that.data, node, codes);
-                });
-            }
             promises.push(myFunc(url, concept));
         }
         return when.all(promises).then( function(results) {
@@ -307,7 +308,7 @@ function requestMetadata(absItem) {
             dest.name = node.items[i].name;
             dest.value = 'temp';
             metadataGroup.items.push(dest);
-            populateMetadata(dest, node.items[i])
+            populateMetadata(dest, node.items[i]);
         }
 
     }
