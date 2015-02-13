@@ -149,7 +149,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
     var url = baseUrl + '?' + objectToQuery(parameters);
 
-    this.filter = [];
+//    this.filter = [];
 
     return loadJson(url).then(function(json) {
         var concepts = json.concepts;
@@ -161,10 +161,14 @@ AbsIttCatalogItem.prototype._load = function() {
                 var node = {description: concept, code: ''};
 
                 var codes = json.codes;
-                that.filter.push(concept + '.' + codes[0].code);
+
+                //spoof filter for now
+//                that.filter.push(concept + '.' + codes[0].code);
+                codes[0].active = true;
 
                 function addTree(parent, code, codes) {
                     var node = {name: code.description, code: code.code, items: []};
+                    node.active = defined(code.active);
                     parent.items.push(node);
                     // Skip the last code, it's just the name of the dataset.
                     for (var i = 0; i < codes.length - 1; ++i) {
@@ -271,9 +275,9 @@ function proxyUrl(application, url) {
     return url;
 }
 
-function createAnd(catalogItem) {
-    var and = catalogItem.filter.slice();
-    and.unshift('REGIONTYPE.' + catalogItem.regionType);
+function createAnd(filter, regionType) {
+    var and = filter.slice();
+    and.unshift('REGIONTYPE.' + regionType);
     return and.join(',');
 }
 
@@ -288,9 +292,9 @@ function requestMetadata(absItem) {
             metadataGroup.items.push(dest);
             populateMetadata(dest, node.items[i]);
         }
-
     }
     populateMetadata(result.serviceMetadata, absItem.data);
+    console.log(absItem.data);
     result.isLoading = false;
     return result;
 }
@@ -298,47 +302,92 @@ function requestMetadata(absItem) {
 
 function updateAbsResults(absItem) {
 
-    var queryFilters = [];   //
+    //walk tree to get active codes
+    var activeCodes = [];
 
-
-/*
-    function buildFilter(idxConcept, filter) {
-        for (codes in concept[idxConcept]) {
-            if (code.active) {
-                if (filterList.length === 0) {
-                    queryFilters.push(filterList);
-                }
-                filterList.push(concept+'.'+code);
-                buildFilter(idxConcept+1, filterList);
-                continue;  //skip children
+    function appendActiveCodes(parent, idxConcept, conceptName) {
+        for (var i = 0; i < parent.items.length; i++) {
+            var node = parent.items[i];
+            if (node.active) {
+                activeCodes[idxConcept].push(conceptName + '.' + node.code);
             }
-            for (c in children) {
-                buildFilter(idxConcept, c, filterList);    
+            else {
+                appendActiveCodes(node, idxConcept, conceptName);
             }
         }
     }
-*/
 
-    //TODO: build query filter list
+    for (var i = 0; i < absItem.data.items.length; i++) {
+        var concept = absItem.data.items[i];
+        activeCodes[i] = [];
+        appendActiveCodes(concept, i, concept.name);
+        if (activeCodes[i].length === 0) {
+            console.log('each primary concept must have at least one code selected');
+            return;
+        }
+    }
 
-    //TODO: if query not done yet,then call and set promise
+    //build filters from activeCodes
+    var queryFilters = [[activeCodes[0][0], activeCodes[1][0]]];
 
-    //TODO: when promises all done then sum up date for final csv
+    function buildQueryFilters(idx1, idx2, filter, limit) {
+        filter.push(activeCodes[idx1][idx2]);
+        if (idx1+1 === limit) {
+            queryFilters.push(filter);
+        } else {
+            buildQueryFilters(idx1+1, idx2, filter, limit);
+        }
+    }
+    buildQueryFilters(0, 0, [], activeCodes.length);
 
-    //TODO: reload csv with new data
+    if (!defined(absItem.queryList)) {
+        absItem.queryList = [];
+    }
 
-    var baseUrl = cleanAndProxyUrl(absItem.application, absItem.url);
-    var parameters = {
-        method: 'GetGenericData',
-        datasetid: absItem.dataSetID,
-        and: createAnd(absItem),
-        or: 'REGION',
-        format: 'csv'
+    var myFunc = function(url) {
+        if (defined(absItem.queryList[url])) {
+            return;
+        }
+        absItem.queryList[url] = '';
+        return loadText(url).then(function(text) {
+            absItem.queryList[url] = text;
+        });
     };
 
-    var url = baseUrl + '?' + objectToQuery(parameters);
+//    var newFilter = absItem.filter.slice();
+//    newFilter[0] = newFilter[0].replace('1', '2');
+//    var queryFilters = [absItem.filter, newFilter];
 
-    return loadText(url).then(function(text) {
+    var promises = [];
+    var baseUrl = cleanAndProxyUrl(absItem.application, absItem.url);
+    var regionType = absItem.regionType;
+
+    for (var i = 0; i < queryFilters.length; ++i) {
+        var filter = queryFilters[i];
+        var parameters = {
+            method: 'GetGenericData',
+            datasetid: absItem.dataSetID,
+            and: createAnd(filter, regionType),
+            or: 'REGION',
+            format: 'csv'
+        };
+
+        var url = baseUrl + '?' + objectToQuery(parameters);
+
+        promises.push(myFunc(url));
+    }
+
+    return when.all(promises).then( function(results) {
+        var text;
+        //TODO: when promises all done then sum up date for final csv
+
+        //TODO: reload csv with new data
+
+        for (var url in absItem.queryList) {
+            if (absItem.queryList.hasOwnProperty(url)) {
+                text = absItem.queryList[url];
+            }
+        }
         // Rename the 'REGION' column to the region type.
         text = text.replace(',REGION,', ',' + absItem.regionType + ',');
         absItem._csvCatalogItem.data = text;
