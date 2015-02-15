@@ -312,11 +312,11 @@ function updateAbsResults(absItem) {
     }
 
     //check that we can create valid filters
-    for (var i = 0; i < absItem.data.items.length; i++) {
-        var concept = absItem.data.items[i];
-        activeCodes[i] = [];
-        appendActiveCodes(concept, i, concept.name);
-        if (activeCodes[i].length === 0) {
+    for (var f = 0; f < absItem.data.items.length; f++) {
+        var concept = absItem.data.items[f];
+        activeCodes[f] = [];
+        appendActiveCodes(concept, f, concept.name);
+        if (activeCodes[f].length === 0) {
             console.log('Error: Each concept must have at least one code selected.');
             //TODO: need to clear final csv data in this case.
             return;
