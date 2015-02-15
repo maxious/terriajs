@@ -149,8 +149,6 @@ AbsIttCatalogItem.prototype._load = function() {
 
     var url = baseUrl + '?' + objectToQuery(parameters);
 
-//    this.filter = [];
-
     return loadJson(url).then(function(json) {
         var concepts = json.concepts;
 
@@ -163,8 +161,8 @@ AbsIttCatalogItem.prototype._load = function() {
                 var codes = json.codes;
 
                 //spoof filter for now
-//                that.filter.push(concept + '.' + codes[0].code);
                 codes[0].active = true;
+                codes[1].active = true;
 
                 function addTree(parent, code, codes) {
                     var node = {name: code.description, code: code.code, items: []};
@@ -222,12 +220,6 @@ problem with your internet connection.  Try opening the group again, and if the 
 sending an email to <a href="mailto:nationalmap@lists.nicta.com.au">nationalmap@lists.nicta.com.au</a>.</p>'
         });
     });
-
-
-    //TODO: filter creates a set of urls all of which are summed for final csv
-    //TODO: enforce policy in the ko ui tree
-    //TODO: auto update from ko bindings in editing dialog
-
 };
 
 AbsIttCatalogItem.prototype._enable = function() {
@@ -302,9 +294,11 @@ function requestMetadata(absItem) {
 
 function updateAbsResults(absItem) {
 
+    //TODO: enforce policy in the ko ui tree
+    //TODO: auto update from ko bindings in editing dialog
+
     //walk tree to get active codes
     var activeCodes = [];
-
     function appendActiveCodes(parent, idxConcept, conceptName) {
         for (var i = 0; i < parent.items.length; i++) {
             var node = parent.items[i];
@@ -317,29 +311,35 @@ function updateAbsResults(absItem) {
         }
     }
 
+    //check that we can create valid filters
     for (var i = 0; i < absItem.data.items.length; i++) {
         var concept = absItem.data.items[i];
         activeCodes[i] = [];
         appendActiveCodes(concept, i, concept.name);
         if (activeCodes[i].length === 0) {
-            console.log('each primary concept must have at least one code selected');
+            console.log('Error: Each concept must have at least one code selected.');
+            //TODO: need to clear final csv data in this case.
             return;
         }
     }
 
     //build filters from activeCodes
-    var queryFilters = [[activeCodes[0][0], activeCodes[1][0]]];
-
-    function buildQueryFilters(idx1, idx2, filter, limit) {
-        filter.push(activeCodes[idx1][idx2]);
-        if (idx1+1 === limit) {
-            queryFilters.push(filter);
-        } else {
-            buildQueryFilters(idx1+1, idx2, filter, limit);
+    var queryFilters = [];
+    function buildQueryFilters(idxConcept, filterIn) {
+        for (var i = 0; i < activeCodes[idxConcept].length; i++) {
+            var filter = filterIn.slice();
+            filter.push(activeCodes[idxConcept][i]);
+            if (idxConcept+1 === activeCodes.length) {
+                queryFilters.push(filter);
+            } else {
+                buildQueryFilters(idxConcept+1, filter);
+            }
         }
     }
-    buildQueryFilters(0, 0, [], activeCodes.length);
+    buildQueryFilters(0, []);
 
+
+    //build abs itt api urls and load the text for each
     if (!defined(absItem.queryList)) {
         absItem.queryList = [];
     }
@@ -354,14 +354,9 @@ function updateAbsResults(absItem) {
         });
     };
 
-//    var newFilter = absItem.filter.slice();
-//    newFilter[0] = newFilter[0].replace('1', '2');
-//    var queryFilters = [absItem.filter, newFilter];
-
     var promises = [];
     var baseUrl = cleanAndProxyUrl(absItem.application, absItem.url);
     var regionType = absItem.regionType;
-
     for (var i = 0; i < queryFilters.length; ++i) {
         var filter = queryFilters[i];
         var parameters = {
