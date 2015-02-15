@@ -129,7 +129,7 @@ function skipConcept(concept) {
     return false;
 }
 
-//TODO: use region or regiontype to decide on region
+//TODO: use region or regiontype concept to decide on region
 
 AbsIttCatalogItem.prototype._load = function() {
     this._csvCatalogItem = new CsvCatalogItem(this.application);
@@ -296,7 +296,7 @@ function requestMetadata(absItem) {
 
 function updateAbsResults(absItem) {
 
-    //TODO: enforce policy in the ko ui tree
+    //TODO: enforce policy in the ko ui tree (parent/child relationship)
     //TODO: auto update from ko bindings in editing dialog
 
     //walk tree to get active codes
@@ -304,6 +304,7 @@ function updateAbsResults(absItem) {
     function appendActiveCodes(parent, idxConcept, conceptName) {
         for (var i = 0; i < parent.items.length; i++) {
             var node = parent.items[i];
+            //don't do children if parent active since it's a total
             if (node.active) {
                 activeCodes[idxConcept].push(conceptName + '.' + node.code);
             }
@@ -320,8 +321,8 @@ function updateAbsResults(absItem) {
         appendActiveCodes(concept, f, concept.name);
         if (activeCodes[f].length === 0) {
             console.log('Error: Each concept must have at least one code selected.');
-            //TODO: need to clear final csv data in this case.
-            return;
+            absItem._csvCatalogItem.data = '';
+            return absItem._csvCatalogItem.load();
         }
     }
 
@@ -394,6 +395,7 @@ function updateAbsResults(absItem) {
                     }
                 }
             }
+            //TODO: if percentage change value to value/total?
         }
         //Serialize the arrays
         var text = '';
