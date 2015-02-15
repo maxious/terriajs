@@ -1,6 +1,6 @@
 'use strict';
 
-/*global require,URI*/
+/*global require,URI,$*/
 
 var defined = require('../../third_party/cesium/Source/Core/defined');
 var defineProperties = require('../../third_party/cesium/Source/Core/defineProperties');
@@ -154,15 +154,17 @@ AbsIttCatalogItem.prototype._load = function() {
 
         var promises = [];
 
-        var myFunc = function(url, concept) {
+        var loadFunc = function(url, concept) {
             return loadJson(url).then(function(json) {
                 var node = {description: concept, code: ''};
 
                 var codes = json.codes;
 
-                //spoof filter for now
+                //preset the filter for now
                 codes[0].active = true;
-                codes[1].active = true;
+                if (codes.length > 1) {
+                    codes[1].active = true;
+                }
 
                 function addTree(parent, code, codes) {
                     var node = {name: code.description, code: code.code, items: []};
@@ -195,7 +197,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
             var url = baseUrl + '?' + objectToQuery(parameters);
 
-            promises.push(myFunc(url, concept));
+            promises.push(loadFunc(url, concept));
         }
         return when.all(promises).then( function(results) {
 
@@ -344,13 +346,14 @@ function updateAbsResults(absItem) {
         absItem.queryList = [];
     }
 
-    var myFunc = function(url) {
+    var loadFunc = function(url) {
         if (defined(absItem.queryList[url])) {
             return;
         }
-        absItem.queryList[url] = '';
         return loadText(url).then(function(text) {
-            absItem.queryList[url] = text;
+            absItem.queryList[url] =  $.csv.toArrays(text, {
+                onParseValue: $.csv.hooks.castToScalar
+            });
         });
     };
 
@@ -369,21 +372,46 @@ function updateAbsResults(absItem) {
 
         var url = baseUrl + '?' + objectToQuery(parameters);
 
-        promises.push(myFunc(url));
+        promises.push(loadFunc(url));
     }
 
     return when.all(promises).then( function(results) {
-        var text;
-        //TODO: when promises all done then sum up date for final csv
-
-        //TODO: reload csv with new data
-
+        //When promises all done then sum up date for final csv
+        // could also add or remove other fields
+        var finalCsvArray;
         for (var url in absItem.queryList) {
             if (absItem.queryList.hasOwnProperty(url)) {
-                text = absItem.queryList[url];
+                var valDest;
+                if (!defined(finalCsvArray)) {
+                    finalCsvArray = absItem.queryList[url].slice();
+                    valDest = finalCsvArray[0].indexOf('Value');
+                }
+                else {
+                    var csvArray = absItem.queryList[url];
+                    var valOrig = csvArray[0].indexOf('Value');
+                    for (var i = 1; i < csvArray.length; i++) {
+                        finalCsvArray[i][1] += csvArray[i][valOrig];
+                    }
+                }
             }
         }
-        // Rename the 'REGION' column to the region type.
+        //Serialize the arrays
+        var text = '';
+        var colNum = finalCsvArray[0].length;
+        var rowNum = finalCsvArray.length;
+        for (var r = 0; r < finalCsvArray.length; r++) {
+            for (var c = 0; c < colNum; c++) {
+                text += finalCsvArray[r][c];
+                if (c <  colNum-1) {
+                    text += ',';
+                }
+            }
+            if (r <  rowNum-1) {
+                text += '\n';
+            }
+        }
+
+        // Rename the 'REGION' column to the region type and display region mapping
         text = text.replace(',REGION,', ',' + absItem.regionType + ',');
         absItem._csvCatalogItem.data = text;
         return absItem._csvCatalogItem.load();
