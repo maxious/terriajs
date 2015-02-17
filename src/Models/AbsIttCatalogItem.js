@@ -16,8 +16,6 @@ var inherit = require('../Core/inherit');
 var loadText = require('../../third_party/cesium/Source/Core/loadText');
 var Metadata = require('./Metadata');
 
-var MetadataItem = require('./MetadataItem');
-
 var AbsDataset = require('./AbsDataset');
 var AbsConcept = require('./AbsConcept');
 var AbsCode = require('./AbsCode');
@@ -119,16 +117,11 @@ defineProperties(AbsIttCatalogItem.prototype, {
      */
     metadata : {
         get : function() {
-//            var result = new Metadata();
-//            result.isLoading = false;
-//            result.dataSourceErrorMessage = 'This data source does not have any details available.';
-//            result.serviceErrorMessage = 'This service does not have any details available.';
-//            return result;
-
-            if (!defined(this._metadata)) {
-                this._metadata = requestMetadata(this);
-            }
-            return this._metadata;
+            var result = new Metadata();
+            result.isLoading = false;
+            result.dataSourceErrorMessage = 'This data source does not have any details available.';
+            result.serviceErrorMessage = 'This service does not have any details available.';
+            return result;
         }
     }
 
@@ -179,7 +172,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
                 var codes = json.codes;
 
-                var activeCnt = 2;
+                var activeCnt = 1;
                 function addTree(parent, codes) {
                     // Skip the last code, it's just the name of the dataset.
                     for (var i = 0; i < codes.length - 1; ++i) {
@@ -269,6 +262,10 @@ AbsIttCatalogItem.prototype._hide = function() {
     }
 };
 
+AbsIttCatalogItem.prototype.helloWorld = function() {
+    console.log('hellow world');
+};
+
 function cleanAndProxyUrl(application, url) {
     return proxyUrl(application, cleanUrl(url));
 }
@@ -294,28 +291,7 @@ function createAnd(filter, regionType) {
     return and.join(',');
 }
 
-function requestMetadata(absItem) {
-    var result = new Metadata();
-    result.isLoading = true;
-    function populateMetadata(metadataGroup, node) {
-        for (var i = 0; i < node.items.length; i++) {
-            var dest = new MetadataItem();
-            dest.name = node.items[i].name;
-            dest.value = node.items[i].code;
-            metadataGroup.items.push(dest);
-            populateMetadata(dest, node.items[i]);
-        }
-    }
-    populateMetadata(result.dataSourceMetadata, absItem._absDataset);
-    result.isLoading = false;
-    return result;
-}
-
-
 function updateAbsResults(absItem) {
-
-    //TODO: enforce policy in the ko ui tree (parent/child relationship)
-    //TODO: auto update from ko bindings in editing dialog
 
     //walk tree to get active codes
     var activeCodes = [];

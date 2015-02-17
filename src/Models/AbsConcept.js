@@ -50,7 +50,4 @@ AbsConcept.prototype.toggleOpen = function() {
     this.isOpen = !this.isOpen;
 };
 
-AbsConcept.prototype.toggleActive = function() {
-};
-
 module.exports = AbsConcept;
