@@ -15,7 +15,13 @@ var CsvCatalogItem = require('./CsvCatalogItem');
 var inherit = require('../Core/inherit');
 var loadText = require('../../third_party/cesium/Source/Core/loadText');
 var Metadata = require('./Metadata');
+
 var MetadataItem = require('./MetadataItem');
+
+var AbsDataset = require('./AbsDataset');
+var AbsConcept = require('./AbsConcept');
+var AbsCode = require('./AbsCode');
+
 
 /**
  * A {@link CatalogItem} representing region-mapped data obtained from the Australia Bureau of Statistics
@@ -32,6 +38,7 @@ var AbsIttCatalogItem = function(application) {
 
     this._csvCatalogItem = undefined;
     this._metadata = undefined;
+    this._absDataset = undefined;
 
     /**
      * Gets or sets the URL of the ABS ITT API, typically http://stat.abs.gov.au/itt/query.jsp.
@@ -66,7 +73,18 @@ var AbsIttCatalogItem = function(application) {
      */
     this.filter = [];
 
-    knockout.track(this, ['url', 'dataSetID', 'regionType', 'filter']);
+    knockout.track(this, ['url', 'dataSetID', 'regionType', 'filter', '_absDataset']);
+
+    delete this.__knockoutObservables.absDataset;
+    knockout.defineProperty(this, 'absDataset', {
+        get : function() {
+            return this._absDataset;
+        },
+        set : function(value) {
+            this._absDataset = value;
+        }
+    });
+
 };
 
 inherit(CatalogItem, AbsIttCatalogItem);
@@ -113,6 +131,7 @@ defineProperties(AbsIttCatalogItem.prototype, {
             return this._metadata;
         }
     }
+
 });
 
 AbsIttCatalogItem.prototype._getValuesThatInfluenceLoad = function() {
@@ -134,8 +153,7 @@ function skipConcept(concept) {
 AbsIttCatalogItem.prototype._load = function() {
     this._csvCatalogItem = new CsvCatalogItem(this.application);
 
-    //get the GetDatasetConcepts and then the GetCodeListValue to build up heirarchical tree
-    this.items = [];
+    //call GetDatasetConcepts and then GetCodeListValue to build up a heirarchical tree
 
     var baseUrl = cleanAndProxyUrl(this.application, this.url);
     var parameters = {
@@ -144,9 +162,9 @@ AbsIttCatalogItem.prototype._load = function() {
         format: 'json'
     };
 
-    var that = this;
-    that.data = {items: []};
+    this._absDataset = new AbsDataset();
 
+    var that = this;
     var url = baseUrl + '?' + objectToQuery(parameters);
 
     return loadJson(url).then(function(json) {
@@ -154,30 +172,29 @@ AbsIttCatalogItem.prototype._load = function() {
 
         var promises = [];
 
-        var loadFunc = function(url, concept) {
+        var loadFunc = function(url, conceptName) {
             return loadJson(url).then(function(json) {
-                var node = {description: concept, code: ''};
+                var concept = new AbsConcept(conceptName);
+                that.absDataset.items.push(concept);
 
                 var codes = json.codes;
 
-                //preset the filter for now
-                codes[0].active = true;
-                if (codes.length > 1) {
-                    codes[1].active = true;
-                }
-
-                function addTree(parent, code, codes) {
-                    var node = {name: code.description, code: code.code, items: []};
-                    node.active = defined(code.active);
-                    parent.items.push(node);
+                var activeCnt = 2;
+                function addTree(parent, codes, parentCode) {
                     // Skip the last code, it's just the name of the dataset.
                     for (var i = 0; i < codes.length - 1; ++i) {
-                        if (codes[i].parentCode === code.code) {
-                            addTree(node, codes[i], codes);
+                        var parentCode = defined(parent.code) ? parent.code : '';
+                        if (codes[i].parentCode === parentCode) {
+                            var absCode = new AbsCode(codes[i].description, codes[i].code);
+                            if (activeCnt-- > 0) {
+                                absCode.isActive = true;
+                            }
+                            parent.items.push(absCode);
+                            addTree(absCode, codes, codes[i].code);
                         }
                     }
                 }
-                addTree(that.data, node, codes);
+                addTree(concept, codes);
             });
         };
 
@@ -200,6 +217,8 @@ AbsIttCatalogItem.prototype._load = function() {
             promises.push(loadFunc(url, concept));
         }
         return when.all(promises).then( function(results) {
+
+            that._absDataset.isLoading = false;
 
             return updateAbsResults(that);
 
@@ -287,8 +306,7 @@ function requestMetadata(absItem) {
             populateMetadata(dest, node.items[i]);
         }
     }
-    populateMetadata(result.serviceMetadata, absItem.data);
-    console.log(absItem.data);
+    populateMetadata(result.dataSourceMetadata, absItem._absDataset);
     result.isLoading = false;
     return result;
 }
@@ -305,7 +323,7 @@ function updateAbsResults(absItem) {
         for (var i = 0; i < parent.items.length; i++) {
             var node = parent.items[i];
             //don't do children if parent active since it's a total
-            if (node.active) {
+            if (node.isActive) {
                 activeCodes[idxConcept].push(conceptName + '.' + node.code);
             }
             else {
@@ -315,8 +333,8 @@ function updateAbsResults(absItem) {
     }
 
     //check that we can create valid filters
-    for (var f = 0; f < absItem.data.items.length; f++) {
-        var concept = absItem.data.items[f];
+    for (var f = 0; f < absItem._absDataset.items.length; f++) {
+        var concept = absItem._absDataset.items[f];
         activeCodes[f] = [];
         appendActiveCodes(concept, f, concept.name);
         if (activeCodes[f].length === 0) {

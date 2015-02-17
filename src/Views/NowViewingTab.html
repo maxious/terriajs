@@ -1,6 +1,6 @@
 <script type="text/html" id="now-viewing-abs-item-template">
     <tr>
-        <td class="now-viewing-abs-properties-name-cell" data-bind="click: toggleOpen, css: 'now-viewing-abs-properties-level' + $parents.length + (hasChildren ? ' now-viewing-abs-properties-parent' : '')">
+        <td class="now-viewing-abs-properties-name-cell" data-bind="click: toggleOpen, css: 'now-viewing-abs-properties-level' + ($parents.length-1) + (hasChildren ? ' now-viewing-abs-properties-parent' : '')">
             <!-- ko if: hasChildren && isOpen -->
             <div class="now-viewing-abs-properties-arrow" data-bind="cesiumSvgPath: { path: $root.svgArrowDown, width: 32, height: 32 }"></div>
             <!-- /ko -->
@@ -12,18 +12,6 @@
             <!-- /ko -->
             <div class="now-viewing-abs-properties-name" data-bind="text: name"></div>
         </td>
-        <!-- ko if: hasChildren -->
-            <td></td>
-        <!-- /ko -->
-        <!-- ko if: valueIsArray -->
-            <td data-bind="foreach: value">
-                <span data-bind="if: $index() !== 0">; </span>
-                <span data-bind="text: $data"></span>
-            </td>
-        <!-- /ko -->
-        <!-- ko ifnot: hasChildren || valueIsArray -->
-            <td data-bind="text: value"></td>
-        <!-- /ko -->
     </tr>
     <!-- ko if: hasChildren && isOpen -->
         <!-- ko template: { name: 'now-viewing-abs-item-template', foreach: items } -->
@@ -75,25 +63,17 @@
                 <div class="now-viewing-legend-text">No legend available for this data item.</div>
                 <!-- /ko -->
                 
-                <div class="now-viewing-abs-section" data-bind="if: supportsOpacity">
+                <!-- ko if: absDataset -->
+                <div class="now-viewing-abs-section" data-bind="if: type === 'abs-itt'">
                     <h2>ABS Data Concepts</h2>
                     <div class="now-viewing-abs-table">
-                        <!-- ko if: metadata.dataSourceMetadata.hasChildren -->
-                        <table data-bind="template: { name: 'now-viewing-abs-item-template', foreach: metadata.dataSourceMetadata.items }">
-                        </table>
-                        <!-- /ko -->
-                        <!-- ko if: metadata.catalogItemErrorMessage -->
-                        <table>
-                            <tr>
-                                <td class="now-viewing-abs-properties-name-cell now-viewing-abs-properties-level1">
-                                    <div class="now-viewing-abs-properties-arrow"></div>
-                                    <div class="now-viewing-abs-properties-name" data-bind="text: metadata.catalogItemErrorMessage"></div>
-                                </td>
-                            </tr>
+                        <!-- ko if: absDataset.items -->
+                        <table data-bind="template: { name: 'now-viewing-abs-item-template', foreach: absDataset.items }">
                         </table>
                         <!-- /ko -->
                     </div>
                 </div>
+                <!-- /ko -->
             </div>
         </div>
     </div>
