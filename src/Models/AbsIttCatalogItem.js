@@ -180,7 +180,7 @@ AbsIttCatalogItem.prototype._load = function() {
                 var codes = json.codes;
 
                 var activeCnt = 2;
-                function addTree(parent, codes, parentCode) {
+                function addTree(parent, codes) {
                     // Skip the last code, it's just the name of the dataset.
                     for (var i = 0; i < codes.length - 1; ++i) {
                         var parentCode = defined(parent.code) ? parent.code : '';
@@ -190,7 +190,7 @@ AbsIttCatalogItem.prototype._load = function() {
                                 absCode.isActive = true;
                             }
                             parent.items.push(absCode);
-                            addTree(absCode, codes, codes[i].code);
+                            addTree(absCode, codes);
                         }
                     }
                 }

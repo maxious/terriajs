@@ -2,7 +2,6 @@
 
 /*global require*/
 
-var AbsConcept = require('./AbsConcept');
 var knockout = require('../../third_party/cesium/Source/ThirdParty/knockout');
 
 /**

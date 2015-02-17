@@ -25,8 +25,9 @@ var AbsConcept = function(name) {
      * @type {Boolean}
      */
     this.isOpen = false;
+    this.isCode = false;
 
-    knockout.track(this, ['name', 'items', 'isOpen']);
+    knockout.track(this, ['name', 'items', 'isOpen', 'isCode']);
 };
 
 defineProperties(AbsConcept.prototype, {
@@ -47,6 +48,9 @@ defineProperties(AbsConcept.prototype, {
  */
 AbsConcept.prototype.toggleOpen = function() {
     this.isOpen = !this.isOpen;
+};
+
+AbsConcept.prototype.toggleActive = function() {
 };
 
 module.exports = AbsConcept;

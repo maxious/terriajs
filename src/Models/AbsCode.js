@@ -5,7 +5,7 @@
 var defineProperties = require('../../third_party/cesium/Source/Core/defineProperties');
 var knockout = require('../../third_party/cesium/Source/ThirdParty/knockout');
 
-var absCode = function(name, value) {
+var AbsCode = function(name, value) {
     /**
      * Gets or sets the name of the abs code.  This property is observable.
      * @type {String}
@@ -20,7 +20,7 @@ var absCode = function(name, value) {
 
     /**
      * Gets the list of abs codes contained in this group.  This property is observable.
-     * @type {absCode[]}
+     * @type {AbsCode[]}
      */
     this.items = [];
 
@@ -37,11 +37,12 @@ var absCode = function(name, value) {
      * @type {Boolean}
      */
     this.isActive = false;
+    this.isCode = true;
 
-    knockout.track(this, ['name', 'value', 'items', 'isOpen', 'isActive']);
+    knockout.track(this, ['name', 'code', 'items', 'isOpen', 'isActive', 'isCode']);
 };
 
-defineProperties(absCode.prototype, {
+defineProperties(AbsCode.prototype, {
     /**
      * Gets a value indicating whether this item has child items.
      * @type {Boolean}
@@ -55,18 +56,18 @@ defineProperties(absCode.prototype, {
 });
 
 /**
- * Toggles the {@link absCode#isOpen} property.  If this item's list of children is open,
+ * Toggles the {@link AbsCode#isOpen} property.  If this item's list of children is open,
  * calling this method will close it.  If the list is closed, calling this method will open it.
  */
-absCode.prototype.toggleOpen = function() {
+AbsCode.prototype.toggleOpen = function() {
     this.isOpen = !this.isOpen;
 };
 
 /**
- * Toggles the {@link absCode#isActive} property.
+ * Toggles the {@link AbsCode#isActive} property.
  */
-absCode.prototype.toggleActive = function() {
+AbsCode.prototype.toggleActive = function() {
     this.isActive = !this.isActive;
 };
 
-module.exports = absCode;
+module.exports = AbsCode;
