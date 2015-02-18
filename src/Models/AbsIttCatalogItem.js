@@ -427,8 +427,10 @@ function updateAbsResults(absItem) {
         // Rename the 'REGION' column to the region type and display region mapping
         text = text.replace(',REGION,', ',' + absItem.regionType + ',');
         absItem._csvCatalogItem.data = text;
-        if (absItem._csvCatalogItem.isShown) {
-            return absItem._csvCatalogItem._rebuild();
+        if (defined(absItem._csvCatalogItem._tableDataSource)) {
+            return when(absItem._csvCatalogItem._rebuild()).then(function() {
+                absItem.legendUrl = absItem._csvCatalogItem.legendUrl;
+            });
         } else {
             return absItem._csvCatalogItem.load();
         }
