@@ -172,6 +172,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
                 var codes = json.codes;
 
+                function absCodeUpdate() { updateAbsResults(that); }
                 var activeCnt = 1;
                 function addTree(parent, codes) {
                     // Skip the last code, it's just the name of the dataset.
@@ -182,7 +183,7 @@ AbsIttCatalogItem.prototype._load = function() {
                             if (activeCnt-- === 0) {
                                 absCode.isActive = true;
                             }
-                            absCode.updateFunction = function() { updateAbsResults(that); };
+                            absCode.updateFunction = absCodeUpdate;
                             parent.items.push(absCode);
                             addTree(absCode, codes);
                         }
@@ -401,8 +402,8 @@ function updateAbsResults(absItem) {
             else {
                 var csvArray = absItem.queryList[ndx].data;
                 var valOrig = csvArray[0].indexOf('Value');
-                for (var i = 1; i < csvArray.length; i++) {
-                    finalCsvArray[i][valDest] += csvArray[i][valOrig];
+                for (var n = 1; n < csvArray.length; n++) {
+                    finalCsvArray[n][valDest] += csvArray[n][valOrig];
                 }
             }
             //TODO: if percentage change value to value/total?
