@@ -722,10 +722,11 @@ function addRegionMap(csvItem) {
         style.table.time = dataset.getVarID(VarType.TIME);
         style.table.data = dataVar;
         style.table.colorMap = [
-            {offset: 0.0, color: 'rgba(200,0,0,1.00)'},
-            {offset: 0.5, color: 'rgba(200,200,200,1.0)'},
-            {offset: 0.5, color: 'rgba(200,200,200,1.0)'},
-            {offset: 1.0, color: 'rgba(0,0,200,1.0)'}
+            {offset: 0.0, color: 'rgba(239,210,193,1.00)'},
+            {offset: 0.25, color: 'rgba(221,139,116,1.0)'},
+            {offset: 0.5, color: 'rgba(255,127,46,1.0)'},
+            {offset: 0.75, color: 'rgba(255,65,43,1.0)'},
+            {offset: 1.0, color: 'rgba(111,0,54,1.0)'}
         ];
         csvItem.style = style;
     }
