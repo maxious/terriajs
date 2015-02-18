@@ -4,6 +4,7 @@
 
 var defineProperties = require('../../third_party/cesium/Source/Core/defineProperties');
 var knockout = require('../../third_party/cesium/Source/ThirdParty/knockout');
+var defined = require('../../third_party/cesium/Source/Core/defined');
 
 var AbsCode = function(name, value) {
     /**
@@ -39,7 +40,14 @@ var AbsCode = function(name, value) {
     this.isActive = false;
     this.isCode = true;
 
-    knockout.track(this, ['name', 'code', 'items', 'isOpen', 'isActive', 'isCode']);
+    /**
+     * Function to call if isActive state is changed.
+     * This property is observable.
+     * @type {Function}
+     */
+    this.updateFunction = undefined;
+
+    knockout.track(this, ['name', 'code', 'items', 'isOpen', 'isActive', 'isCode', 'updateFunction']);
 };
 
 defineProperties(AbsCode.prototype, {
@@ -66,8 +74,11 @@ AbsCode.prototype.toggleOpen = function() {
 /**
  * Toggles the {@link AbsCode#isActive} property.
  */
-AbsCode.prototype.toggleActive = function() {
+AbsCode.prototype.toggleActive = function(test) {
     this.isActive = !this.isActive;
+    if (defined(this.updateFunction)) {
+        this.updateFunction();
+    }
 };
 
 module.exports = AbsCode;

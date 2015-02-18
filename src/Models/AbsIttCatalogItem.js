@@ -179,9 +179,10 @@ AbsIttCatalogItem.prototype._load = function() {
                         var parentCode = defined(parent.code) ? parent.code : '';
                         if (codes[i].parentCode === parentCode) {
                             var absCode = new AbsCode(codes[i].description, codes[i].code);
-                            if (activeCnt-- > 0) {
+                            if (activeCnt-- === 0) {
                                 absCode.isActive = true;
                             }
+                            absCode.updateFunction = function() { updateAbsResults(that); };
                             parent.items.push(absCode);
                             addTree(absCode, codes);
                         }
@@ -263,7 +264,7 @@ AbsIttCatalogItem.prototype._hide = function() {
 };
 
 AbsIttCatalogItem.prototype.helloWorld = function() {
-    console.log('hellow world');
+    console.log('hello world');
 };
 
 function cleanAndProxyUrl(application, url) {
@@ -316,7 +317,7 @@ function updateAbsResults(absItem) {
         if (activeCodes[f].length === 0) {
             console.log('Error: Each concept must have at least one code selected.');
             absItem._csvCatalogItem.data = '';
-            return absItem._csvCatalogItem.load();
+            absItem._csvCatalogItem._rebuild();
         }
     }
 
@@ -341,14 +342,26 @@ function updateAbsResults(absItem) {
         absItem.queryList = [];
     }
 
+    function getQueryDataIndex(url) {
+        for (var i = 0; i < absItem.queryList.length; i++) {
+            if (absItem.queryList[i].url === url) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    var currentQueryList = [];
     var loadFunc = function(url) {
-        if (defined(absItem.queryList[url])) {
+        if (getQueryDataIndex(url) !== -1) {
             return;
         }
         return loadText(url).then(function(text) {
-            absItem.queryList[url] =  $.csv.toArrays(text, {
+            var result = {url: url};
+            result.data = $.csv.toArrays(text, {
                 onParseValue: $.csv.hooks.castToScalar
             });
+            absItem.queryList.push(result);
         });
     };
 
@@ -367,6 +380,8 @@ function updateAbsResults(absItem) {
 
         var url = baseUrl + '?' + objectToQuery(parameters);
 
+        currentQueryList.push(url);
+
         promises.push(loadFunc(url));
     }
 
@@ -374,19 +389,20 @@ function updateAbsResults(absItem) {
         //When promises all done then sum up date for final csv
         // could also add or remove other fields
         var finalCsvArray;
-        for (var url in absItem.queryList) {
-            if (absItem.queryList.hasOwnProperty(url)) {
-                var valDest;
-                if (!defined(finalCsvArray)) {
-                    finalCsvArray = absItem.queryList[url].slice();
-                    valDest = finalCsvArray[0].indexOf('Value');
-                }
-                else {
-                    var csvArray = absItem.queryList[url];
-                    var valOrig = csvArray[0].indexOf('Value');
-                    for (var i = 1; i < csvArray.length; i++) {
-                        finalCsvArray[i][1] += csvArray[i][valOrig];
-                    }
+        for (var i = 0; i < currentQueryList.length; i++) {
+            var ndx = getQueryDataIndex(currentQueryList[i]);
+            var valDest;
+            if (!defined(finalCsvArray)) {
+                finalCsvArray = absItem.queryList[ndx].data.map(function(arr) {
+                    return arr.slice();
+                });
+                valDest = finalCsvArray[0].indexOf('Value');
+            }
+            else {
+                var csvArray = absItem.queryList[ndx].data;
+                var valOrig = csvArray[0].indexOf('Value');
+                for (var i = 1; i < csvArray.length; i++) {
+                    finalCsvArray[i][valDest] += csvArray[i][valOrig];
                 }
             }
             //TODO: if percentage change value to value/total?
@@ -410,7 +426,11 @@ function updateAbsResults(absItem) {
         // Rename the 'REGION' column to the region type and display region mapping
         text = text.replace(',REGION,', ',' + absItem.regionType + ',');
         absItem._csvCatalogItem.data = text;
-        return absItem._csvCatalogItem.load();
+        if (absItem._csvCatalogItem.isShown) {
+            return absItem._csvCatalogItem._rebuild();
+        } else {
+            return absItem._csvCatalogItem.load();
+        }
     });
 }
 

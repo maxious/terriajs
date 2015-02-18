@@ -339,7 +339,11 @@ CsvCatalogItem.prototype._hideInLeaflet = function() {
 CsvCatalogItem.prototype._rebuild = function() {
     if (defined(this.application.cesium)) {
         this._hideInCesium();
-        this._showInCesium();
+        var that = this;
+        return when(this.load()).then(function () {
+            that._showInCesium();
+            that.application.currentViewer.notifyRepaintRequired();
+        });
     }
     else {
         this._hideInLeaflet();
@@ -378,7 +382,6 @@ a region mapping column.'
             else {
                 csvItem.legendUrl = csvItem._tableDataSource.getLegendGraphic();
                 csvItem.application.currentViewer.notifyRepaintRequired();
-
             }
         });
     }

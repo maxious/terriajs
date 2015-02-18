@@ -1,17 +1,17 @@
 <script type="text/html" id="now-viewing-abs-item-template">
     <tr>
-        <td class="now-viewing-abs-properties-name-cell" data-bind="click: toggleOpen, css: 'now-viewing-abs-properties-level' + ($parents.length-1) + (hasChildren ? ' now-viewing-abs-properties-parent' : '')">
+        <td class="now-viewing-abs-properties-name-cell" data-bind="css: 'now-viewing-abs-properties-level' + ($parents.length-1) + (hasChildren ? ' now-viewing-abs-properties-parent' : '')">
             <!-- ko if: hasChildren && isOpen -->
-            <div class="now-viewing-abs-properties-arrow" data-bind="cesiumSvgPath: { path: $root.svgArrowDown, width: 32, height: 32 }"></div>
+            <div class="now-viewing-abs-properties-arrow" data-bind="click: toggleOpen, cesiumSvgPath: { path: $root.svgArrowDown, width: 32, height: 32 }"></div>
             <!-- /ko -->
             <!-- ko if: hasChildren && !isOpen -->
-            <div class="now-viewing-abs-properties-arrow" data-bind="cesiumSvgPath: { path: $root.svgArrowRight, width: 32, height: 32 }"></div>
+            <div class="now-viewing-abs-properties-arrow" data-bind="click: toggleOpen, cesiumSvgPath: { path: $root.svgArrowRight, width: 32, height: 32 }"></div>
             <!-- /ko -->
             <!-- ko if: !hasChildren -->
             <div class="now-viewing-abs-properties-arrow"></div>
             <!-- /ko -->
             <!-- ko if: isCode -->
-             <div class="now-viewing-abs-icon clickable" data-bind="click: toggleActive, cesiumSvgPath: { path: isActive ? $root.svgCheckboxChecked : $root.svgCheckboxUnchecked, width: 32, height: 32 }, css: { 'now-viewing-shown-item': isActive }"></div>
+             <div class="now-viewing-abs-icon clickable" data-bind="click: toggleActive, cesiumSvgPath: { path: isActive ? $root.svgCheckboxChecked : $root.svgCheckboxUnchecked, width: 32, height: 32 }"></div>
             <!-- /ko -->
             <div class="now-viewing-abs-properties-name" data-bind="text: name"></div>
         </td>
