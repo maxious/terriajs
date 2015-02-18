@@ -240,7 +240,6 @@ sending an email to <a href="mailto:nationalmap@lists.nicta.com.au">nationalmap@
 
 AbsIttCatalogItem.prototype._enable = function() {
     if (defined(this._csvCatalogItem)) {
-        this.legendUrl = this._csvCatalogItem.legendUrl;
         this._csvCatalogItem._enable();
     }
 };
@@ -253,7 +252,6 @@ AbsIttCatalogItem.prototype._disable = function() {
 
 AbsIttCatalogItem.prototype._show = function() {
     if (defined(this._csvCatalogItem)) {
-        this.legendUrl = this._csvCatalogItem.legendUrl;
         this._csvCatalogItem._show();
     }
 };
@@ -311,15 +309,22 @@ function updateAbsResults(absItem) {
     }
 
     //check that we can create valid filters
+    var bValidSelection = true;
     for (var f = 0; f < absItem._absDataset.items.length; f++) {
         var concept = absItem._absDataset.items[f];
         activeCodes[f] = [];
         appendActiveCodes(concept, f, concept.name);
         if (activeCodes[f].length === 0) {
-            console.log('Error: Each concept must have at least one code selected.');
-            absItem._csvCatalogItem.data = '';
-            absItem._csvCatalogItem._rebuild();
+            bValidSelection = false;
+            break;
         }
+    }
+    if (!bValidSelection) {
+        console.log('No display because each concept must have at least one code selected.');
+        return when(absItem._csvCatalogItem.dynamicUpdate('')).then(function() {
+            absItem.legendUrl = '';
+            absItem.application.currentViewer.notifyRepaintRequired();
+       });
     }
 
     //build filters from activeCodes
@@ -426,14 +431,10 @@ function updateAbsResults(absItem) {
 
         // Rename the 'REGION' column to the region type and display region mapping
         text = text.replace(',REGION,', ',' + absItem.regionType + ',');
-        absItem._csvCatalogItem.data = text;
-        if (defined(absItem._csvCatalogItem._tableDataSource)) {
-            return when(absItem._csvCatalogItem._rebuild()).then(function() {
-                absItem.legendUrl = absItem._csvCatalogItem.legendUrl;
-            });
-        } else {
-            return absItem._csvCatalogItem.load();
-        }
+        return when(absItem._csvCatalogItem.dynamicUpdate(text)).then(function() {
+            absItem.legendUrl = absItem._csvCatalogItem.legendUrl;
+            absItem.application.currentViewer.notifyRepaintRequired();
+        });
     });
 }
 

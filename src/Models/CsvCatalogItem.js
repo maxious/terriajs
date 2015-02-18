@@ -339,15 +339,37 @@ CsvCatalogItem.prototype._hideInLeaflet = function() {
 CsvCatalogItem.prototype._rebuild = function() {
     if (defined(this.application.cesium)) {
         this._hideInCesium();
-        var that = this;
-        return when(this.load()).then(function () {
-            that._showInCesium();
-            that.application.currentViewer.notifyRepaintRequired();
-        });
-    }
-    else {
+        this._showInCesium();
+    } else {
         this._hideInLeaflet();
         this._showInLeaflet();
+    }
+};
+
+CsvCatalogItem.prototype.dynamicUpdate = function(text) {
+    this.data = text;
+    var that = this;
+
+    if (defined(this._tableDataSource)) {
+        if (defined(this.application.cesium)) {
+            if (defined(this._imageryLayer)) {
+                this._hideInCesium();
+            }
+            return when(this.load()).then(function () {
+                that._showInCesium();
+            });
+        }
+        else {
+            if (defined(this._imageryLayer)) {
+                this._hideInLeaflet();
+            }
+            return when(this.load()).then(function () {
+                that._showInLeaflet();
+            });
+        }
+    }
+    else if (text.length > 0) {
+        return this.load();
     }
 };
 
