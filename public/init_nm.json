@@ -12,49 +12,6 @@
     "services": [],
     "catalog": [
         {
-            "name": "Australian Bureau of Statistics",
-            "type": "group",
-            "items": [
-                {
-                    "name": "Type of educational institution",
-                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
-                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
-                    "rectangle": [
-                        "112.93529999999998",
-                        "-38.208809999082796",
-                        "152.06206",
-                        "-11.05104999964455"
-                    ],
-                    "type": "abs-itt",
-                    "url": "http://stat.abs.gov.au/itt/query.jsp",
-                    "dataSetID": "ABS_CENSUS2011_B15",
-                    "regionType": "SA4"
-                },
-                {
-                    "name": "ABS Data Sets",
-                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
-                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
-                    "rectangle": [
-                        "112.93529999999998",
-                        "-38.208809999082796",
-                        "152.06206",
-                        "-11.05104999964455"
-                    ],
-                    "type": "abs-itt-dataset-list",
-                    "url": "http://stat.abs.gov.au/itt/query.jsp",
-                    "regionType": "SA4",
-                    "blacklist": {
-                        "?LGA": true,
-                        "?SA1": true,
-                        "?GCCSA": true,
-                        "Aboriginal and Torres Strait Islander Population Projections, Remoteness Area": true,
-                        "Annual Turnover Size Ranges": true,
-                        "Tourist Accommodation": true
-                    }
-                }
-            ]
-        },
-        {
             "name": "National Data Sets",
             "type": "group",
             "items": [
@@ -2526,6 +2483,154 @@
             "blacklist": {
                 "Rainforests (EVC_2005)": true
             }
+        },
+        {
+            "name": "Australian Bureau of Statistics",
+            "type": "group",
+            "items": [
+                {
+                    "name": "Type of educational institution",
+                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
+                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
+                    "rectangle": [
+                        "112.93529999999998",
+                        "-38.208809999082796",
+                        "152.06206",
+                        "-11.05104999964455"
+                    ],
+                    "type": "abs-itt",
+                    "url": "http://stat.abs.gov.au/itt/query.jsp",
+                    "dataSetID": "ABS_CENSUS2011_B15",
+                    "regionType": "SA4"
+                },
+                {
+                    "name": "Total Personal Income (weekly)",
+                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
+                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
+                    "rectangle": [
+                        "112.93529999999998",
+                        "-38.208809999082796",
+                        "152.06206",
+                        "-11.05104999964455"
+                    ],
+                    "type": "abs-itt",
+                    "url": "http://stat.abs.gov.au/itt/query.jsp",
+                    "dataSetID": "ABS_CENSUS2011_B17",
+                    "regionType": "SA4"
+                },
+                {
+                    "name": "Volunteer Work",
+                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
+                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
+                    "rectangle": [
+                        "112.93529999999998",
+                        "-38.208809999082796",
+                        "152.06206",
+                        "-11.05104999964455"
+                    ],
+                    "type": "abs-itt",
+                    "url": "http://stat.abs.gov.au/itt/query.jsp",
+                    "dataSetID": "ABS_CENSUS2011_B19",
+                    "regionType": "SA4"
+                },
+                {
+                    "name": "Occupation",
+                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
+                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
+                    "rectangle": [
+                        "112.93529999999998",
+                        "-38.208809999082796",
+                        "152.06206",
+                        "-11.05104999964455"
+                    ],
+                    "type": "abs-itt",
+                    "url": "http://stat.abs.gov.au/itt/query.jsp",
+                    "dataSetID": "ABS_CENSUS2011_B45",
+                    "regionType": "SA4"
+                },
+                {
+                    "name": "Age",
+                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
+                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
+                    "rectangle": [
+                        "112.93529999999998",
+                        "-38.208809999082796",
+                        "152.06206",
+                        "-11.05104999964455"
+                    ],
+                    "type": "abs-itt",
+                    "url": "http://stat.abs.gov.au/itt/query.jsp",
+                    "dataSetID": "ABS_CENSUS2011_B04",
+                    "regionType": "SA4"
+                },
+                {
+                    "name": "Country of Birth",
+                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
+                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
+                    "rectangle": [
+                        "112.93529999999998",
+                        "-38.208809999082796",
+                        "152.06206",
+                        "-11.05104999964455"
+                    ],
+                    "type": "abs-itt",
+                    "url": "http://stat.abs.gov.au/itt/query.jsp",
+                    "dataSetID": "ABS_CENSUS2011_B09",
+                    "regionType": "SA4"
+                },
+                {
+                    "name": "Rent (weekly)",
+                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
+                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
+                    "rectangle": [
+                        "112.93529999999998",
+                        "-38.208809999082796",
+                        "152.06206",
+                        "-11.05104999964455"
+                    ],
+                    "type": "abs-itt",
+                    "url": "http://stat.abs.gov.au/itt/query.jsp",
+                    "dataSetID": "ABS_CENSUS2011_B34",
+                    "regionType": "SA4"
+                },
+                {
+                    "name": "Type of Internet Connection",
+                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
+                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
+                    "rectangle": [
+                        "112.93529999999998",
+                        "-38.208809999082796",
+                        "152.06206",
+                        "-11.05104999964455"
+                    ],
+                    "type": "abs-itt",
+                    "url": "http://stat.abs.gov.au/itt/query.jsp",
+                    "dataSetID": "ABS_CENSUS2011_B35",
+                    "regionType": "SA4"
+                },
+                {
+                    "name": "ABS Data Sets",
+                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
+                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
+                    "rectangle": [
+                        "112.93529999999998",
+                        "-38.208809999082796",
+                        "152.06206",
+                        "-11.05104999964455"
+                    ],
+                    "type": "abs-itt-dataset-list",
+                    "url": "http://stat.abs.gov.au/itt/query.jsp",
+                    "regionType": "SA4",
+                    "blacklist": {
+                        "?LGA": true,
+                        "?SA1": true,
+                        "?GCCSA": true,
+                        "Aboriginal and Torres Strait Islander Population Projections, Remoteness Area": true,
+                        "Annual Turnover Size Ranges": true,
+                        "Tourist Accommodation": true
+                    }
+                }
+            ]
         },
         {
             "name": "Data Providers",
