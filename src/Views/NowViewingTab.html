@@ -66,11 +66,11 @@
                 <div class="now-viewing-legend-text">No legend available for this data item.</div>
                 <!-- /ko -->
                 
-                <!-- ko if: absDataset -->
-                <div class="now-viewing-abs-section" data-bind="if: type === 'abs-itt'">
+                <!-- ko if: type === 'abs-itt' -->
+                <div class="now-viewing-abs-section">
                     <h2>ABS Data Selection</h2>
                     <div class="now-viewing-abs-table">
-                        <!-- ko if: absDataset.items -->
+                        <!-- ko if: absDataset && absDataset.items -->
                         <table data-bind="template: { name: 'now-viewing-abs-item-template', foreach: absDataset.items }">
                         </table>
                         <!-- /ko -->
