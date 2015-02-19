@@ -489,10 +489,10 @@ var regionWmsMap = {
         "regionProp": "LGA_CODE11",
         "aliases": ['lga']
     },
-    'SCC': {
+    'SSC': {
         "name":"region_map:FID_SCC_2011_AUST",
-        "regionProp": "SCC_CODE",
-        "aliases": ['scc', 'suburb']
+        "regionProp": "SSC_CODE",
+        "aliases": ['ssc', 'suburb']
     },
     'SA4': {
         "name":"region_map:FID_SA4_2011_AUST",
