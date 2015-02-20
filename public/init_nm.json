@@ -2489,6 +2489,28 @@
             "type": "group",
             "items": [
                 {
+                    "name": "ABS Data Sets",
+                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
+                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
+                    "rectangle": [
+                        "112.93529999999998",
+                        "-38.208809999082796",
+                        "152.06206",
+                        "-11.05104999964455"
+                    ],
+                    "type": "abs-itt-dataset-list",
+                    "url": "http://stat.abs.gov.au/itt/query.jsp",
+                    "regionType": "SA4",
+                    "blacklist": {
+                        "?LGA": true,
+                        "?SA1": true,
+                        "?GCCSA": true,
+                        "Aboriginal and Torres Strait Islander Population Projections, Remoteness Area": true,
+                        "Annual Turnover Size Ranges": true,
+                        "Tourist Accommodation": true
+                    }
+                },
+                {
                     "name": "Type of educational institution",
                     "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
                     "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
@@ -2609,7 +2631,7 @@
                     "regionType": "SA4"
                 },
                 {
-                    "name": "ABS Data Sets",
+                    "name": "Selected Person Characteristics",
                     "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
                     "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
                     "rectangle": [
@@ -2618,17 +2640,10 @@
                         "152.06206",
                         "-11.05104999964455"
                     ],
-                    "type": "abs-itt-dataset-list",
+                    "type": "abs-itt",
                     "url": "http://stat.abs.gov.au/itt/query.jsp",
-                    "regionType": "SA4",
-                    "blacklist": {
-                        "?LGA": true,
-                        "?SA1": true,
-                        "?GCCSA": true,
-                        "Aboriginal and Torres Strait Islander Population Projections, Remoteness Area": true,
-                        "Annual Turnover Size Ranges": true,
-                        "Tourist Accommodation": true
-                    }
+                    "dataSetID": "ABS_CENSUS2011_B01",
+                    "regionType": "SA4"
                 }
             ]
         },

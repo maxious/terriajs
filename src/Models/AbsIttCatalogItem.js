@@ -173,14 +173,14 @@ AbsIttCatalogItem.prototype._load = function() {
                 var codes = json.codes;
 
                 function absCodeUpdate() { updateAbsResults(that); }
-                var activeCnt = 1;
+                var initActive = 1;
                 function addTree(parent, codes) {
                     // Skip the last code, it's just the name of the dataset.
                     for (var i = 0; i < codes.length - 1; ++i) {
                         var parentCode = defined(parent.code) ? parent.code : '';
                         if (codes[i].parentCode === parentCode) {
                             var absCode = new AbsCode(codes[i].description, codes[i].code);
-                            if (activeCnt-- === 0) {
+                            if (initActive-- > 0) {
                                 absCode.isActive = true;
                             }
                             absCode.updateFunction = absCodeUpdate;
