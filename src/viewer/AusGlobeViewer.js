@@ -1039,6 +1039,9 @@ function selectFeatureLeaflet(viewer, latlng) {
     var promises = [];
     for (var i = 0; i < dataSources.length ; ++i) {
         var dataSource = dataSources[i];
+        if (dataSource.type === 'abs-itt') {
+            dataSource = dataSource._csvCatalogItem;
+        }
         if (dataSource.type === 'wms' || (dataSource.type === 'csv' && defined(dataSource.layers))) {
             var useProxy = corsProxy.shouldUseProxy(dataSource.url);
             promises.push(getWmsFeatureInfo(dataSource.url, useProxy, dataSource.layers, 
