@@ -693,9 +693,13 @@ function addRegionMap(csvItem) {
     if (!(csvItem._tableDataSource instanceof TableDataSource)) {
         return;
     }
-    //see if we can do region mapping
+
     var dataSource = csvItem._tableDataSource;
     var dataset = dataSource.dataset;
+    csvItem.colorFunc = function(id) { return [0,0,0,0]; };
+    if (dataset.rowCount === 0) {
+        return;
+    }
 
     //if csvItem includes style/var info then use that
     if (!defined(csvItem.style) || !defined(csvItem.style.table)) {
