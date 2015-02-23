@@ -123,8 +123,22 @@ defineProperties(AbsIttCatalogItem.prototype, {
             result.serviceErrorMessage = 'This service does not have any details available.';
             return result;
         }
-    }
+    },
 
+    /**
+     * Gets the Cesium or Leaflet imagery layer object associated with this data source.
+     * This property is undefined if the data source is not enabled.
+     * @memberOf CsvCatalogItem.prototype
+     * @type {Object}
+     */
+    imageryLayer : {
+        get : function() {
+            if (defined(this._csvCatalogItem)) {
+                return this._csvCatalogItem.imageryLayer;
+            }
+            return undefined;
+        }
+    }
 });
 
 AbsIttCatalogItem.prototype._getValuesThatInfluenceLoad = function() {
@@ -260,10 +274,6 @@ AbsIttCatalogItem.prototype._hide = function() {
     if (defined(this._csvCatalogItem)) {
         this._csvCatalogItem._hide();
     }
-};
-
-AbsIttCatalogItem.prototype.helloWorld = function() {
-    console.log('hello world');
 };
 
 function cleanAndProxyUrl(application, url) {
