@@ -369,7 +369,7 @@ function updateAbsResults(absItem) {
             var node = parent.items[i];
             //don't do children if parent active since it's a total
             if (node.isActive) {
-                activeCodes[idxConcept].push(conceptName + '.' + node.code);
+                activeCodes[idxConcept].push({filter: conceptName + '.' + node.code, name: node.name});
             }
             else {
                 appendActiveCodes(node, idxConcept, conceptName);
@@ -398,18 +398,22 @@ function updateAbsResults(absItem) {
 
     //build filters from activeCodes
     var queryFilters = [];
-    function buildQueryFilters(idxConcept, filterIn) {
+    var queryNames = [];
+    function buildQueryFilters(idxConcept, filterIn, nameIn) {
         for (var i = 0; i < activeCodes[idxConcept].length; i++) {
             var filter = filterIn.slice();
-            filter.push(activeCodes[idxConcept][i]);
+            filter.push(activeCodes[idxConcept][i].filter);
+            var name = nameIn.slice();
+            name.push(activeCodes[idxConcept][i].name);
             if (idxConcept+1 === activeCodes.length) {
                 queryFilters.push(filter);
+                queryNames.push(name);
             } else {
-                buildQueryFilters(idxConcept+1, filter);
+                buildQueryFilters(idxConcept+1, filter, name);
             }
         }
     }
-    buildQueryFilters(0, []);
+    buildQueryFilters(0, [], []);
 
 
     //build abs itt api urls and load the text for each
@@ -427,12 +431,12 @@ function updateAbsResults(absItem) {
     }
 
     var currentQueryList = [];
-    var loadFunc = function(url) {
+    var loadFunc = function(url, name) {
         if (getQueryDataIndex(url) !== -1) {
             return;
         }
         return loadText(url).then(function(text) {
-            var result = {url: url};
+            var result = {url: url, name: name};
             result.data = $.csv.toArrays(text, {
                 onParseValue: $.csv.hooks.castToScalar
             });
@@ -452,40 +456,44 @@ function updateAbsResults(absItem) {
             or: 'REGION',
             format: 'csv'
         };
-
         var url = baseUrl + '?' + objectToQuery(parameters);
 
-        currentQueryList.push(url);
+        var name = queryNames[i].join(' ');
 
-        promises.push(loadFunc(url));
+        currentQueryList.push(url);  //remember for this specific dataset
+
+        promises.push(loadFunc(url, name));
     }
 
     return when.all(promises).then( function(results) {
         //When promises all done then sum up date for final csv
         var finalCsvArray;
+        var colAdd = [false,true,true,true];
+        function filterRow(arr) {
+            var newRow = [];
+            arr.map(function (val, c) {
+                if (colAdd[c]) {
+                    newRow.push(val);
+                }
+            });
+            return newRow;
+        }                
         for (var i = 0; i < currentQueryList.length; i++) {
             var ndx = getQueryDataIndex(currentQueryList[i]);
+            var csvArray = absItem.queryList[ndx].data;
             var valDest;
             if (!defined(finalCsvArray)) {
-                var colAdd = [false,true,true,true];
-                finalCsvArray = absItem.queryList[ndx].data.map(function(arr) {
-                    var newRow = [];
-                    arr.map(function (val, c) {
-                        if (colAdd[c]) {
-                            newRow.push(val);
-                        }
-                    });
-                    return newRow;
-                });
+                finalCsvArray = csvArray.map(filterRow);
                 valDest = finalCsvArray[0].indexOf('Value');
                 finalCsvArray[0][valDest] = 'Total';
                 var idxRgn = finalCsvArray[0].indexOf('REGION');
                 finalCsvArray[0][idxRgn] = absItem.regionType;
             }
-            else {
-                var csvArray = absItem.queryList[ndx].data;
-                var valOrig = csvArray[0].indexOf('Value');
-                for (var n = 1; n < csvArray.length; n++) {
+            var valOrig = csvArray[0].indexOf('Value');
+            finalCsvArray[0].push(absItem.queryList[ndx].name);
+            for (var n = 1; n < csvArray.length; n++) {
+                finalCsvArray[n].push(csvArray[n][valOrig]);
+                if (i > 0) {
                     finalCsvArray[n][valDest] += csvArray[n][valOrig];
                 }
             }
