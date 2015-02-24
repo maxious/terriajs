@@ -462,16 +462,25 @@ function updateAbsResults(absItem) {
 
     return when.all(promises).then( function(results) {
         //When promises all done then sum up date for final csv
-        // could also add or remove other fields
         var finalCsvArray;
         for (var i = 0; i < currentQueryList.length; i++) {
             var ndx = getQueryDataIndex(currentQueryList[i]);
             var valDest;
             if (!defined(finalCsvArray)) {
+                var colAdd = [false,true,true,true];
                 finalCsvArray = absItem.queryList[ndx].data.map(function(arr) {
-                    return arr.slice();
+                    var newRow = [];
+                    arr.map(function (val, c) {
+                        if (colAdd[c]) {
+                            newRow.push(val);
+                        }
+                    });
+                    return newRow;
                 });
                 valDest = finalCsvArray[0].indexOf('Value');
+                finalCsvArray[0][valDest] = 'Total';
+                var idxRgn = finalCsvArray[0].indexOf('REGION');
+                finalCsvArray[0][idxRgn] = absItem.regionType;
             }
             else {
                 var csvArray = absItem.queryList[ndx].data;
@@ -483,23 +492,11 @@ function updateAbsResults(absItem) {
             //TODO: if percentage change value to value/total?
         }
         //Serialize the arrays
-        var text = '';
-        var colNum = finalCsvArray[0].length;
-        var rowNum = finalCsvArray.length;
-        for (var r = 0; r < finalCsvArray.length; r++) {
-            for (var c = 0; c < colNum; c++) {
-                text += finalCsvArray[r][c];
-                if (c <  colNum-1) {
-                    text += ',';
-                }
-            }
-            if (r <  rowNum-1) {
-                text += '\n';
-            }
-        }
+        var joinedRows = finalCsvArray.map(function(arr) {
+            return arr.join(',');
+        });
+        var text = joinedRows.join('\n');
 
-        // Rename the 'REGION' column to the region type and display region mapping
-        text = text.replace(',REGION,', ',' + absItem.regionType + ',');
         return when(absItem._csvCatalogItem.dynamicUpdate(text)).then(function() {
             absItem.legendUrl = absItem._csvCatalogItem.legendUrl;
             absItem.application.currentViewer.notifyRepaintRequired();
