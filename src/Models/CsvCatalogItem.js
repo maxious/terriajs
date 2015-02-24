@@ -2,11 +2,13 @@
 
 /*global require,L,$*/
 
+var clone = require('../../third_party/cesium/Source/Core/clone');
 var combine = require('../../third_party/cesium/Source/Core/combine');
 var defaultValue = require('../../third_party/cesium/Source/Core/defaultValue');
 var defined = require('../../third_party/cesium/Source/Core/defined');
 var defineProperties = require('../../third_party/cesium/Source/Core/defineProperties');
 var DeveloperError = require('../../third_party/cesium/Source/Core/DeveloperError');
+var freezeObject = require('../../third_party/cesium/Source/Core/freezeObject');
 var knockout = require('../../third_party/cesium/Source/ThirdParty/knockout');
 var loadText = require('../../third_party/cesium/Source/Core/loadText');
 var when = require('../../third_party/cesium/Source/ThirdParty/when');
@@ -69,7 +71,19 @@ var CsvCatalogItem = function(application, url) {
      */
     this.colorByValue = true;
 
-    knockout.track(this, ['url', 'data', 'dataSourceUrl', 'colorByValue']);
+    /**
+     * Gets or sets the opacity (alpha) of the data item, where 0.0 is fully transparent and 1.0 is
+     * fully opaque.  This property is observable.
+     * @type {Number}
+     * @default 0.6
+     */
+    this.opacity = 0.6;
+
+    knockout.track(this, ['url', 'data', 'dataSourceUrl', 'colorByValue', 'opacity']);
+
+    knockout.getObservable(this, 'opacity').subscribe(function(newValue) {
+        updateOpacity(this);
+    }, this);
 };
 
 inherit(CatalogItem, CsvCatalogItem);
@@ -125,6 +139,17 @@ defineProperties(CsvCatalogItem.prototype, {
     },
 
     /**
+     * Gets a value indicating whether the opacity of this data source can be changed.
+     * @memberOf ImageryLayerCatalogItem.prototype
+     * @type {Boolean}
+     */
+    supportsOpacity : {
+        get : function() {
+            return this._regionMapped;
+        }
+    },
+
+    /**
      * Gets the Cesium or Leaflet imagery layer object associated with this data source.
      * This property is undefined if the data source is not enabled.
      * @memberOf CsvCatalogItem.prototype
@@ -134,8 +159,30 @@ defineProperties(CsvCatalogItem.prototype, {
         get : function() {
             return this._imageryLayer;
         }
+    },
+    
+    /**
+     * Gets the set of names of the properties to be serialized for this object when {@link CatalogMember#serializeToJson} is called
+     * and the `serializeForSharing` flag is set in the options.
+     * @memberOf ImageryLayerCatalogItem.prototype
+     * @type {String[]}
+     */
+    propertiesForSharing : {
+        get : function() {
+            return CsvCatalogItem.defaultPropertiesForSharing;
+        }
     }
 });
+
+/**
+ * Gets or sets the default set of properties that are serialized when serializing a {@link CatalogItem}-derived object with the
+ * `serializeForSharing` flag set in the options.
+ * @type {String[]}
+ */
+CsvCatalogItem.defaultPropertiesForSharing = clone(CatalogItem.defaultPropertiesForSharing);
+CsvCatalogItem.defaultPropertiesForSharing.push('opacity');
+freezeObject(CsvCatalogItem.defaultPropertiesForSharing);
+
 
 CsvCatalogItem.prototype._getValuesThatInfluenceLoad = function() {
     return [this.url, this.data, this.colorByValue];
@@ -243,7 +290,7 @@ CsvCatalogItem.prototype._showInCesium = function() {
             });
         };
 
-        this._imageryLayer = new ImageryLayer(imageryProvider, {alpha : 0.6} );
+        this._imageryLayer = new ImageryLayer(imageryProvider, {alpha : this.opacity} );
 
         scene.imageryLayers.add(this._imageryLayer);
 
@@ -291,7 +338,7 @@ CsvCatalogItem.prototype._showInLeaflet = function() {
         
         var options = {
             layers : this.layers,
-            opacity : 0.6
+            opacity : this.opacity
         };
         options = combine(defaultValue(WebMapServiceCatalogItem.defaultParameters), options);
 
@@ -382,6 +429,20 @@ function proxyUrl(application, url) {
 }
 
 
+
+function updateOpacity(csvItem) {
+    if (defined(csvItem._imageryLayer)) {
+        if (defined(csvItem._imageryLayer.alpha)) {
+            csvItem._imageryLayer.alpha = csvItem.opacity;
+        }
+
+        if (defined(csvItem._imageryLayer.setOpacity)) {
+            csvItem._imageryLayer.setOpacity(csvItem.opacity);
+        }
+
+        csvItem.application.currentViewer.notifyRepaintRequired();
+    }
+}
 
 //////////////////////////////////////////////////////////////////////////
 

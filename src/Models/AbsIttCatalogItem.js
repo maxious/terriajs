@@ -2,8 +2,10 @@
 
 /*global require,URI,$*/
 
+var clone = require('../../third_party/cesium/Source/Core/clone');
 var defined = require('../../third_party/cesium/Source/Core/defined');
 var defineProperties = require('../../third_party/cesium/Source/Core/defineProperties');
+var freezeObject = require('../../third_party/cesium/Source/Core/freezeObject');
 var knockout = require('../../third_party/cesium/Source/ThirdParty/knockout');
 var objectToQuery = require('../../third_party/cesium/Source/Core/objectToQuery');
 var loadJson = require('../../third_party/cesium/Source/Core/loadJson');
@@ -71,7 +73,15 @@ var AbsIttCatalogItem = function(application) {
      */
     this.filter = [];
 
-    knockout.track(this, ['url', 'dataSetID', 'regionType', 'filter', '_absDataset']);
+    /**
+     * Gets or sets the opacity (alpha) of the data item, where 0.0 is fully transparent and 1.0 is
+     * fully opaque.  This property is observable.
+     * @type {Number}
+     * @default 0.6
+     */
+    this.opacity = 0.6;
+
+    knockout.track(this, ['url', 'dataSetID', 'regionType', 'filter', '_absDataset', 'opacity']);
 
     delete this.__knockoutObservables.absDataset;
     knockout.defineProperty(this, 'absDataset', {
@@ -83,6 +93,9 @@ var AbsIttCatalogItem = function(application) {
         }
     });
 
+    knockout.getObservable(this, 'opacity').subscribe(function(newValue) {
+        this._csvCatalogItem.opacity = this.opacity;
+    }, this);
 };
 
 inherit(CatalogItem, AbsIttCatalogItem);
@@ -125,6 +138,29 @@ defineProperties(AbsIttCatalogItem.prototype, {
         }
     },
 
+
+    /**
+     * Gets a value indicating whether this data source, when enabled, can be reordered with respect to other data sources.
+     * Data sources that cannot be reordered are typically displayed above reorderable data sources.
+     * @memberOf CsvCatalogItem.prototype
+     * @type {Boolean}
+     */
+    supportsReordering : {
+        get : function() {
+            return true;
+        }
+    },
+    /**
+     * Gets a value indicating whether the opacity of this data source can be changed.
+     * @memberOf ImageryLayerCatalogItem.prototype
+     * @type {Boolean}
+     */
+    supportsOpacity : {
+        get : function() {
+            return true;
+        }
+    },
+
     /**
      * Gets the Cesium or Leaflet imagery layer object associated with this data source.
      * This property is undefined if the data source is not enabled.
@@ -138,8 +174,30 @@ defineProperties(AbsIttCatalogItem.prototype, {
             }
             return undefined;
         }
+    },
+
+    /**
+     * Gets the set of names of the properties to be serialized for this object when {@link CatalogMember#serializeToJson} is called
+     * and the `serializeForSharing` flag is set in the options.
+     * @memberOf ImageryLayerCatalogItem.prototype
+     * @type {String[]}
+     */
+    propertiesForSharing : {
+        get : function() {
+            return AbsIttCatalogItem.defaultPropertiesForSharing;
+        }
     }
 });
+
+/**
+ * Gets or sets the default set of properties that are serialized when serializing a {@link CatalogItem}-derived object with the
+ * `serializeForSharing` flag set in the options.
+ * @type {String[]}
+ */
+AbsIttCatalogItem.defaultPropertiesForSharing = clone(CatalogItem.defaultPropertiesForSharing);
+AbsIttCatalogItem.defaultPropertiesForSharing.push('opacity');
+freezeObject(AbsIttCatalogItem.defaultPropertiesForSharing);
+
 
 AbsIttCatalogItem.prototype._getValuesThatInfluenceLoad = function() {
     return [this.url, this.dataSetID, this.regionType, this.filter];
@@ -159,6 +217,7 @@ function skipConcept(concept) {
 
 AbsIttCatalogItem.prototype._load = function() {
     this._csvCatalogItem = new CsvCatalogItem(this.application);
+    this._csvCatalogItem.opacity = this.opacity;
 
     //call GetDatasetConcepts and then GetCodeListValue to build up a heirarchical tree
 
