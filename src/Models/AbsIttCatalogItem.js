@@ -240,7 +240,7 @@ AbsIttCatalogItem.prototype._load = function() {
     function getConceptName(id) {
         return defined(conceptNameMap[id]) ? conceptNameMap[id] : id;
     }
-    
+
     loadPromises[1] = loadJson(url).then(function(json) {
         concepts = json.concepts;
     });
@@ -250,9 +250,8 @@ AbsIttCatalogItem.prototype._load = function() {
 
         var promises = [];
 
-        var loadFunc = function(url, conceptID) {
+        var loadFunc = function(url, concept) {
             return loadJson(url).then(function(json) {
-                var concept = new AbsConcept(conceptID, getConceptName(conceptID));
                 that.absDataset.items.push(concept);
 
                 var codes = json.codes;
@@ -294,7 +293,8 @@ AbsIttCatalogItem.prototype._load = function() {
 
             var url = baseUrl + '?' + objectToQuery(parameters);
 
-            promises.push(loadFunc(url, conceptID));
+            var concept = new AbsConcept(conceptID, getConceptName(conceptID));
+            promises.push(loadFunc(url, concept));
         }
         return when.all(promises).then( function(results) {
 
@@ -493,7 +493,7 @@ function updateAbsResults(absItem) {
             }
             var valOrig = csvArray[0].indexOf('Value');
             finalCsvArray[0].push(absItem.queryList[ndx].name);
-            for (var n = 1; n < csvArray.length; n++) {
+            for (var n = 1; n < finalCsvArray.length; n++) {
                 finalCsvArray[n].push(csvArray[n][valOrig]);
                 if (i > 0) {
                     finalCsvArray[n][valDest] += csvArray[n][valOrig];
