@@ -6,18 +6,18 @@ var defineProperties = require('../../third_party/cesium/Source/Core/definePrope
 var knockout = require('../../third_party/cesium/Source/ThirdParty/knockout');
 var defined = require('../../third_party/cesium/Source/Core/defined');
 
-var AbsCode = function(name, value) {
+var AbsCode = function(code, name) {
+    /**
+     * Gets or sets the value of the abs code.
+     * @type {String}
+     */
+    this.code = code;
+
     /**
      * Gets or sets the name of the abs code.  This property is observable.
      * @type {String}
      */
     this.name = name;
-
-    /**
-     * Gets or sets the value of the abs code.
-     * @type {String}
-     */
-    this.code = value;
 
     /**
      * Gets the list of abs codes contained in this group.  This property is observable.

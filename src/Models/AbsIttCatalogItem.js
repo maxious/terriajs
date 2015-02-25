@@ -213,13 +213,12 @@ function skipConcept(concept) {
     return false;
 }
 
+
 //TODO: use region or regiontype concept to decide on region
 
 AbsIttCatalogItem.prototype._load = function() {
     this._csvCatalogItem = new CsvCatalogItem(this.application);
     this._csvCatalogItem.opacity = this.opacity;
-
-    //call GetDatasetConcepts and then GetCodeListValue to build up a heirarchical tree
 
     var baseUrl = cleanAndProxyUrl(this.application, this.url);
     var parameters = {
@@ -228,19 +227,29 @@ AbsIttCatalogItem.prototype._load = function() {
         format: 'json'
     };
 
-    this._absDataset = new AbsDataset();
-
     var that = this;
     var url = baseUrl + '?' + objectToQuery(parameters);
+    var loadPromises = [];
 
-    return loadJson(url).then(function(json) {
+    //cover for missing human readable name in api
+    var conceptNameMap;
+    loadPromises[0] = loadJson('data/abs_names.json').then(function(json) {
+        conceptNameMap = json;
+    });
+    function getConceptName(id) {
+        return defined(conceptNameMap[id]) ? conceptNameMap[id] : id;
+    }
+
+    //call GetDatasetConcepts and then GetCodeListValue to build up a heirarchical tree
+    this._absDataset = new AbsDataset();
+    loadPromises[1] = loadJson(url).then(function(json) {
         var concepts = json.concepts;
 
         var promises = [];
 
-        var loadFunc = function(url, conceptName) {
+        var loadFunc = function(url, conceptID) {
             return loadJson(url).then(function(json) {
-                var concept = new AbsConcept(conceptName);
+                var concept = new AbsConcept(conceptID, getConceptName(conceptID));
                 that.absDataset.items.push(concept);
 
                 var codes = json.codes;
@@ -250,9 +259,9 @@ AbsIttCatalogItem.prototype._load = function() {
                 function addTree(parent, codes) {
                     // Skip the last code, it's just the name of the dataset.
                     for (var i = 0; i < codes.length - 1; ++i) {
-                        var parentCode = defined(parent.code) ? parent.code : '';
+                        var parentCode = (parent instanceof AbsCode) ? parent.code : '';
                         if (codes[i].parentCode === parentCode) {
-                            var absCode = new AbsCode(codes[i].description, codes[i].code);
+                            var absCode = new AbsCode(codes[i].code, codes[i].description);
                             if (initActive-- > 0) {
                                 absCode.isActive = true;
                             }
@@ -267,22 +276,22 @@ AbsIttCatalogItem.prototype._load = function() {
         };
 
         for (var i = 0; i < concepts.length - 1; ++i) {
-            var concept = concepts[i];
+            var conceptID = concepts[i];
 
-            if (skipConcept(concept)) {
+            if (skipConcept(conceptID)) {
                 continue;
             }
 
             var parameters = {
                 method: 'GetCodeListValue',
                 datasetid: that.dataSetID,
-                concept: concept,
+                concept: conceptID,
                 format: 'json'
             };
 
             var url = baseUrl + '?' + objectToQuery(parameters);
 
-            promises.push(loadFunc(url, concept));
+            promises.push(loadFunc(url, conceptID));
         }
         return when.all(promises).then( function(results) {
 
@@ -309,6 +318,7 @@ problem with your internet connection.  Try opening the group again, and if the 
 sending an email to <a href="mailto:nationalmap@lists.nicta.com.au">nationalmap@lists.nicta.com.au</a>.</p>'
         });
     });
+    return when.all(loadPromises);
 };
 
 AbsIttCatalogItem.prototype._enable = function() {
@@ -364,15 +374,15 @@ function updateAbsResults(absItem) {
 
     //walk tree to get active codes
     var activeCodes = [];
-    function appendActiveCodes(parent, idxConcept, conceptName) {
+    function appendActiveCodes(parent, idxConcept, conceptCode) {
         for (var i = 0; i < parent.items.length; i++) {
             var node = parent.items[i];
             //don't do children if parent active since it's a total
             if (node.isActive) {
-                activeCodes[idxConcept].push({filter: conceptName + '.' + node.code, name: node.name});
+                activeCodes[idxConcept].push({filter: conceptCode + '.' + node.code, name: node.name});
             }
             else {
-                appendActiveCodes(node, idxConcept, conceptName);
+                appendActiveCodes(node, idxConcept, conceptCode);
             }
         }
     }
@@ -382,7 +392,7 @@ function updateAbsResults(absItem) {
     for (var f = 0; f < absItem._absDataset.items.length; f++) {
         var concept = absItem._absDataset.items[f];
         activeCodes[f] = [];
-        appendActiveCodes(concept, f, concept.name);
+        appendActiveCodes(concept, f, concept.code);
         if (activeCodes[f].length === 0) {
             bValidSelection = false;
             break;
@@ -398,7 +408,7 @@ function updateAbsResults(absItem) {
 
     //build filters from activeCodes
     var queryFilters = [];
-    var queryNames = [];
+    var queryNames = [];  //TODO: make an object?
     function buildQueryFilters(idxConcept, filterIn, nameIn) {
         for (var i = 0; i < activeCodes[idxConcept].length; i++) {
             var filter = filterIn.slice();
