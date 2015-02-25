@@ -30,7 +30,7 @@ var AbsCode = function(code, name) {
      * item is open, its child items (if any) are visible.  This property is observable.
      * @type {Boolean}
      */
-    this.isOpen = true;
+    this.isOpen = false;
 
     /**
      * Gets or sets a value indicating whether this abs code is currently active.  When a

@@ -29,7 +29,7 @@ var AbsConcept = function(code, name) {
      * item is open, its child items (if any) are visible.  This property is observable.
      * @type {Boolean}
      */
-    this.isOpen = false;
+    this.isOpen = true;
     this.isCode = false;
 
     knockout.track(this, ['code', 'name', 'items', 'isOpen', 'isCode']);

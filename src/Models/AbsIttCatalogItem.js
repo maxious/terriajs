@@ -226,24 +226,27 @@ AbsIttCatalogItem.prototype._load = function() {
         datasetid: this.dataSetID,
         format: 'json'
     };
+    var url = baseUrl + '?' + objectToQuery(parameters);
 
     var that = this;
-    var url = baseUrl + '?' + objectToQuery(parameters);
-    var loadPromises = [];
+    var concepts, conceptNameMap, loadPromises = [];
+
+    this._absDataset = new AbsDataset();
 
     //cover for missing human readable name in api
-    var conceptNameMap;
     loadPromises[0] = loadJson('data/abs_names.json').then(function(json) {
         conceptNameMap = json;
     });
     function getConceptName(id) {
         return defined(conceptNameMap[id]) ? conceptNameMap[id] : id;
     }
-
-    //call GetDatasetConcepts and then GetCodeListValue to build up a heirarchical tree
-    this._absDataset = new AbsDataset();
+    
     loadPromises[1] = loadJson(url).then(function(json) {
-        var concepts = json.concepts;
+        concepts = json.concepts;
+    });
+
+    return when.all(loadPromises).then(function() {
+        //call GetDatasetConcepts and then GetCodeListValue to build up a heirarchical tree
 
         var promises = [];
 
@@ -305,20 +308,9 @@ AbsIttCatalogItem.prototype._load = function() {
             sender: that,
             title: 'Group is not available',
             message: '\
-An error occurred while invoking GetCodeListValue on the ABS ITT server.  \
-<p>If you entered the link manually, please verify that the link is correct.</p>\
-<p>This error may also indicate that the server does not support <a href="http://enable-cors.org/" target="_blank">CORS</a>.  If this is your \
-server, verify that CORS is enabled and enable it if it is not.  If you do not control the server, \
-please contact the administrator of the server and ask them to enable CORS.  Or, contact the National \
-Map team by emailing <a href="mailto:nationalmap@lists.nicta.com.au">nationalmap@lists.nicta.com.au</a> \
-and ask us to add this server to the list of non-CORS-supporting servers that may be proxied by \
-National Map itself.</p>\
-<p>If you did not enter this link manually, this error may indicate that the group you opened is temporarily unavailable or there is a \
-problem with your internet connection.  Try opening the group again, and if the problem persists, please report it by \
-sending an email to <a href="mailto:nationalmap@lists.nicta.com.au">nationalmap@lists.nicta.com.au</a>.</p>'
+An error occurred while invoking GetCodeListValue on the ABS ITT server.'
         });
     });
-    return when.all(loadPromises);
 };
 
 AbsIttCatalogItem.prototype._enable = function() {
