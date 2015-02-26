@@ -437,6 +437,7 @@ function recolorImageWithCanvas(csvCatalogItem, img, colorFunc) {
 }
 
 
+
 var regionServer = 'http://geoserver-nm.nicta.com.au/region_map/ows';
 var regionWmsMap = {
     'STE': {
@@ -464,10 +465,10 @@ var regionWmsMap = {
         "regionProp": "LGA_CODE11",
         "aliases": ['lga']
     },
-    'SCC': {
+    'SSC': {
         "name":"region_map:FID_SCC_2011_AUST",
-        "regionProp": "SCC_CODE",
-        "aliases": ['scc', 'suburb']
+        "regionProp": "SSC_CODE",
+        "aliases": ['ssc', 'suburb']
     },
     'SA4': {
         "name":"region_map:FID_SA4_2011_AUST",
@@ -484,6 +485,11 @@ var regionWmsMap = {
         "regionProp": "SA2_MAIN11",
         "aliases": ['sa2']
     },
+    'UN': {
+        "name":"region_map:FID_TM_WORLD_BORDERS",
+        "regionProp": "UN",
+        "aliases": ['un', 'country']
+    },
 // COMMENTING OUT SA1: it works, but server performance is just too slow to be widely usable
 //    'SA1': {
 //        "name":"region_map:FID_SA1_2011_AUST",
@@ -491,6 +497,7 @@ var regionWmsMap = {
 //        "aliases": ['sa1']
 //    }
 };
+
 
 //TODO: if we add enum capability and then can work with any unique field
 function loadRegionIDs(regionDescriptor) {
