@@ -22,7 +22,8 @@
                     "dataCustodian": "[UNISDR](http://preview.grid.unep.ch/)",
                     "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
                     "type": "wms-getCapabilities",
-                    "isOpen": true
+                    "isOpen": true,
+                    "getFeatureInfoXmlContentType": "application/vnd.ogc.gml"
                 }
             ]
         }
