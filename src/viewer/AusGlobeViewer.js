@@ -5,7 +5,7 @@
 
 "use strict";
 
-/*global require,L,URI,$,html2canvas,console,ga*/
+/*global require,L,URI,$,console,ga*/
 
 var BingMapsApi = require('../../third_party/cesium/Source/Core/BingMapsApi');
 var Cartographic = require('../../third_party/cesium/Source/Core/Cartographic');
@@ -106,6 +106,7 @@ If you\'re on a desktop or laptop, consider increasing the size of your window.'
     this.scene = undefined;
     this.viewer = undefined;
     this.map = undefined;
+    this._popupSinceLastClick = false;
 
     this.application = application;
 
@@ -212,54 +213,6 @@ function changeBaseMap(viewer, newBaseMap) {
         viewer.application.currentViewer.notifyRepaintRequired();
     }
 }
-
-// -------------------------------------------
-// PERF: skip frames where reasonable
-// -------------------------------------------
-var FrameChecker = function () {
-    this._lastDate = new JulianDate(0, 0.0);
-    this._lastCam = new Matrix4();
-    this._maxFPS = 40.0;
-    this._skipCnt = 0;
-    this._skipWaitNorm = 3.0; //start skip after launch
-    this._skipWaitLim = 10.0; //start skip at launch
-};
-
-// call to force draw - usually after long downloads/processes
-FrameChecker.prototype.forceFrameUpdate = function() {
-    this._skipCnt = 0;
-};
-
-// see if we can skip the draw on this frame
-FrameChecker.prototype.skipFrame = function(scene, date) {
-    //check if anything actually changed
-    if (this._lastDate) {
-        var bDateSame = this._lastDate.equals(date);
-        var bCamSame = this._lastCam.equalsEpsilon(scene.camera.viewMatrix, CesiumMath.EPSILON5);
-        if (bDateSame && bCamSame) {
-            this._skipCnt++;
-        }
-        else {
-            this._skipCnt = 0;
-        }
-    }
-
-    // If terrain/imagery is loading, force another render immediately so that the loading
-    // happens as quickly as possible.
-    var surface = scene.globe._surface;
-    if (surface._tileLoadQueue.length > 0 || surface._debug.tilesWaitingForChildren > 0) {
-        this._skipCnt = 0;
-    }
-
-    if (this._skipCnt > (this._maxFPS * this._skipWaitLim)) {
-        this._skipWaitLim = this._skipWaitNorm; //go to normal skip wait
-        return true;
-    }
-
-    this._lastDate = date.clone(this._lastDate);
-    this._lastCam = scene.camera.viewMatrix.clone(this._lastCam);
-    return false;
-};
 
 // -------------------------------------------
 // DrawExtentHelper from the cesium sample code
@@ -638,24 +591,16 @@ AusGlobeViewer.prototype.selectViewer = function(bCesium) {
         this.application.cesium = undefined;
         this.application.currentViewer = this.application.leaflet;
 
-        this.captureCanvas = function() {
-            var that = this;
-            if (that.startup) {
-                that.startup = false;
-            }
-            that.map.attributionControl.removeFrom(that.map);
-            html2canvas( document.getElementById('cesiumContainer'), {
-	            useCORS: true,
-                onrendered: function(canvas) {
-                    var dataUrl = canvas.toDataURL("image/jpeg");
-                    that.captureCanvasCallback(dataUrl);
-                    that.map.attributionControl.addTo(that.map);
-                }
-            });
-        };
-
         map.on('click', function(e) {
             selectFeatureLeaflet(that, e.latlng);
+        });
+
+        map.on('preclick', function(e) {
+            preClickLeaflet(that);
+        });
+
+        map.on('popupopen', function(e) {
+            popupOpenLeaflet(that);
         });
 
         this.application.leaflet.zoomTo(rect, 0.0);
@@ -684,16 +629,6 @@ AusGlobeViewer.prototype.selectViewer = function(bCesium) {
         this.application.cesium = new Cesium(this.application, this.viewer);
         this.application.leaflet = undefined;
         this.application.currentViewer = this.application.cesium;
-
-        this.frameChecker = new FrameChecker();
-
-        // Make sure we re-render when data sources or imagery layers are added or removed.
-        this.scene.imageryLayers.layerAdded.addEventListener(this.frameChecker.forceFrameUpdate, this.frameChecker);
-        this.scene.imageryLayers.layerRemoved.addEventListener(this.frameChecker.forceFrameUpdate, this.frameChecker);
-        this.scene.imageryLayers.layerMoved.addEventListener(this.frameChecker.forceFrameUpdate, this.frameChecker);
-
-        this.viewer.dataSources.dataSourceAdded.addEventListener(this.frameChecker.forceFrameUpdate, this.frameChecker);
-        this.viewer.dataSources.dataSourceRemoved.addEventListener(this.frameChecker.forceFrameUpdate, this.frameChecker);
 
         this._enableSelectExtent(true);
 
@@ -974,6 +909,14 @@ function zoomCamera(scene, distFactor, pos) {
 function zoomIn(scene, pos) { zoomCamera(scene, 2.0/3.0, pos); }
 function zoomOut(scene, pos) { zoomCamera(scene, -2.0, pos); }
 
+function preClickLeaflet(viewer) {
+    viewer._popupSinceLastClick = false;
+}
+
+function popupOpenLeaflet(viewer) {
+    viewer._popupSinceLastClick = true;
+}
+
 function selectFeatureLeaflet(viewer, latlng) {
     var dataSources = viewer.application.nowViewing.items;
 
@@ -1004,7 +947,11 @@ function selectFeatureLeaflet(viewer, latlng) {
     updatePopup('', 'Loading WMS feature information...');
 
     // Wait for .5 seconds to show to let double click through
-    setTimeout(function() { popup.openOn(viewer.map); }, 500);
+    setTimeout(function() {
+        if (!viewer._popupSinceLastClick) {
+            popup.openOn(viewer.map);
+        }
+    }, 500);
 
     return when.all(promises, function(results) {
         var foundFeature = false;

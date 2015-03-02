@@ -4,8 +4,10 @@
         "gov.au",
         "csiro.au",
         "arcgis.com",
-        "unep.ch:8080"
-    ],
+        "unep.ch:8080",
+        "argo.jcommops.org",
+        "www.abc.net.au"
+   ],
     "initializationUrls" : [
         "init_un.json"
     ]
