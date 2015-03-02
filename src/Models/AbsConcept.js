@@ -5,13 +5,18 @@
 var defineProperties = require('../../third_party/cesium/Source/Core/defineProperties');
 var knockout = require('../../third_party/cesium/Source/ThirdParty/knockout');
 
-var AbsConcept = function(name) {
+var AbsConcept = function(code, name) {
+    /**
+     * Gets or sets the name of the concept item.  This property is observable.
+     * @type {String}
+     */
+    this.code = code;
+
     /**
      * Gets or sets the name of the concept item.  This property is observable.
      * @type {String}
      */
     this.name = name;
-
 
     /**
      * Gets the list of absCodes contained in this group.  This property is observable.
@@ -24,10 +29,10 @@ var AbsConcept = function(name) {
      * item is open, its child items (if any) are visible.  This property is observable.
      * @type {Boolean}
      */
-    this.isOpen = false;
+    this.isOpen = true;
     this.isCode = false;
 
-    knockout.track(this, ['name', 'items', 'isOpen', 'isCode']);
+    knockout.track(this, ['code', 'name', 'items', 'isOpen', 'isCode']);
 };
 
 defineProperties(AbsConcept.prototype, {

@@ -4,6 +4,7 @@
 var VarType = require('./VarType');
 var Variable = require('./Variable');
 
+var defined = require('../../third_party/cesium/Source/Core/defined');
 var defaultValue = require('../../third_party/cesium/Source/Core/defaultValue');
 var destroyObject = require('../../third_party/cesium/Source/Core/destroyObject');
 var loadText = require('../../third_party/cesium/Source/Core/loadText');
@@ -51,7 +52,7 @@ Dataset.prototype.getExtent = function () {
     var maxPos = [0, 0, 0];
     var type = [VarType.LON, VarType.LAT, VarType.ALT];
     for (var p in type) {
-        if (this.varTypeSet[type[p]]) {
+        if (defined(this.varTypeSet[type[p]])) {
             minPos[p] = this.variables[this.varTypeSet[type[p]]].minVal;
             maxPos[p] = this.variables[this.varTypeSet[type[p]]].maxVal;
         }
@@ -65,7 +66,7 @@ Dataset.prototype.getExtent = function () {
 * @returns {Float} The minimum data value
 */
 Dataset.prototype.getMinVal = function () {
-    if (this.variables && this.varTypeSet[VarType.SCALAR]) {
+    if (defined(this.variables) && defined(this.varTypeSet[VarType.SCALAR])) {
         return this.variables[this.varTypeSet[VarType.SCALAR]].minVal;
     }
 };
@@ -76,7 +77,7 @@ Dataset.prototype.getMinVal = function () {
 * @returns {Float} The maximum data value
 */
 Dataset.prototype.getMaxVal = function () {
-    if (this.variables && this.varTypeSet[VarType.SCALAR]) {
+    if (defined(this.variables) && defined(this.varTypeSet[VarType.SCALAR])) {
         return this.variables[this.varTypeSet[VarType.SCALAR]].maxVal;
     }
 };
@@ -87,7 +88,7 @@ Dataset.prototype.getMaxVal = function () {
 * @returns {Object} The minimum time value in Cesium JulianTime
 */
 Dataset.prototype.getMinTime = function () {
-    if (this.variables && this.varTypeSet[VarType.TIME]) {
+    if (defined(this.variables) && defined(this.varTypeSet[VarType.TIME])) {
         return this.variables[this.varTypeSet[VarType.TIME]].timeVar.minVal;
     }
 };
@@ -98,7 +99,7 @@ Dataset.prototype.getMinTime = function () {
 * @returns {Object} The maximum time value in Cesium JulianTime
 */
 Dataset.prototype.getMaxTime = function () {
-    if (this.variables && this.varTypeSet[VarType.TIME]) {
+    if (defined(this.variables) && defined(this.varTypeSet[VarType.TIME])) {
         return this.variables[this.varTypeSet[VarType.TIME]].timeVar.maxVal;
     }
 };
@@ -127,13 +128,13 @@ Dataset.prototype._processVariables = function () {
         if (this.variables.hasOwnProperty(id)) {
             var variable = this.variables[id];
             //guess var type if not set
-            if (variable.varType === undefined) {
+            if (!defined(variable.varType)) {
                 variable.guessVarType(id);
             }
             if (variable.varType === VarType.TIME) {
                 variable.processTimeVar();            //calculate time variables
                 //if failed then default type to scalar
-                if (variable.timeVar === undefined) {
+                if (!defined(variable.timeVar)) {
                     variable.varType = VarType.SCALAR;
                 }
             }
@@ -149,7 +150,7 @@ Dataset.prototype._processVariables = function () {
             //set the varIDs
             for (var vt in VarType) {
                 if (VarType.hasOwnProperty(vt)) {
-                    if (this.varTypeSet[VarType[vt]] === undefined && variable.varType === VarType[vt]) {
+                    if (!defined(this.varTypeSet[VarType[vt]]) && variable.varType === VarType[vt]) {
                         this.varTypeSet[VarType[vt]] = id;
                     }
                 }
@@ -162,14 +163,14 @@ Dataset.prototype._processVariables = function () {
         this.varTypeSet[VarType.SCALAR] = this.varName;
     }
 
-    if (this.varTypeSet[VarType.SCALAR] === undefined) {
+    if (!defined(this.varTypeSet[VarType.SCALAR])) {
         this.varTypeSet[VarType.SCALAR] = this.varTypeSet[VarType.ENUM];
     }
     //set point count
     this.rowCount = this.variables[this.varTypeSet[VarType.SCALAR]].vals.length;
 
     //save the shape information
-    if (this.dataShape === undefined) {
+    if (!defined(this.dataShape)) {
         this.dataShape = [this.rowCount];
     }
 };
@@ -182,25 +183,25 @@ Dataset.prototype._processVariables = function () {
 */
 Dataset.prototype.loadJson = function (jsonTable) {
 
-    this.dataShape = undefined;
-
-    //create the variable set
-    this.variables = {};
-    var columnNames = jsonTable[0];
-    for (var c = 0; c < columnNames.length; c++) {
-        var name = columnNames[c];
-        var variable = new Variable();
-        for (var i = 1; i < jsonTable.length; ++i) {
-            variable.vals.push(jsonTable[i][c]);
+    if (defined(jsonTable) && jsonTable.length > 0 && jsonTable[0].length > 0) {
+        //create the variable set
+        this.variables = {};
+        var columnNames = jsonTable[0];
+        for (var c = 0; c < columnNames.length; c++) {
+            var name = columnNames[c];
+            var variable = new Variable();
+            for (var i = 1; i < jsonTable.length; ++i) {
+                variable.vals.push(jsonTable[i][c]);
+            }
+            this.variables[name] = variable;
         }
-        this.variables[name] = variable;
-    }
 
-    //calculate variable type and min/max vals
-    this._processVariables();
+        //calculate variable type and min/max vals
+        this._processVariables();
 
-    if (this.varName) {
-        this.setCurrentVariable({ variable: this.varName });
+        if (this.varName) {
+            this.setCurrentVariable({ variable: this.varName });
+        }
     }
 
     console.log(this);
@@ -262,7 +263,7 @@ Dataset.prototype.loadUrl = function (description) {
 *
 */
 Dataset.prototype.setCurrentVariable = function (description) {
-    if (!this.variables[description.variable] || 
+    if (!defined(this.variables) || !this.variables[description.variable] || 
         this.variables[description.variable].vals.length === 0) {
         return;
     }
@@ -302,7 +303,7 @@ Dataset.prototype.getVariable = function (varName) {
 */
 Dataset.prototype.addVariable = function (varName, variable) {
     this.variables[varName] = variable;
-    if (variable.minVal === undefined || variable.maxVal === undefined) {
+    if (!defined(variable.minVal) || !defined(variable.maxVal)) {
         this.variables[varName]._calculateVarMinMax();
     }
 };
@@ -315,7 +316,7 @@ Dataset.prototype.addVariable = function (varName, variable) {
 *
 */
 Dataset.prototype.removeVariable = function (varName) {
-    if (this.variables[varName] !== undefined) {
+    if (defined(this.variables[varName])) {
         delete this.variables[varName];
     }
 };
@@ -330,7 +331,7 @@ Dataset.prototype.removeVariable = function (varName) {
 */
 Dataset.prototype.getDataValue = function (varName, idx) {
     var variable = this.variables[varName];
-    if (variable === undefined || variable.vals === undefined) {
+    if (!defined(variable) || !defined(variable.vals)) {
         return undefined;
     }
     if (variable.varType === VarType.ENUM) {
@@ -351,7 +352,7 @@ Dataset.prototype.getDataValue = function (varName, idx) {
 */
 Dataset.prototype.getDataRow = function (idx) {
     var rowObj = {};
-    if (idx !== undefined) {
+    if (defined(idx)) {
         for (var id in this.variables) {
             if (this.variables.hasOwnProperty(id)) {
                 rowObj[id] = this.getDataValue(id, idx);
@@ -369,7 +370,7 @@ Dataset.prototype.getDataRow = function (idx) {
 * @returns {Array} Array of values for the variable
 */
 Dataset.prototype.getDataValues = function (varName) {
-    if (this.variables[varName] === undefined || this.variables[varName].vals === undefined) {
+    if (!defined(this.variables[varName]) || !defined(this.variables[varName].vals)) {
         return undefined;
     }
     return this.variables[varName].vals;
@@ -400,7 +401,7 @@ Dataset.prototype.getPointList = function (maxPts) {
     var alt = this.varTypeSet[VarType.ALT] ? this.variables[this.varTypeSet[VarType.ALT]].vals : undefined;
     var vals = this.variables[this.varTypeSet[VarType.SCALAR]].vals;
     var time = this.varTypeSet[VarType.TIME] ? this.variables[this.varTypeSet[VarType.TIME]].timeVar.vals : undefined;
-    if (maxPts === undefined) {
+    if (!defined(maxPts)) {
         maxPts = vals.length;
     }
 
