@@ -929,14 +929,6 @@ function selectFeatureLeaflet(viewer, latlng) {
         var dataSource = dataSources[i];
         if (defined(dataSource.pickFeaturesInLeaflet)) {
             promises.push(dataSource.pickFeaturesInLeaflet(extent, viewer.map.getSize().x, viewer.map.getSize().y, pickedXY.x, pickedXY.y));
-        if (dataSource.type === 'abs-itt') {
-            dataSource = dataSource._csvCatalogItem;
-        }
-        if (dataSource.type === 'wms' || (dataSource.type === 'csv' && defined(dataSource.layers))) {
-            var useProxy = corsProxy.shouldUseProxy(dataSource.url);
-            promises.push(getWmsFeatureInfo(dataSource.url, useProxy, dataSource.layers, 
-                extent, viewer.map.getSize().x, viewer.map.getSize().y, pickedXY.x, pickedXY.y, true, 
-                dataSource.wmsFeatureInfoFilter));
         }
     }
 
