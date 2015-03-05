@@ -256,7 +256,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
                 var codes = json.codes;
 
-                function absCodeUpdate() { updateAbsResults(that); }
+                function absCodeUpdate() { updateAbsResults(that, false); }
                 var initActive = 1;
                 function addTree(parent, codes) {
                     // Skip the last code, it's just the name of the dataset.
@@ -327,6 +327,7 @@ AbsIttCatalogItem.prototype._disable = function() {
 
 AbsIttCatalogItem.prototype._show = function() {
     if (defined(this._csvCatalogItem)) {
+        updateAbsResults(this, true);
         this._csvCatalogItem._show();
     }
 };
@@ -362,7 +363,11 @@ function createAnd(filter, regionType) {
     return and.join(',');
 }
 
-function updateAbsResults(absItem) {
+function updateAbsResults(absItem, forceUpdate) {
+
+    if (!forceUpdate && !absItem.isShown) {
+        return;
+    }
 
     //walk tree to get active codes
     var activeCodes = [];
@@ -442,6 +447,10 @@ function updateAbsResults(absItem) {
             result.data = $.csv.toArrays(text, {
                 onParseValue: $.csv.hooks.castToScalar
             });
+            //clean up spurious extra lines from api
+            if (result.data[result.data.length-1].length < result.data[0].length) {
+                result.data.length--;
+            }
             absItem.queryList.push(result);
         });
     };
