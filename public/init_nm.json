@@ -2583,7 +2583,8 @@
                     "type": "abs-itt",
                     "url": "http://stat.abs.gov.au/itt/query.jsp",
                     "dataSetID": "ABS_CENSUS2011_B04",
-                    "regionType": "SA4"
+                    "regionType": "SA4",
+                    "filter": ["MEASURE.1", "AGE.A04", "AGE.A10"]
                 },
                 {
                     "name": "Country of Birth",

@@ -65,7 +65,7 @@ var AbsIttCatalogItem = function(application) {
     this.regionType = undefined;
 
     /**
-     * Gets the list of additional concepts and values on which to filter the data.  You can obtain a list of all available
+     * Gets the list of initial concepts and codes on which to filter the data.  You can obtain a list of all available
      * concepts for a dataset by querying http://stat.abs.gov.au/itt/query.jsp?method=GetDatasetConcepts&datasetid=ABS_CENSUS2011_B25
      * (or equivalent) and a list of the possible values for a concept by querying
      * http://stat.abs.gov.au/itt/query.jsp?method=GetCodeListValue&datasetid=ABS_CENSUS2011_B25&concept=MEASURE&format=json.
@@ -232,6 +232,7 @@ AbsIttCatalogItem.prototype._load = function() {
     var concepts, conceptNameMap, loadPromises = [];
 
     this._absDataset = new AbsDataset();
+    this.initialShow = true;
 
     //cover for missing human readable name in api
     loadPromises[0] = loadJson('data/abs_names.json').then(function(json) {
@@ -327,8 +328,11 @@ AbsIttCatalogItem.prototype._disable = function() {
 
 AbsIttCatalogItem.prototype._show = function() {
     if (defined(this._csvCatalogItem)) {
-        updateAbsResults(this, true);
         this._csvCatalogItem._show();
+        if (!this.initialShow) {
+            updateAbsResults(this, true);
+        }
+        this.initialShow = false;
     }
 };
 
