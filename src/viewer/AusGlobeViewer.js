@@ -927,6 +927,9 @@ function selectFeatureLeaflet(viewer, latlng) {
     var promises = [];
     for (var i = 0; i < dataSources.length ; ++i) {
         var dataSource = dataSources[i];
+        if (dataSource.type === 'abs-itt') {
+            dataSource = dataSource._csvCatalogItem;
+        }
         if (defined(dataSource.pickFeaturesInLeaflet)) {
             promises.push(dataSource.pickFeaturesInLeaflet(extent, viewer.map.getSize().x, viewer.map.getSize().y, pickedXY.x, pickedXY.y));
         }
