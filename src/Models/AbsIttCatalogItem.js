@@ -259,8 +259,7 @@ AbsIttCatalogItem.prototype._load = function() {
                 function absCodeUpdate() { updateAbsResults(that, false); }
                 var initActive = 1;
                 function addTree(parent, codes) {
-                    // Skip the last code, it's just the name of the dataset.
-                    for (var i = 0; i < codes.length - 1; ++i) {
+                    for (var i = 0; i < codes.length; ++i) {
                         var parentCode = (parent instanceof AbsCode) ? parent.code : '';
                         if (codes[i].parentCode === parentCode) {
                             var absCode = new AbsCode(codes[i].code, codes[i].description);
