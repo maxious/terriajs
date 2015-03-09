@@ -232,7 +232,6 @@ AbsIttCatalogItem.prototype._load = function() {
     var concepts, conceptNameMap, loadPromises = [];
 
     this._absDataset = new AbsDataset();
-    this.initialShow = true;
 
     //cover for missing human readable name in api
     loadPromises[0] = loadJson('data/abs_names.json').then(function(json) {
@@ -301,6 +300,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
             that._absDataset.isLoading = false;
 
+            //TODO: see if I can get rid of this - also if need to flag show on initial load
             return updateAbsResults(that);
 
         });
@@ -329,9 +329,7 @@ AbsIttCatalogItem.prototype._disable = function() {
 AbsIttCatalogItem.prototype._show = function() {
     if (defined(this._csvCatalogItem)) {
         this._csvCatalogItem._show();
-        if (!this.initialShow) {
-            updateAbsResults(this, true);
-        }
+        updateAbsResults(this, true);
         this.initialShow = false;
     }
 };

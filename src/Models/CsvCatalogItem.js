@@ -255,8 +255,8 @@ CsvCatalogItem.prototype._showInCesium = function() {
         var scene = this.application.cesium.scene;
 
         var imageryProvider = new WebMapServiceImageryProvider({
-            url : proxyUrl(this.application, this.url),
-            layers : this.layers,
+            url : proxyUrl(this.application, this.regionServer),
+            layers : this.regionLayers,
             parameters : WebMapServiceCatalogItem.defaultParameters
         });
 
@@ -340,12 +340,12 @@ CsvCatalogItem.prototype._showInLeaflet = function() {
         var map = this.application.leaflet.map;
         
         var options = {
-            layers : this.layers,
+            layers : this.regionLayers,
             opacity : this.opacity
         };
         options = combine(defaultValue(WebMapServiceCatalogItem.defaultParameters), options);
 
-        this._imageryLayer = new L.tileLayer.wms(proxyUrl(this.application, this.url), options);
+        this._imageryLayer = new L.tileLayer.wms(proxyUrl(this.application, this.regionServer), options);
 
         var that = this;
         this._imageryLayer.setFilter(function () {
@@ -445,8 +445,8 @@ CsvCatalogItem.prototype.pickFeaturesInLeaflet = function(mapExtent, mapWidth, m
 
     // Use a Cesium imagery provider to pick features.
     var imageryProvider = new WebMapServiceImageryProvider({
-        url : proxyUrl(this.application, this.url),
-        layers : this.layers,
+        url : proxyUrl(this.application, this.regionServer),
+        layers : this.regionLayers,
         tilingScheme : tilingScheme,
         tileWidth : mapWidth,
         tileHeight : mapHeight
@@ -499,7 +499,7 @@ function loadTable(csvItem, text) {
 
     if (!csvItem._tableDataSource.dataset.hasLocationData()) {
         console.log('No locaton date found in csv file - trying to match based on region');
-        csvItem.data = text;
+//        csvItem.data = text;
         return when(addRegionMap(csvItem), function() {
             if (csvItem._regionMapped !== true) {
                 throw new ModelError({
@@ -576,54 +576,64 @@ var regionWmsMap = {
     'STE': {
         "name":"region_map:FID_STE_2011_AUST",
         "regionProp": "STE_CODE11",
-        "aliases": ['state', 'ste']
-    },
-    'CED': {
-        "name":"region_map:FID_CED_2011_AUST",
-        "regionProp": "CED_CODE",
-        "aliases": ['ced']
-    },
-    'SED': {
-        "name":"region_map:FID_SED_2011_AUST",
-        "regionProp": "SED_CODE",
-        "aliases": ['sed']
-    },
-    'POA': {
-        "name":"region_map:FID_POA_2011_AUST",
-        "regionProp": "POA_CODE",
-        "aliases": ['poa', 'postcode']
-    },
-    'LGA': {
-        "name":"region_map:FID_LGA_2011_AUST",
-        "regionProp": "LGA_CODE11",
-        "aliases": ['lga']
-    },
-    'SSC': {
-        "name":"region_map:FID_SCC_2011_AUST",
-        "regionProp": "SSC_CODE",
-        "aliases": ['ssc', 'suburb']
+        "aliases": ['state', 'ste'],
+        "digits": 1
     },
     'SA4': {
         "name":"region_map:FID_SA4_2011_AUST",
         "regionProp": "SA4_CODE11",
-        "aliases": ['sa4']
+        "aliases": ['sa4'],
+        "digits": 3
     },
     'SA3': {
         "name":"region_map:FID_SA3_2011_AUST",
         "regionProp": "SA3_CODE11",
-        "aliases": ['sa3']
+        "aliases": ['sa3'],
+        "digits": 5
     },
     'SA2': {
         "name":"region_map:FID_SA2_2011_AUST",
         "regionProp": "SA2_MAIN11",
-        "aliases": ['sa2']
+        "aliases": ['sa2'],
+        "digits": 9
     },
 // COMMENTING OUT SA1: it works, but server performance is just too slow to be widely usable
 //    'SA1': {
 //        "name":"region_map:FID_SA1_2011_AUST",
 //        "regionProp": "SA1_7DIG11",
-//        "aliases": ['sa1']
-//    }
+//        "aliases": ['sa1'],
+//        "digits": 11
+//    },
+    'POA': {
+        "name":"region_map:FID_POA_2011_AUST",
+        "regionProp": "POA_CODE",
+        "aliases": ['poa', 'postcode'],
+        "digits": 4
+    },
+    'CED': {
+        "name":"region_map:FID_CED_2011_AUST",
+        "regionProp": "CED_CODE",
+        "aliases": ['ced'],
+        "digits": 3
+    },
+    'SED': {
+        "name":"region_map:FID_SED_2011_AUST",
+        "regionProp": "SED_CODE",
+        "aliases": ['sed'],
+        "digits": 5
+    },
+    'LGA': {
+        "name":"region_map:FID_LGA_2011_AUST",
+        "regionProp": "LGA_CODE11",
+        "aliases": ['lga'],
+        "digits": 5
+    },
+    'SSC': {
+        "name":"region_map:FID_SCC_2011_AUST",
+        "regionProp": "SSC_CODE",
+        "aliases": ['ssc', 'suburb'],
+        "digits": 5
+    }
 };
 
 //TODO: if we add enum capability and then can work with any unique field
@@ -669,44 +679,57 @@ function determineRegionVar(vars, aliases) {
 function determineRegionType(dataset) {
     var vars = dataset.getVarList();
 
-    var regionType;
-    var idx = -1;
+    var regionType, regionVar, region;
     //try to figure out the region variable
-    for (regionType in regionWmsMap) {
-        if (regionWmsMap.hasOwnProperty(regionType)) {
-            idx = determineRegionVar(vars, regionWmsMap[regionType].aliases);
+    for (region in regionWmsMap) {
+        if (regionWmsMap.hasOwnProperty(region)) {
+            var idx = determineRegionVar(vars, regionWmsMap[region].aliases);
             if (idx !== -1) {
+                regionType = region;
+                regionVar = vars[idx];
                 break;
             }
         }
     }
     
     //if no match, try to derive regionType from region_id to use native abs census files
-    if (idx === -1) {
+    if (!defined(regionType)) {
         var absRegion = 'region_id';
-        idx = vars.indexOf(absRegion);
-        if (idx === -1) {
+        if (vars.indexOf(absRegion) === -1) {
             return;
         }
         var code = dataset.getDataValue(absRegion, 0);
-        regionType = code.replace(/[0-9]/g, '');
-        if (regionWmsMap[regionType] === undefined) {
-            return;
+        if (typeof code === 'string') {
+            region = code.replace(/[0-9]/g, '');
+            if (!defined(regionWmsMap[region])) {
+                return;
+            }
+            regionType = region;
+            var vals = dataset.getDataValues(absRegion);
+            var new_vals = [];
+            for (var i = 0; i < vals.length; i++) {
+                var id = dataset.getDataValue(absRegion, vals[i]).replace( /^\D+/g, '');
+                new_vals.push(parseInt(id,10));
+            }
+            dataset.variables[absRegion].vals = new_vals;
+        } else {
+            var digits = code.toString().length;
+            for (region in regionWmsMap) {
+                if (regionWmsMap.hasOwnProperty(region)) {
+                    if (digits === regionWmsMap[region].digits) {
+                        regionType = region;
+                        break;
+                    }
+                }
+            }
         }
-        var vals = dataset.getDataValues(absRegion);
-        var new_vals = [];
-        for (var i = 0; i < vals.length; i++) {
-            var id = dataset.getDataValue(absRegion, vals[i]).replace( /^\D+/g, '');
-            new_vals.push(parseInt(id,10));
+        if (defined(regionType)) {
+            regionVar = regionType;
+            dataset.variables[regionType] = dataset.variables[absRegion];
+            delete dataset.variables[absRegion];
         }
-
-        dataset.variables[absRegion].vals = new_vals;
-        dataset.variables[regionType] = dataset.variables[absRegion];
-        delete dataset.variables[absRegion];
-        vars = dataset.getVarList();
-        idx = vars.indexOf(regionType);
     }
-    return { idx: idx, regionType: regionType};
+    return { regionType: regionType, regionVar: regionVar };
 }
 
 function createRegionLookupFunc(csvItem) {
@@ -752,8 +775,8 @@ function setRegionVariable(csvItem, regionVar, regionType) {
     if (csvItem.regionType !== regionType) {
         csvItem.regionType = regionType;
 
-        csvItem.url = regionServer;
-        csvItem.layers = regionDescriptor.name;
+        csvItem.regionServer = regionServer;
+        csvItem.regionLayers = regionDescriptor.name;
 
         csvItem.regionProp = regionDescriptor.regionProp;
     }
@@ -807,26 +830,24 @@ function addRegionMap(csvItem) {
 
     //if csvItem includes style/var info then use that
     if (!defined(csvItem.style) || !defined(csvItem.style.table)) {
-        var regionObj = determineRegionType(dataset);
-        if (regionObj === undefined) {
+        var result = determineRegionType(dataset);
+        if (!defined(result) || !defined(result.regionType)) {
             return;
         }
-        var idx = regionObj.idx;
-        var regionType = regionObj.regionType;
-
             //change current var if necessary
         var dataVar = dataset.getCurrentVariable();
         var vars = dataset.getVarList();
-        if (dataVar === vars[idx]) {
-            dataVar = (idx === 0) ? vars[1] : vars[0];
+
+        if (vars.indexOf(dataVar) === -1 || dataVar === result.regionVar) {
+            dataVar = (vars.indexOf(result.regionVar) === 0) ? vars[1] : vars[0];
         }
             //set default style if none set
         var style = {line: {}, point: {}, polygon: {}, table: {}};
         style.table.lat = undefined;
         style.table.lon = undefined;
         style.table.alt = undefined;
-        style.table.region = vars[idx];
-        style.table.regionType = regionType;
+        style.table.regionVar = result.regionVar;
+        style.table.regionType = result.regionType;
         style.table.time = dataset.getVarID(VarType.TIME);
         style.table.data = dataVar;
         style.table.colorMap = [
@@ -852,7 +873,7 @@ function addRegionMap(csvItem) {
     
     //TODO: figure out how sharing works or doesn't
     
-    return setRegionVariable(csvItem, csvItem.style.table.region, csvItem.style.table.regionType);
+    return setRegionVariable(csvItem, csvItem.style.table.regionVar, csvItem.style.table.regionType);
 }
 
 
