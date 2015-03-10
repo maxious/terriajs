@@ -2630,6 +2630,21 @@
                     "url": "http://stat.abs.gov.au/itt/query.jsp",
                     "dataSetID": "ABS_CENSUS2011_B01",
                     "regionType": "SA4"
+                },
+                {
+                    "name": "SEIFA by Local Government Area (LGA)",
+                    "description": "[Licence](http://creativecommons.org/licenses/by/2.5/au/)",
+                    "dataCustodian": "[Australian Bureau of Statistics](http://www.abs.gov.au/)",
+                    "rectangle": [
+                        "112.93529999999998",
+                        "-38.208809999082796",
+                        "152.06206",
+                        "-11.05104999964455"
+                    ],
+                    "type": "abs-itt",
+                    "url": "http://stat.abs.gov.au/itt/query.jsp",
+                    "dataSetID": "ABS_SEIFA_LGA",
+                    "regionType": "LGA"
                 }
             ]
         },

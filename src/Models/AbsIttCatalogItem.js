@@ -204,7 +204,7 @@ AbsIttCatalogItem.prototype._getValuesThatInfluenceLoad = function() {
 };
 
 function skipConcept(concept) {
-    var conceptMask = ["STATE","REGIONTYPE","REGION","FREQUENCY"];
+    var conceptMask = ["STATE","REGIONTYPE","REGION","FREQUENCY","LGA_2011"];
     for (var i = 0; i < conceptMask.length; i++) {
         if (conceptMask[i] === concept) {
             return true;
@@ -365,7 +365,7 @@ function proxyUrl(application, url) {
 
 function createAnd(filter, regionType) {
     var and = filter.slice();
-    and.unshift('REGIONTYPE.' + regionType);
+//    and.unshift('REGIONTYPE.' + regionType);
     return and.join(',');
 }
 
@@ -470,7 +470,7 @@ function updateAbsResults(absItem, forceUpdate) {
             method: 'GetGenericData',
             datasetid: absItem.dataSetID,
             and: createAnd(filter, regionType),
-            or: 'REGION',
+            or: 'LGA_2011',
             format: 'csv'
         };
         var url = baseUrl + '?' + objectToQuery(parameters);
