@@ -26,6 +26,12 @@ var AbsCode = function(code, name) {
     this.items = [];
 
     /**
+     * Gets or sets the parent for a code.  This property is observable.
+     * @type {AbsCode[]}
+     */
+    this.parent = undefined;
+
+    /**
      * Gets or sets a value indicating whether this abs code is currently open.  When an
      * item is open, its child items (if any) are visible.  This property is observable.
      * @type {Boolean}
@@ -47,7 +53,7 @@ var AbsCode = function(code, name) {
      */
     this.updateFunction = undefined;
 
-    knockout.track(this, ['name', 'code', 'items', 'isOpen', 'isActive', 'isCode', 'updateFunction']);
+    knockout.track(this, ['name', 'code', 'items', 'isOpen', 'isActive', 'isCode', 'updateFunction', 'parent']);
 };
 
 defineProperties(AbsCode.prototype, {
@@ -76,6 +82,22 @@ AbsCode.prototype.toggleOpen = function() {
  */
 AbsCode.prototype.toggleActive = function(test) {
     this.isActive = !this.isActive;
+    if (this.isActive) {
+        function clearParents(code) {
+            if (defined(code.parent)) {
+                code.parent.isActive = false;
+                clearParents(code.parent);
+            }
+        }        
+        function clearChildren(code) {
+            code.items.forEach( function(item) {
+                item.isActive = false;  //TODO: make indeterminate?
+                clearChildren(item);
+            });
+        }
+        clearParents(this);
+        clearChildren(this);
+    }
     if (defined(this.updateFunction)) {
         this.updateFunction();
     }

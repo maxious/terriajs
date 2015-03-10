@@ -243,6 +243,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
     loadPromises[1] = loadJson(url).then(function(json) {
         concepts = json.concepts;
+        console.log('concepts', concepts);
     });
 
     return when.all(loadPromises).then(function() {
@@ -266,6 +267,10 @@ AbsIttCatalogItem.prototype._load = function() {
                             if (initActive-- > 0) {
                                 absCode.isActive = true;
                             }
+                            if (parentCode === '') {
+                                absCode.isOpen = true;
+                            }
+                            absCode.parent = parent;
                             absCode.updateFunction = absCodeUpdate;
                             parent.items.push(absCode);
                             addTree(absCode, codes);
@@ -276,7 +281,7 @@ AbsIttCatalogItem.prototype._load = function() {
             });
         };
 
-        for (var i = 0; i < concepts.length - 1; ++i) {
+        for (var i = 0; i < concepts.length; ++i) {
             var conceptID = concepts[i];
 
             if (skipConcept(conceptID)) {
