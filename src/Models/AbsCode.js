@@ -82,19 +82,19 @@ AbsCode.prototype.toggleOpen = function() {
  */
 AbsCode.prototype.toggleActive = function(test) {
     this.isActive = !this.isActive;
-    if (this.isActive) {
-        function clearParents(code) {
-            if (defined(code.parent)) {
-                code.parent.isActive = false;
-                clearParents(code.parent);
-            }
-        }        
-        function clearChildren(code) {
-            code.items.forEach( function(item) {
-                item.isActive = false;  //TODO: make indeterminate?
-                clearChildren(item);
-            });
+    function clearParents(code) {
+        if (defined(code.parent)) {
+            code.parent.isActive = false;
+            clearParents(code.parent);
         }
+    }
+    function clearChildren(code) {
+        code.items.forEach( function(item) {
+            item.isActive = false;  //TODO: make indeterminate?
+            clearChildren(item);
+        });
+    }
+    if (this.isActive) {
         clearParents(this);
         clearChildren(this);
     }
