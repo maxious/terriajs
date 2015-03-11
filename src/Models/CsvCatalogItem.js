@@ -418,7 +418,7 @@ CsvCatalogItem.prototype.dynamicUpdate = function(text) {
             });
         }
     }
-    else if (text.length > 0) {
+    else {
         return this.load();
     }
 };
@@ -495,6 +495,9 @@ function updateOpacity(csvItem) {
 //////////////////////////////////////////////////////////////////////////
 
 function loadTable(csvItem, text) {
+    if (text.length === 0) {
+        return;
+    }    
     csvItem._tableDataSource.loadText(text);
 
     if (!csvItem._tableDataSource.dataset.hasLocationData()) {

@@ -39,6 +39,7 @@ var AbsIttCatalogItem = function(application) {
     this._csvCatalogItem = undefined;
     this._metadata = undefined;
     this._absDataset = undefined;
+    this._concepts = [];
 
     /**
      * Gets or sets the URL of the ABS ITT API, typically http://stat.abs.gov.au/itt/query.jsp.
@@ -65,6 +66,15 @@ var AbsIttCatalogItem = function(application) {
     this.regionType = undefined;
 
     /**
+     * Gets or sets the ABS region concept.  You can obtain a list of all available concepts for
+     * a dataset by querying
+     * http://stat.abs.gov.au/itt/query.jsp?method=GetDatasetConcepts&datasetid=ABS_CENSUS2011_B19
+     * (or equivalent).  This property is observable.
+     * @type {String}
+     */
+    this.regionConcept = 'REGION';
+
+    /**
      * Gets the list of initial concepts and codes on which to filter the data.  You can obtain a list of all available
      * concepts for a dataset by querying http://stat.abs.gov.au/itt/query.jsp?method=GetDatasetConcepts&datasetid=ABS_CENSUS2011_B25
      * (or equivalent) and a list of the possible values for a concept by querying
@@ -81,7 +91,7 @@ var AbsIttCatalogItem = function(application) {
      */
     this.opacity = 0.6;
 
-    knockout.track(this, ['url', 'dataSetID', 'regionType', 'filter', '_absDataset', 'opacity']);
+    knockout.track(this, ['url', 'dataSetID', 'regionType', 'regionConcept', 'filter', '_absDataset', 'opacity']);
 
     delete this.__knockoutObservables.absDataset;
     knockout.defineProperty(this, 'absDataset', {
@@ -200,11 +210,12 @@ freezeObject(AbsIttCatalogItem.defaultPropertiesForSharing);
 
 
 AbsIttCatalogItem.prototype._getValuesThatInfluenceLoad = function() {
-    return [this.url, this.dataSetID, this.regionType, this.filter];
+    return [this.url, this.dataSetID, this.regionType, this.regionConcept, this.filter];
 };
 
-function skipConcept(concept) {
-    var conceptMask = ["STATE","REGIONTYPE","REGION","FREQUENCY","LGA_2011"];
+//TODO: look at exposing these
+function skipConcept(concept, regionConcept) {
+    var conceptMask = ["STATE","REGIONTYPE","FREQUENCY",regionConcept];
     for (var i = 0; i < conceptMask.length; i++) {
         if (conceptMask[i] === concept) {
             return true;
@@ -229,7 +240,7 @@ AbsIttCatalogItem.prototype._load = function() {
     var url = baseUrl + '?' + objectToQuery(parameters);
 
     var that = this;
-    var concepts, conceptNameMap, loadPromises = [];
+    var conceptNameMap, loadPromises = [];
 
     this._absDataset = new AbsDataset();
 
@@ -242,8 +253,8 @@ AbsIttCatalogItem.prototype._load = function() {
     }
 
     loadPromises[1] = loadJson(url).then(function(json) {
-        concepts = json.concepts;
-        console.log('concepts', concepts);
+        that._concepts = json.concepts;
+        console.log('concepts', that._concepts);
     });
 
     return when.all(loadPromises).then(function() {
@@ -267,7 +278,7 @@ AbsIttCatalogItem.prototype._load = function() {
                             if (initActive-- > 0) {
                                 absCode.isActive = true;
                             }
-                            if (parentCode === '') {
+                            if (parentCode === '' && codes.length < 50) {
                                 absCode.isOpen = true;
                             }
                             absCode.parent = parent;
@@ -281,10 +292,10 @@ AbsIttCatalogItem.prototype._load = function() {
             });
         };
 
-        for (var i = 0; i < concepts.length; ++i) {
-            var conceptID = concepts[i];
+        for (var i = 0; i < that._concepts.length; ++i) {
+            var conceptID = that._concepts[i];
 
-            if (skipConcept(conceptID)) {
+            if (skipConcept(conceptID, that.regionConcept)) {
                 continue;
             }
 
@@ -361,12 +372,6 @@ function proxyUrl(application, url) {
     }
 
     return url;
-}
-
-function createAnd(filter, regionType) {
-    var and = filter.slice();
-//    and.unshift('REGIONTYPE.' + regionType);
-    return and.join(',');
 }
 
 function updateAbsResults(absItem, forceUpdate) {
@@ -454,7 +459,7 @@ function updateAbsResults(absItem, forceUpdate) {
                 onParseValue: $.csv.hooks.castToScalar
             });
             //clean up spurious extra lines from api
-            if (result.data[result.data.length-1].length < result.data[0].length) {
+            if (result.data.length > 0 && result.data[result.data.length-1].length < result.data[0].length) {
                 result.data.length--;
             }
             absItem.queryList.push(result);
@@ -466,11 +471,15 @@ function updateAbsResults(absItem, forceUpdate) {
     var regionType = absItem.regionType;
     for (var i = 0; i < queryFilters.length; ++i) {
         var filter = queryFilters[i];
+            //HACK FOR NOW - need to define regionTypeConcept?
+        if (absItem._concepts.indexOf('REGIONTYPE') !== -1) {
+            filter.push('REGIONTYPE.' + regionType);
+        }
         var parameters = {
             method: 'GetGenericData',
             datasetid: absItem.dataSetID,
-            and: createAnd(filter, regionType),
-            or: 'LGA_2011',
+            and: filter.join(','),
+            or: absItem.regionConcept,
             format: 'csv'
         };
         var url = baseUrl + '?' + objectToQuery(parameters);
@@ -498,6 +507,9 @@ function updateAbsResults(absItem, forceUpdate) {
         for (var i = 0; i < currentQueryList.length; i++) {
             var ndx = getQueryDataIndex(currentQueryList[i]);
             var csvArray = absItem.queryList[ndx].data;
+            if (csvArray.length === 0) {
+                continue;
+            }
             var valDest;
             if (!defined(finalCsvArray)) {
                 finalCsvArray = csvArray.map(filterRow);
@@ -516,6 +528,14 @@ function updateAbsResults(absItem, forceUpdate) {
             }
             //TODO: if percentage change value to value/total?
         }
+        //check that the created csvArray is ok
+        if (!defined(finalCsvArray) || finalCsvArray.length === 0) {
+            return when(absItem._csvCatalogItem.dynamicUpdate('')).then(function() {
+                absItem.legendUrl = '';
+                absItem.application.currentViewer.notifyRepaintRequired();
+            });
+        }
+
         //Serialize the arrays
         var joinedRows = finalCsvArray.map(function(arr) {
             return arr.join(',');
