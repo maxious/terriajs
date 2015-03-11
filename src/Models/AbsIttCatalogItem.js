@@ -239,7 +239,8 @@ AbsIttCatalogItem.prototype._load = function() {
     };
     var url = baseUrl + '?' + objectToQuery(parameters);
 
-    url = './data/2011Census_B15_AUST_POA_short.json';
+    //***CSV VERSION
+    url = './data/2011Census_B15_AUST_SA4_short.json';
 
     var that = this;
     var conceptNameMap, loadPromises = [];
@@ -255,6 +256,8 @@ AbsIttCatalogItem.prototype._load = function() {
     }
 
     loadPromises[1] = loadJson(url).then(function(json) {
+    //***CSV VERSION
+        that._dataHeader = json;
         that._concepts = json.concepts;
         console.log('concepts', that._concepts);
     });
@@ -264,34 +267,37 @@ AbsIttCatalogItem.prototype._load = function() {
 
         var promises = [];
 
-        var loadFunc = function(url, concept) {
-            return loadJson(url).then(function(json) {
-                console.log(url);
-                that.absDataset.items.push(concept);
+        function addConceptCodes(concept, json) {
+            that.absDataset.items.push(concept);
 
-                var codes = json.codes;
+            var codes = json.codes;
 
-                function absCodeUpdate() { updateAbsResults(that, false); }
-                var initActive = 1;
-                function addTree(parent, codes) {
-                    for (var i = 0; i < codes.length; ++i) {
-                        var parentCode = (parent instanceof AbsCode) ? parent.code : '';
-                        if (codes[i].parentCode === parentCode) {
-                            var absCode = new AbsCode(codes[i].code, codes[i].description);
-                            if (initActive-- > 0) {
-                                absCode.isActive = true;
-                            }
-                            if (parentCode === '' && codes.length < 50) {
-                                absCode.isOpen = true;
-                            }
-                            absCode.parent = parent;
-                            absCode.updateFunction = absCodeUpdate;
-                            parent.items.push(absCode);
-                            addTree(absCode, codes);
+            function absCodeUpdate() { updateAbsResults(that, false); }
+            var initActive = 1;
+            function addTree(parent, codes) {
+                for (var i = 0; i < codes.length; ++i) {
+                    var parentCode = (parent instanceof AbsCode) ? parent.code : '';
+                    if (codes[i].parentCode === parentCode) {
+                        var absCode = new AbsCode(codes[i].code, codes[i].description);
+                        if (initActive-- > 0) {
+                            absCode.isActive = true;
                         }
+                        if (parentCode === '' && codes.length < 50) {
+                            absCode.isOpen = true;
+                        }
+                        absCode.parent = parent;
+                        absCode.updateFunction = absCodeUpdate;
+                        parent.items.push(absCode);
+                        addTree(absCode, codes);
                     }
                 }
-                addTree(concept, codes);
+            }
+            addTree(concept, codes);
+        }
+
+        var loadFunc = function(url, concept) {
+            return loadJson(url).then( function(url) {
+                addConceptCodes(concept, json)
             });
         };
 
@@ -312,7 +318,10 @@ AbsIttCatalogItem.prototype._load = function() {
             var url = baseUrl + '?' + objectToQuery(parameters);
 
             var concept = new AbsConcept(conceptID, getConceptName(conceptID));
-            promises.push(loadFunc(url, concept));
+    //***CSV VERSION
+            var json = that._dataHeader.codeGroups[conceptID];
+            promises.push(addConceptCodes(concept, json));
+//            promises.push(loadFunc(url, concept));
         }
         return when.all(promises).then( function(results) {
 
@@ -470,11 +479,60 @@ function updateAbsResults(absItem, forceUpdate) {
     };
 
     var promises = [];
+    var url = './data/2011Census_B15_AUST_SA4_short.csv';
+    promises.push(loadFunc(url, name));
+    return when.all(promises).then( function(results) {
+        //When promises all done then sum up date for final csv
+        var csvArray = absItem.queryList[0].data;
+        var finalCsvArray = [];
+        finalCsvArray.push(["Total", "SA4"]);
+        var cols = [];
+        var map = absItem._dataHeader.filterColumnMap;
+        for (var f = 0; f < queryFilters.length; f++) {
+            var filter = queryFilters[f].join(',');
+            var colName = map[filter];
+            if (defined(colName)) {
+                finalCsvArray[0].push(queryNames[f].join(' '));
+                cols.push(csvArray[0].indexOf(colName));
+            }
+        }
+        for (var r = 1; r < csvArray.length; r++) {
+            var row = csvArray[r];
+            var newRow = [0, row[0]];
+            for (var c = 0; c < cols.length; c++) {
+                var val = row[cols[c]];
+                newRow[0] += val;
+                newRow.push(val);
+            }
+            finalCsvArray.push(newRow);
+        }
+        //check that the created csvArray is ok
+        if (!defined(finalCsvArray) || finalCsvArray.length === 0) {
+            return when(absItem._csvCatalogItem.dynamicUpdate('')).then(function() {
+                absItem.legendUrl = '';
+                absItem.application.currentViewer.notifyRepaintRequired();
+            });
+        }
+
+        //Serialize the arrays
+        var joinedRows = finalCsvArray.map(function(arr) {
+            return arr.join(',');
+        });
+        var text = joinedRows.join('\n');
+
+        return when(absItem._csvCatalogItem.dynamicUpdate(text)).then(function() {
+            absItem.legendUrl = absItem._csvCatalogItem.legendUrl;
+            absItem.application.currentViewer.notifyRepaintRequired();
+        });
+    });
+
+
+/*    
     var baseUrl = cleanAndProxyUrl(absItem.application, absItem.url);
     var regionType = absItem.regionType;
     for (var i = 0; i < queryFilters.length; ++i) {
         var filter = queryFilters[i];
-            //HACK FOR NOW - need to define regionTypeConcept?
+            //hack for abs data with regiontype concept
         if (absItem._concepts.indexOf('REGIONTYPE') !== -1) {
             filter.push('REGIONTYPE.' + regionType);
         }
@@ -497,7 +555,7 @@ function updateAbsResults(absItem, forceUpdate) {
     return when.all(promises).then( function(results) {
         //When promises all done then sum up date for final csv
         var finalCsvArray;
-        var colAdd = [false,true,true,true];
+//        var colAdd = [false,true,true,true];
         function filterRow(arr) {
             var newRow = [];
             arr.map(function (val, c) {
@@ -550,6 +608,7 @@ function updateAbsResults(absItem, forceUpdate) {
             absItem.application.currentViewer.notifyRepaintRequired();
         });
     });
+*/
 }
 
 
