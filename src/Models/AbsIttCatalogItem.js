@@ -239,6 +239,8 @@ AbsIttCatalogItem.prototype._load = function() {
     };
     var url = baseUrl + '?' + objectToQuery(parameters);
 
+    url = './data/2011Census_B15_AUST_POA_short.json';
+
     var that = this;
     var conceptNameMap, loadPromises = [];
 
@@ -264,6 +266,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
         var loadFunc = function(url, concept) {
             return loadJson(url).then(function(json) {
+                console.log(url);
                 that.absDataset.items.push(concept);
 
                 var codes = json.codes;
