@@ -240,7 +240,7 @@ AbsIttCatalogItem.prototype._load = function() {
     var url = baseUrl + '?' + objectToQuery(parameters);
 
     //***CSV VERSION
-    url = './data/2011Census_B15_AUST_SA4_short.json';
+//    url = './data/2011Census_B15_AUST_SA4_short.json';
 
     var that = this;
     var conceptNameMap, loadPromises = [];
@@ -296,7 +296,7 @@ AbsIttCatalogItem.prototype._load = function() {
         }
 
         var loadFunc = function(url, concept) {
-            return loadJson(url).then( function(url) {
+            return loadJson(url).then( function(json) {
                 addConceptCodes(concept, json)
             });
         };
@@ -319,9 +319,9 @@ AbsIttCatalogItem.prototype._load = function() {
 
             var concept = new AbsConcept(conceptID, getConceptName(conceptID));
     //***CSV VERSION
-            var json = that._dataHeader.codeGroups[conceptID];
-            promises.push(addConceptCodes(concept, json));
-//            promises.push(loadFunc(url, concept));
+//            var json = that._dataHeader.codeGroups[conceptID];
+//            promises.push(addConceptCodes(concept, json));
+            promises.push(loadFunc(url, concept));
         }
         return when.all(promises).then( function(results) {
 
@@ -447,26 +447,26 @@ function updateAbsResults(absItem, forceUpdate) {
 
 
     //build abs itt api urls and load the text for each
-    if (!defined(absItem.queryList)) {
-        absItem.queryList = [];
+    if (!defined(absItem.filterList)) {
+        absItem.filterList = [];
     }
 
-    function getQueryDataIndex(url) {
-        for (var i = 0; i < absItem.queryList.length; i++) {
-            if (absItem.queryList[i].url === url) {
+    function getFilterDataIndex(filter) {
+        for (var i = 0; i < absItem.filterList.length; i++) {
+            if (absItem.filterList[i].filter === filter) {
                 return i;
             }
         }
         return -1;
     }
 
-    var currentQueryList = [];
-    var loadFunc = function(url, name) {
-        if (getQueryDataIndex(url) !== -1) {
+    var currentFilterList = [];
+    var loadFunc = function(url, filter, name) {
+        if (getFilterDataIndex(filter) !== -1) {
             return;
         }
         return loadText(url).then(function(text) {
-            var result = {url: url, name: name};
+            var result = {filter: filter, name: name};
             result.data = $.csv.toArrays(text, {
                 onParseValue: $.csv.hooks.castToScalar
             });
@@ -474,16 +474,16 @@ function updateAbsResults(absItem, forceUpdate) {
             if (result.data.length > 0 && result.data[result.data.length-1].length < result.data[0].length) {
                 result.data.length--;
             }
-            absItem.queryList.push(result);
+            absItem.filterList.push(result);
         });
     };
-
+/*
     var promises = [];
     var url = './data/2011Census_B15_AUST_SA4_short.csv';
     promises.push(loadFunc(url, name));
     return when.all(promises).then( function(results) {
         //When promises all done then sum up date for final csv
-        var csvArray = absItem.queryList[0].data;
+        var csvArray = absItem.filterList[0].data;
         var finalCsvArray = [];
         finalCsvArray.push(["Total", "SA4"]);
         var cols = [];
@@ -525,37 +525,38 @@ function updateAbsResults(absItem, forceUpdate) {
             absItem.application.currentViewer.notifyRepaintRequired();
         });
     });
+*/
 
-
-/*    
+    
+    var promises = [];
     var baseUrl = cleanAndProxyUrl(absItem.application, absItem.url);
     var regionType = absItem.regionType;
     for (var i = 0; i < queryFilters.length; ++i) {
-        var filter = queryFilters[i];
+        var filter = queryFilters[i].join(',');
             //hack for abs data with regiontype concept
         if (absItem._concepts.indexOf('REGIONTYPE') !== -1) {
-            filter.push('REGIONTYPE.' + regionType);
+            filter += ',REGIONTYPE.' + regionType;
         }
+        var name = queryNames[i].join(' ');
+
         var parameters = {
             method: 'GetGenericData',
             datasetid: absItem.dataSetID,
-            and: filter.join(','),
+            and: filter,
             or: absItem.regionConcept,
             format: 'csv'
         };
         var url = baseUrl + '?' + objectToQuery(parameters);
 
-        var name = queryNames[i].join(' ');
+        currentFilterList.push(filter);
 
-        currentQueryList.push(url);  //remember for this specific dataset
-
-        promises.push(loadFunc(url, name));
+        promises.push(loadFunc(url, filter, name));
     }
 
     return when.all(promises).then( function(results) {
         //When promises all done then sum up date for final csv
         var finalCsvArray;
-//        var colAdd = [false,true,true,true];
+        var colAdd = [false,true,true,true];
         function filterRow(arr) {
             var newRow = [];
             arr.map(function (val, c) {
@@ -565,9 +566,9 @@ function updateAbsResults(absItem, forceUpdate) {
             });
             return newRow;
         }                
-        for (var i = 0; i < currentQueryList.length; i++) {
-            var ndx = getQueryDataIndex(currentQueryList[i]);
-            var csvArray = absItem.queryList[ndx].data;
+        for (var i = 0; i < currentFilterList.length; i++) {
+            var ndx = getFilterDataIndex(currentFilterList[i]);
+            var csvArray = absItem.filterList[ndx].data;
             if (csvArray.length === 0) {
                 continue;
             }
@@ -580,7 +581,7 @@ function updateAbsResults(absItem, forceUpdate) {
                 finalCsvArray[0][idxRgn] = absItem.regionType;
             }
             var valOrig = csvArray[0].indexOf('Value');
-            finalCsvArray[0].push(absItem.queryList[ndx].name);
+            finalCsvArray[0].push(absItem.filterList[ndx].name);
             for (var n = 1; n < finalCsvArray.length; n++) {
                 finalCsvArray[n].push(csvArray[n][valOrig]);
                 if (i > 0) {
@@ -608,7 +609,6 @@ function updateAbsResults(absItem, forceUpdate) {
             absItem.application.currentViewer.notifyRepaintRequired();
         });
     });
-*/
 }
 
 
