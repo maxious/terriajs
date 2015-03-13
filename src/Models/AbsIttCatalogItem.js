@@ -39,7 +39,10 @@ var AbsIttCatalogItem = function(application) {
     this._csvCatalogItem = undefined;
     this._metadata = undefined;
     this._absDataset = undefined;
-    this._concepts = [];
+    this._absDataTable = undefined;
+    this._filterColumnMap = [];
+
+    this._regionTypeActive = false;
 
     /**
      * Gets or sets the URL of the ABS ITT API, typically http://stat.abs.gov.au/itt/query.jsp.
@@ -72,7 +75,7 @@ var AbsIttCatalogItem = function(application) {
      * (or equivalent).  This property is observable.
      * @type {String}
      */
-    this.regionConcept = 'REGION';
+    this.regionConcept = undefined;
 
     /**
      * Gets the list of initial concepts and codes on which to filter the data.  You can obtain a list of all available
@@ -230,40 +233,52 @@ function skipConcept(concept, regionConcept) {
 AbsIttCatalogItem.prototype._load = function() {
     this._csvCatalogItem = new CsvCatalogItem(this.application);
     this._csvCatalogItem.opacity = this.opacity;
-
-    var baseUrl = cleanAndProxyUrl(this.application, this.url);
-    var parameters = {
-        method: 'GetDatasetConcepts',
-        datasetid: this.dataSetID,
-        format: 'json'
-    };
-    var url = baseUrl + '?' + objectToQuery(parameters);
-
-    //***CSV VERSION
-//    url = './data/2011Census_B15_AUST_SA4_short.json';
+    this._csvCatalogItem.opacity = this.opacity;
 
     var that = this;
-    var conceptNameMap, loadPromises = [];
+    var concepts, codeGroups, conceptNameMap, loadPromises = [];
 
     this._absDataset = new AbsDataset();
 
+    if (this.dataSetID === 'FILE') {
+        loadPromises.push(loadText(this.url + '.csv').then( function(text) {
+            that._absDataTable = $.csv.toArrays(text, {
+                onParseValue: $.csv.hooks.castToScalar
+            });
+        }));
+        loadPromises.push(loadJson(this.url + '.json').then(function(json) {
+            concepts = json.concepts;
+            codeGroups = json.codeGroups;
+            that._filterColumnMap = json.filterColumnMap;
+        }));
+        this.regionConcept = this.regionConcept || 'region_id';
+    } 
+    else {
+        var baseUrl = cleanAndProxyUrl(this.application, this.url);
+        var parameters = {
+            method: 'GetDatasetConcepts',
+            datasetid: this.dataSetID,
+            format: 'json'
+        };
+        var url = baseUrl + '?' + objectToQuery(parameters);
+
+        loadPromises.push(loadJson(url).then(function(json) {
+            concepts = json.concepts;
+        }));
+        this.regionConcept = this.regionConcept || 'REGION';
+    }
+
     //cover for missing human readable name in api
-    loadPromises[0] = loadJson('data/abs_names.json').then(function(json) {
+    loadPromises.push(loadJson('data/abs_names.json').then(function(json) {
         conceptNameMap = json;
-    });
+    }));
     function getConceptName(id) {
         return defined(conceptNameMap[id]) ? conceptNameMap[id] : id;
     }
 
-    loadPromises[1] = loadJson(url).then(function(json) {
-    //***CSV VERSION
-        that._dataHeader = json;
-        that._concepts = json.concepts;
-        console.log('concepts', that._concepts);
-    });
 
     return when.all(loadPromises).then(function() {
-        //call GetDatasetConcepts and then GetCodeListValue to build up a heirarchical tree
+        //call GetDatasetConcepts and then GetCodeListValue to build up a tree
 
         var promises = [];
 
@@ -297,12 +312,14 @@ AbsIttCatalogItem.prototype._load = function() {
 
         var loadFunc = function(url, concept) {
             return loadJson(url).then( function(json) {
-                addConceptCodes(concept, json)
+                addConceptCodes(concept, json);
             });
         };
 
-        for (var i = 0; i < that._concepts.length; ++i) {
-            var conceptID = that._concepts[i];
+        for (var i = 0; i < concepts.length; ++i) {
+            var conceptID = concepts[i];
+
+            that._regionTypeActive |= (conceptID === 'REGIONTYPE');
 
             if (skipConcept(conceptID, that.regionConcept)) {
                 continue;
@@ -318,17 +335,23 @@ AbsIttCatalogItem.prototype._load = function() {
             var url = baseUrl + '?' + objectToQuery(parameters);
 
             var concept = new AbsConcept(conceptID, getConceptName(conceptID));
-    //***CSV VERSION
-//            var json = that._dataHeader.codeGroups[conceptID];
-//            promises.push(addConceptCodes(concept, json));
-            promises.push(loadFunc(url, concept));
+
+            if (defined(codeGroups)) {
+                var json = codeGroups[conceptID];
+                if (defined(json)) {
+                    promises.push(addConceptCodes(concept, json));
+                }
+            }
+            else {
+                promises.push(loadFunc(url, concept));
+            }
         }
         return when.all(promises).then( function(results) {
 
             that._absDataset.isLoading = false;
 
-            //TODO: see if I can get rid of this - also if need to flag show on initial load
-            return updateAbsResults(that);
+            //keep checking if this is necessary
+//            return updateAbsResults(that);
 
         });
     }).otherwise(function(e) {
@@ -445,22 +468,16 @@ function updateAbsResults(absItem, forceUpdate) {
     }
     buildQueryFilters(0, [], []);
 
-
-    //build abs itt api urls and load the text for each
-    if (!defined(absItem.filterList)) {
-        absItem.filterList = [];
-    }
-
     function getFilterDataIndex(filter) {
-        for (var i = 0; i < absItem.filterList.length; i++) {
-            if (absItem.filterList[i].filter === filter) {
+        for (var i = 0; i < absItem._filterColumnMap.length; i++) {
+            if (absItem._filterColumnMap[i].filter === filter) {
                 return i;
             }
         }
         return -1;
     }
 
-    var loadFunc = function(url, filterItem) {
+    var loadFilterData = function(url, filterItem) {
         if (getFilterDataIndex(filterItem.filter) !== -1) {
             return;
         }
@@ -472,35 +489,38 @@ function updateAbsResults(absItem, forceUpdate) {
             if (data.length > 0 && data[data.length-1].length < data[0].length) {
                 data.length--;
             }
+            filterItem.colName =  filterItem.filter.split(',').join('_');
             var ndx = data[0].indexOf('Value');
             data[0][ndx] = filterItem.colName;
-            if (!defined(absItem.absDataTable)) {
-                absItem.absDataTable = data;
+            if (!defined(absItem._absDataTable)) {
+                absItem._absDataTable = data;
             } else {
                 data.forEach( function(row, r) {
-                    absItem.absDataTable[r].push(row[ndx]);
+                    absItem._absDataTable[r].push(row[ndx]);
                 });
             }
-            absItem.filterList.push(filterItem);
+            absItem._filterColumnMap.push(filterItem);
         });
     };
 
     var promises = [];
+
     var currentFilterList = [];
     var baseUrl = cleanAndProxyUrl(absItem.application, absItem.url);
     var regionType = absItem.regionType;
     for (var i = 0; i < queryFilters.length; ++i) {
         var filterItem = {
             filter: queryFilters[i].join(','),
-            name: queryNames[i].join(' '),
-            colName: queryFilters[i].join('_')
+            name: queryNames[i].join(' ')
         };
+        currentFilterList.push(filterItem);
 
-            //hack for abs data with regiontype concept
-        var regionArg = '';
-        if (absItem._concepts.indexOf('REGIONTYPE') !== -1) {
-            regionArg = ',REGIONTYPE.' + regionType;
+        if (absItem.dataSetID === 'FILE') {
+            continue;
         }
+
+            //abs data with regiontype concept
+        var regionArg = absItem._regionTypeActive ? ',REGIONTYPE.' + regionType : '';
 
         var parameters = {
             method: 'GetGenericData',
@@ -511,33 +531,27 @@ function updateAbsResults(absItem, forceUpdate) {
         };
         var url = baseUrl + '?' + objectToQuery(parameters);
 
-        currentFilterList.push(filterItem);
-
-        promises.push(loadFunc(url, filterItem));
+        promises.push(loadFilterData(url, filterItem));
     }
 
-
-//    var url = './data/2011Census_B15_AUST_SA4_short.csv';
-//    promises.push(loadFunc(url, filter, name));
     return when.all(promises).then( function(results) {
         //When promises all done then sum up date for final csv
-        var csvArray = absItem.absDataTable;
+        var csvArray = absItem._absDataTable;
         var finalCsvArray = [];
-        finalCsvArray.push(["Total", "SA4"]);
+        var regionCol = csvArray[0].indexOf(absItem.regionConcept);
+        finalCsvArray.push(["Total", absItem.regionType]);
         var cols = [];
-//        var map = absItem._dataHeader.filterColumnMap;
         for (var f = 0; f < currentFilterList.length; f++) {
-            var filterItem = currentFilterList[f];
-            var colName = filterItem.colName;
-//            var colName = map[filter];
-            if (defined(colName)) {
-                finalCsvArray[0].push(filterItem.name);
+            var idx = getFilterDataIndex(currentFilterList[f].filter);
+            var colName = absItem._filterColumnMap[idx].colName;
+           if (defined(colName)) {
+                finalCsvArray[0].push(currentFilterList[f].name);
                 cols.push(csvArray[0].indexOf(colName));
             }
         }
         for (var r = 1; r < csvArray.length; r++) {
             var row = csvArray[r];
-            var newRow = [0, row[2]];  //!!!
+            var newRow = [0, row[regionCol]];
             for (var c = 0; c < cols.length; c++) {
                 var val = row[cols[c]];
                 newRow[0] += val;
