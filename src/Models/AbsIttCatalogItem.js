@@ -460,135 +460,90 @@ function updateAbsResults(absItem, forceUpdate) {
         return -1;
     }
 
-    var currentFilterList = [];
-    var loadFunc = function(url, filter, name) {
-        if (getFilterDataIndex(filter) !== -1) {
+    var loadFunc = function(url, filterItem) {
+        if (getFilterDataIndex(filterItem.filter) !== -1) {
             return;
         }
         return loadText(url).then(function(text) {
-            var result = {filter: filter, name: name};
-            result.data = $.csv.toArrays(text, {
+            var data = $.csv.toArrays(text, {
                 onParseValue: $.csv.hooks.castToScalar
             });
             //clean up spurious extra lines from api
-            if (result.data.length > 0 && result.data[result.data.length-1].length < result.data[0].length) {
-                result.data.length--;
+            if (data.length > 0 && data[data.length-1].length < data[0].length) {
+                data.length--;
             }
-            absItem.filterList.push(result);
+            var ndx = data[0].indexOf('Value');
+            data[0][ndx] = filterItem.colName;
+            if (!defined(absItem.absDataTable)) {
+                absItem.absDataTable = data;
+            } else {
+                data.forEach( function(row, r) {
+                    absItem.absDataTable[r].push(row[ndx]);
+                });
+            }
+            absItem.filterList.push(filterItem);
         });
     };
-/*
+
     var promises = [];
-    var url = './data/2011Census_B15_AUST_SA4_short.csv';
-    promises.push(loadFunc(url, name));
+    var currentFilterList = [];
+    var baseUrl = cleanAndProxyUrl(absItem.application, absItem.url);
+    var regionType = absItem.regionType;
+    for (var i = 0; i < queryFilters.length; ++i) {
+        var filterItem = {
+            filter: queryFilters[i].join(','),
+            name: queryNames[i].join(' '),
+            colName: queryFilters[i].join('_')
+        };
+
+            //hack for abs data with regiontype concept
+        var regionArg = '';
+        if (absItem._concepts.indexOf('REGIONTYPE') !== -1) {
+            regionArg = ',REGIONTYPE.' + regionType;
+        }
+
+        var parameters = {
+            method: 'GetGenericData',
+            datasetid: absItem.dataSetID,
+            and: filterItem.filter + regionArg,
+            or: absItem.regionConcept,
+            format: 'csv'
+        };
+        var url = baseUrl + '?' + objectToQuery(parameters);
+
+        currentFilterList.push(filterItem);
+
+        promises.push(loadFunc(url, filterItem));
+    }
+
+
+//    var url = './data/2011Census_B15_AUST_SA4_short.csv';
+//    promises.push(loadFunc(url, filter, name));
     return when.all(promises).then( function(results) {
         //When promises all done then sum up date for final csv
-        var csvArray = absItem.filterList[0].data;
+        var csvArray = absItem.absDataTable;
         var finalCsvArray = [];
         finalCsvArray.push(["Total", "SA4"]);
         var cols = [];
-        var map = absItem._dataHeader.filterColumnMap;
-        for (var f = 0; f < queryFilters.length; f++) {
-            var filter = queryFilters[f].join(',');
-            var colName = map[filter];
+//        var map = absItem._dataHeader.filterColumnMap;
+        for (var f = 0; f < currentFilterList.length; f++) {
+            var filterItem = currentFilterList[f];
+            var colName = filterItem.colName;
+//            var colName = map[filter];
             if (defined(colName)) {
-                finalCsvArray[0].push(queryNames[f].join(' '));
+                finalCsvArray[0].push(filterItem.name);
                 cols.push(csvArray[0].indexOf(colName));
             }
         }
         for (var r = 1; r < csvArray.length; r++) {
             var row = csvArray[r];
-            var newRow = [0, row[0]];
+            var newRow = [0, row[2]];  //!!!
             for (var c = 0; c < cols.length; c++) {
                 var val = row[cols[c]];
                 newRow[0] += val;
                 newRow.push(val);
             }
             finalCsvArray.push(newRow);
-        }
-        //check that the created csvArray is ok
-        if (!defined(finalCsvArray) || finalCsvArray.length === 0) {
-            return when(absItem._csvCatalogItem.dynamicUpdate('')).then(function() {
-                absItem.legendUrl = '';
-                absItem.application.currentViewer.notifyRepaintRequired();
-            });
-        }
-
-        //Serialize the arrays
-        var joinedRows = finalCsvArray.map(function(arr) {
-            return arr.join(',');
-        });
-        var text = joinedRows.join('\n');
-
-        return when(absItem._csvCatalogItem.dynamicUpdate(text)).then(function() {
-            absItem.legendUrl = absItem._csvCatalogItem.legendUrl;
-            absItem.application.currentViewer.notifyRepaintRequired();
-        });
-    });
-*/
-
-    
-    var promises = [];
-    var baseUrl = cleanAndProxyUrl(absItem.application, absItem.url);
-    var regionType = absItem.regionType;
-    for (var i = 0; i < queryFilters.length; ++i) {
-        var filter = queryFilters[i].join(',');
-            //hack for abs data with regiontype concept
-        if (absItem._concepts.indexOf('REGIONTYPE') !== -1) {
-            filter += ',REGIONTYPE.' + regionType;
-        }
-        var name = queryNames[i].join(' ');
-
-        var parameters = {
-            method: 'GetGenericData',
-            datasetid: absItem.dataSetID,
-            and: filter,
-            or: absItem.regionConcept,
-            format: 'csv'
-        };
-        var url = baseUrl + '?' + objectToQuery(parameters);
-
-        currentFilterList.push(filter);
-
-        promises.push(loadFunc(url, filter, name));
-    }
-
-    return when.all(promises).then( function(results) {
-        //When promises all done then sum up date for final csv
-        var finalCsvArray;
-        var colAdd = [false,true,true,true];
-        function filterRow(arr) {
-            var newRow = [];
-            arr.map(function (val, c) {
-                if (colAdd[c]) {
-                    newRow.push(val);
-                }
-            });
-            return newRow;
-        }                
-        for (var i = 0; i < currentFilterList.length; i++) {
-            var ndx = getFilterDataIndex(currentFilterList[i]);
-            var csvArray = absItem.filterList[ndx].data;
-            if (csvArray.length === 0) {
-                continue;
-            }
-            var valDest;
-            if (!defined(finalCsvArray)) {
-                finalCsvArray = csvArray.map(filterRow);
-                valDest = finalCsvArray[0].indexOf('Value');
-                finalCsvArray[0][valDest] = 'Total';
-                var idxRgn = finalCsvArray[0].indexOf('REGION');
-                finalCsvArray[0][idxRgn] = absItem.regionType;
-            }
-            var valOrig = csvArray[0].indexOf('Value');
-            finalCsvArray[0].push(absItem.filterList[ndx].name);
-            for (var n = 1; n < finalCsvArray.length; n++) {
-                finalCsvArray[n].push(csvArray[n][valOrig]);
-                if (i > 0) {
-                    finalCsvArray[n][valDest] += csvArray[n][valOrig];
-                }
-            }
-            //TODO: if percentage change value to value/total?
         }
         //check that the created csvArray is ok
         if (!defined(finalCsvArray) || finalCsvArray.length === 0) {
