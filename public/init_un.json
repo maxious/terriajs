@@ -2,7 +2,7 @@
     "corsDomains": [
         "corsproxy.com"
     ],
-    "camera": {
+    "homeCamera": {
         "west": 60,
         "south": 0,
         "east": 160,
@@ -978,13 +978,8 @@
                             ]
                         }
                     ]
->>>>>>> 1cf86c06690c61d665a4a65106540ef8986ea0a1
                 }
             ]
         }
     ]
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 1cf86c06690c61d665a4a65106540ef8986ea0a1
