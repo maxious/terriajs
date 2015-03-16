@@ -287,7 +287,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
             var codes = json.codes;
 
-            function absCodeUpdate() { updateAbsResults(that, false); }
+            function absCodeUpdate() { return updateAbsResults(that, false); }
             var initActive = 1;
             function addTree(parent, codes) {
                 for (var i = 0; i < codes.length; ++i) {
@@ -351,7 +351,7 @@ AbsIttCatalogItem.prototype._load = function() {
             that._absDataset.isLoading = false;
 
             //keep checking if this is necessary
-//            return updateAbsResults(that);
+            return updateAbsResults(that);
 
         });
     }).otherwise(function(e) {
@@ -539,7 +539,7 @@ function updateAbsResults(absItem, forceUpdate) {
         var csvArray = absItem._absDataTable;
         var finalCsvArray = [];
         var regionCol = csvArray[0].indexOf(absItem.regionConcept);
-        finalCsvArray.push(["Total", absItem.regionType]);
+        finalCsvArray.push(["Region Total", absItem.regionType]);
         var cols = [];
         for (var f = 0; f < currentFilterList.length; f++) {
             var idx = getFilterDataIndex(currentFilterList[f].filter);
