@@ -2,11 +2,14 @@
     "proxyDomains" : [
         "nicta.com.au",
         "gov.au",
+        "csiro.au",
         "arcgis.com",
+        "argo.jcommops.org",
+        "www.abc.net.au",
         "unep.ch:8080"
-    ],
+   ],
     "initializationUrls" : [
-    	"init_un.json"
+        "init_un.json"
     ]
 }
 
