@@ -209,6 +209,7 @@ defineProperties(AbsIttCatalogItem.prototype, {
  */
 AbsIttCatalogItem.defaultPropertiesForSharing = clone(CatalogItem.defaultPropertiesForSharing);
 AbsIttCatalogItem.defaultPropertiesForSharing.push('opacity');
+AbsIttCatalogItem.defaultPropertiesForSharing.push('filter');
 freezeObject(AbsIttCatalogItem.defaultPropertiesForSharing);
 
 
@@ -237,6 +238,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
     var that = this;
     var concepts, codeGroups, conceptNameMap, loadPromises = [];
+    var createDefaultFilter = (this.filter.length === 0);
 
     this._absDataset = new AbsDataset();
 
@@ -276,7 +278,6 @@ AbsIttCatalogItem.prototype._load = function() {
         return defined(conceptNameMap[id]) ? conceptNameMap[id] : id;
     }
 
-
     return when.all(loadPromises).then(function() {
         //call GetDatasetConcepts and then GetCodeListValue to build up a tree
 
@@ -288,13 +289,21 @@ AbsIttCatalogItem.prototype._load = function() {
             var codes = json.codes;
 
             function absCodeUpdate() { return updateAbsResults(that, false); }
-            var initActive = 1;
+            if (createDefaultFilter) {
+                for (var i = 0; i < codes.length; ++i) {
+                    if (codes[i].parentCode === "") {
+                        that.filter.push(concept.code + '.' + codes[i].code);
+                        break;
+                    }
+                }
+            }
             function addTree(parent, codes) {
                 for (var i = 0; i < codes.length; ++i) {
                     var parentCode = (parent instanceof AbsCode) ? parent.code : '';
                     if (codes[i].parentCode === parentCode) {
                         var absCode = new AbsCode(codes[i].code, codes[i].description);
-                        if (initActive-- > 0) {
+                        var codeFilter = concept.code + '.' + absCode.code;
+                        if (that.filter.indexOf(codeFilter) !== -1) {
                             absCode.isActive = true;
                         }
                         if (parentCode === '' && codes.length < 50) {
@@ -417,12 +426,15 @@ function updateAbsResults(absItem, forceUpdate) {
 
     //walk tree to get active codes
     var activeCodes = [];
+    absItem.filter = [];
     function appendActiveCodes(parent, idxConcept, conceptCode) {
         for (var i = 0; i < parent.items.length; i++) {
             var node = parent.items[i];
             //don't do children if parent active since it's a total
             if (node.isActive) {
-                activeCodes[idxConcept].push({filter: conceptCode + '.' + node.code, name: node.name});
+                var codeFilter = conceptCode + '.' + node.code;
+                absItem.filter.push(codeFilter);
+                activeCodes[idxConcept].push({filter: codeFilter, name: node.name});
             }
             else {
                 appendActiveCodes(node, idxConcept, conceptCode);
@@ -438,9 +450,9 @@ function updateAbsResults(absItem, forceUpdate) {
         appendActiveCodes(concept, f, concept.code);
         if (activeCodes[f].length === 0) {
             bValidSelection = false;
-            break;
         }
     }
+
     if (!bValidSelection) {
         console.log('No display because each concept must have at least one code selected.');
         return when(absItem._csvCatalogItem.dynamicUpdate('')).then(function() {

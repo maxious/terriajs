@@ -2568,8 +2568,7 @@
                     "type": "abs-itt",
                     "url": "http://stat.abs.gov.au/itt/query.jsp",
                     "dataSetID": "ABS_CENSUS2011_B04",
-                    "regionType": "SA4",
-                    "filter": ["MEASURE.1", "AGE.A04", "AGE.A10"]
+                    "regionType": "SA4"
                 },
                 {
                     "name": "Country of Birth",
@@ -2659,7 +2658,8 @@
                     "type": "abs-itt",
                     "url": "./data/2011Census_B15_AUST_SA4_short",
                     "dataSetID": "FILE",
-                    "regionType": "SA4"
+                    "regionType": "SA4",
+                    "filter": ["MEASURE.1", "MEASURE.2", "TYPP.10"]
                 },
                 {
                     "name": "SEIFA by Local Government Area",
