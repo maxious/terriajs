@@ -499,6 +499,8 @@ function loadTable(csvItem, text) {
         return;
     }    
     csvItem._tableDataSource.loadText(text);
+//    csvItem._tableDataSource.dataset.variables['Region Percent'].maxVal = 20.0;
+//    csvItem._tableDataSource.dataset.variables['Region Percent'].minVal = 5.0;
 
     if (!csvItem._tableDataSource.dataset.hasLocationData()) {
         console.log('No locaton date found in csv file - trying to match based on region');

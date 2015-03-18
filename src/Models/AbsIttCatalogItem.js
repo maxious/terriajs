@@ -243,7 +243,7 @@ AbsIttCatalogItem.prototype._load = function() {
     this._absDataset = new AbsDataset();
 
     if (this.dataSetID === 'FILE') {
-        loadPromises.push(loadText(this.url + '.csv').then( function(text) {
+        loadPromises.push(loadText(this.url + '_' + this.regionType + '_short.csv').then( function(text) {
             that._absDataTable = $.csv.toArrays(text, {
                 onParseValue: $.csv.hooks.castToScalar
             });
@@ -269,6 +269,12 @@ AbsIttCatalogItem.prototype._load = function() {
         }));
         this.regionConcept = this.regionConcept || 'REGION';
     }
+
+    loadPromises.push(loadText('data/2011Census_TOT_' + this.regionType + '.csv').then( function(text) {
+        that._absTotalTable = $.csv.toArrays(text, {
+            onParseValue: $.csv.hooks.castToScalar
+        });
+    }));
 
     //cover for missing human readable name in api
     loadPromises.push(loadJson('data/abs_names.json').then(function(json) {
@@ -551,7 +557,8 @@ function updateAbsResults(absItem, forceUpdate) {
         var csvArray = absItem._absDataTable;
         var finalCsvArray = [];
         var regionCol = csvArray[0].indexOf(absItem.regionConcept);
-        finalCsvArray.push(["Region Total", absItem.regionType]);
+        finalCsvArray.push(["Region Percent", absItem.regionType]);
+//        finalCsvArray.push(["Region Total", absItem.regionType]);
         var cols = [];
         for (var f = 0; f < currentFilterList.length; f++) {
             var idx = getFilterDataIndex(currentFilterList[f].filter);
@@ -561,16 +568,21 @@ function updateAbsResults(absItem, forceUpdate) {
                 cols.push(csvArray[0].indexOf(colName));
             }
         }
+
         for (var r = 1; r < csvArray.length; r++) {
-            var row = csvArray[r];
-            var newRow = [0, row[regionCol]];
+            var newRow = [0, csvArray[r][regionCol]];
             for (var c = 0; c < cols.length; c++) {
-                var val = row[cols[c]];
+                var val = csvArray[r][cols[c]];
                 newRow[0] += val;
                 newRow.push(val);
             }
+            if (true) {
+                val = absItem._absTotalTable[r][3];
+                newRow[0] = val > 0 ? Math.round(newRow[0] * 10000 / val)/100 : 0;
+            }
             finalCsvArray.push(newRow);
         }
+
         //check that the created csvArray is ok
         if (!defined(finalCsvArray) || finalCsvArray.length === 0) {
             return when(absItem._csvCatalogItem.dynamicUpdate('')).then(function() {

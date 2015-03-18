@@ -2656,9 +2656,9 @@
                         "-11.05104999964455"
                     ],
                     "type": "abs-itt",
-                    "url": "./data/2011Census_B15_AUST_SA4_short",
+                    "url": "./data/2011Census_B15_AUST",
                     "dataSetID": "FILE",
-                    "regionType": "SA4",
+                    "regionType": "SA3",
                     "filter": ["MEASURE.1", "MEASURE.2", "TYPP.10"]
                 },
                 {
