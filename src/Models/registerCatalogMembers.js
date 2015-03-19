@@ -2,6 +2,7 @@
 
 /*global require*/
 
+var ArcGisMapServerCatalogGroup = require('./ArcGisMapServerCatalogGroup');
 var ArcGisMapServerCatalogItem = require('./ArcGisMapServerCatalogItem');
 var CkanCatalogGroup = require('./CkanCatalogGroup');
 var createCatalogMemberFromType = require('./createCatalogMemberFromType');
@@ -25,6 +26,7 @@ var registerCatalogMembers = function() {
     createCatalogMemberFromType.register('csv', CsvCatalogItem);
     createCatalogMemberFromType.register('czml', CzmlCatalogItem);
     createCatalogMemberFromType.register('esri-mapServer', ArcGisMapServerCatalogItem);
+    createCatalogMemberFromType.register('esri-mapServer-group', ArcGisMapServerCatalogGroup);
     createCatalogMemberFromType.register('geojson', GeoJsonCatalogItem);
     createCatalogMemberFromType.register('gpx', GpxCatalogItem);
     createCatalogMemberFromType.register('group', CatalogGroup);
