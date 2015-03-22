@@ -42,16 +42,17 @@ var TableDataSource = function () {
     this.leadTimeMin = 0;
     this.trailTimeMin = 60;
 
+    this.minDisplayValue = undefined;
+    this.maxDisplayValue = undefined;
+
     var rainbowGradient = [
         {offset: 0.0, color: 'rgba(32,0,200,1.0)'},
         {offset: 0.25, color: 'rgba(0,200,200,1.0)'},
-        {offset: 0.25, color: 'rgba(0,200,200,1.0)'},
         {offset: 0.5, color: 'rgba(0,200,0,1.0)'},
-        {offset: 0.5, color: 'rgba(0,200,0,1.0)'},
-        {offset: 0.75, color: 'rgba(200,200,0,1.0)'},
         {offset: 0.75, color: 'rgba(200,200,0,1.0)'},
         {offset: 1.0, color: 'rgba(200,0,0,1.0)'}
     ];
+
     this.setColorGradient(rainbowGradient);
 };
 
@@ -287,8 +288,8 @@ TableDataSource.prototype._getNormalizedPoint = function (pntVal) {
     if (data === undefined || data.isNoData(pntVal)) {
         return undefined;
     }
-    var minVal = data.getMinVal();
-    var maxVal = data.getMaxVal();
+    var minVal = minDisplayValue || data.getMinVal();
+    var maxVal = maxDisplayValue || data.getMaxVal();
     var normPoint = (maxVal === minVal) ? 0 : (pntVal - minVal) / (maxVal - minVal);
     return normPoint;
 };

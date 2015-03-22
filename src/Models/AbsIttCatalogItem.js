@@ -94,7 +94,14 @@ var AbsIttCatalogItem = function(application) {
      */
     this.opacity = 0.6;
 
-    knockout.track(this, ['url', 'dataSetID', 'regionType', 'regionConcept', 'filter', '_absDataset', 'opacity']);
+    /**
+     * Gets or sets whether to show percentages or raw values.  This property is observable.
+     * @type {Boolean}
+     * @default true
+     */
+    this.displayPercent = true;
+
+    knockout.track(this, ['url', 'dataSetID', 'regionType', 'regionConcept', 'filter', '_absDataset', 'opacity', 'displayPercent']);
 
     delete this.__knockoutObservables.absDataset;
     knockout.defineProperty(this, 'absDataset', {
@@ -108,6 +115,10 @@ var AbsIttCatalogItem = function(application) {
 
     knockout.getObservable(this, 'opacity').subscribe(function(newValue) {
         this._csvCatalogItem.opacity = this.opacity;
+    }, this);
+
+    knockout.getObservable(this, 'displayPercent').subscribe(function(newValue) {
+        updateAbsResults(this, true);
     }, this);
 };
 
@@ -557,8 +568,8 @@ function updateAbsResults(absItem, forceUpdate) {
         var csvArray = absItem._absDataTable;
         var finalCsvArray = [];
         var regionCol = csvArray[0].indexOf(absItem.regionConcept);
-        finalCsvArray.push(["Region Percent", absItem.regionType]);
-//        finalCsvArray.push(["Region Total", absItem.regionType]);
+
+        finalCsvArray.push([absItem.displayPercent ? "Region Percent" : "Region Total", absItem.regionType]);
         var cols = [];
         for (var f = 0; f < currentFilterList.length; f++) {
             var idx = getFilterDataIndex(currentFilterList[f].filter);
@@ -576,7 +587,7 @@ function updateAbsResults(absItem, forceUpdate) {
                 newRow[0] += val;
                 newRow.push(val);
             }
-            if (true) {
+            if (absItem.displayPercent) {
                 val = absItem._absTotalTable[r][3];
                 newRow[0] = val > 0 ? Math.round(newRow[0] * 10000 / val)/100 : 0;
             }

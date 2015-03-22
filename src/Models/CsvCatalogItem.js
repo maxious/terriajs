@@ -82,10 +82,34 @@ var CsvCatalogItem = function(application, url) {
      */
     this.opacity = 0.6;
 
-    knockout.track(this, ['url', 'data', 'dataSourceUrl', 'colorByValue', 'opacity']);
+    /**
+     * Gets or sets the maximum value of the data item for presentation purposes.
+     * This property is observable.
+     * @type {Number}
+     * @default undefined
+     */
+    this.maxDisplayValue = undefined;
+
+    /**
+     * Gets or sets the minimum value of the data item for presentation purposes.
+     * This property is observable.
+     * @type {Number}
+     * @default undefined
+     */
+    this.minDisplayValue = undefined;
+
+    knockout.track(this, ['url', 'data', 'dataSourceUrl', 'colorByValue', 'opacity', 'maxDataValue', 'minDataValue']);
 
     knockout.getObservable(this, 'opacity').subscribe(function(newValue) {
         updateOpacity(this);
+    }, this);
+
+    knockout.getObservable(this, 'maxDataValue').subscribe(function(newValue) {
+        this.dynamicUpdate(this.data);
+    }, this);
+
+    knockout.getObservable(this, 'minDataValue').subscribe(function(newValue) {
+        this.dynamicUpdate(this.data);
     }, this);
 };
 
@@ -397,7 +421,7 @@ CsvCatalogItem.prototype._rebuild = function() {
 };
 
 CsvCatalogItem.prototype.dynamicUpdate = function(text) {
-    this.data = text;
+    this.data = text;  //TODO: is this causing 2 draws??
     var that = this;
 
     if (defined(this._tableDataSource)) {
@@ -499,8 +523,10 @@ function loadTable(csvItem, text) {
         return;
     }    
     csvItem._tableDataSource.loadText(text);
-//    csvItem._tableDataSource.dataset.variables['Region Percent'].maxVal = 20.0;
-//    csvItem._tableDataSource.dataset.variables['Region Percent'].minVal = 5.0;
+
+    var curVar = csvItem._tableDataSource.dataset.getCurrentVariable();
+    csvItem._tableDataSource.dataset.variables[curVar].maxDisplayValue = csvItem.maxDisplayValue;
+    csvItem._tableDataSource.dataset.variables[curVar].minDisplayValue = csvItem.minDisplayValue;
 
     if (!csvItem._tableDataSource.dataset.hasLocationData()) {
         console.log('No locaton date found in csv file - trying to match based on region');

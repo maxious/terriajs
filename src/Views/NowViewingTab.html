@@ -54,6 +54,13 @@
                     <input class="now-viewing-opacity-slider" type="range" min="0" max="1" step="0.01" data-bind="value: opacity, valueUpdate: 'input'" />
                 </div>
 
+                <!-- ko if: minDisplayValue -->
+                <div class="now-viewing-item-opacity">
+                    Minimum Value: <span data-bind="text: minDisplayValue"></span>
+                    <input class="now-viewing-opacity-slider" type="range" min="0" max="100" step="0.1" data-bind="value: minDisplayValue, valueUpdate: 'input'" />
+                </div>
+                <!-- /ko -->
+
                 <!-- ko if: legendIsImage -->
                 <a data-bind="attr: { href: legendUrl }" target="_blank">
                     <img class="now-viewing-legend-image" data-bind="attr: { src: legendUrl }" />
