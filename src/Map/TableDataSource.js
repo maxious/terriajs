@@ -288,8 +288,8 @@ TableDataSource.prototype._getNormalizedPoint = function (pntVal) {
     if (data === undefined || data.isNoData(pntVal)) {
         return undefined;
     }
-    var minVal = minDisplayValue || data.getMinVal();
-    var maxVal = maxDisplayValue || data.getMaxVal();
+    var minVal = this.minDisplayValue || data.getMinVal();
+    var maxVal = this.maxDisplayValue || data.getMaxVal();
     var normPoint = (maxVal === minVal) ? 0 : (pntVal - minVal) / (maxVal - minVal);
     return normPoint;
 };

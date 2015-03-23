@@ -54,11 +54,9 @@
                     <input class="now-viewing-opacity-slider" type="range" min="0" max="1" step="0.01" data-bind="value: opacity, valueUpdate: 'input'" />
                 </div>
 
-                <!-- ko if: minDisplayValue -->
-                <div class="now-viewing-item-opacity">
-                    Minimum Value: <span data-bind="text: minDisplayValue"></span>
-                    <input class="now-viewing-opacity-slider" type="range" min="0" max="100" step="0.1" data-bind="value: minDisplayValue, valueUpdate: 'input'" />
-                </div>
+                <!-- ko if: type === 'abs-itt'-->
+                 <div class="now-viewing-abs-icon clickable" data-bind="click: function(data, event) { displayPercent = !displayPercent; }, cesiumSvgPath: { path: displayPercent ? $root.svgCheckboxChecked : $root.svgCheckboxUnchecked, width: 32, height: 32 }">TEST</div>
+                <div class="now-viewing-abs-percent" data-bind="text: 'Display as Percent of Region'"></div>
                 <!-- /ko -->
 
                 <!-- ko if: legendIsImage -->
