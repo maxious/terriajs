@@ -588,8 +588,8 @@ function updateAbsResults(absItem, forceUpdate) {
                 newRow.push(val);
             }
             if (absItem.displayPercent) {
-                val = absItem._absTotalTable[r][3];
-                newRow[0] = val > 0 ? Math.round(newRow[0] * 10000 / val)/100 : 0;
+                var tot = absItem._absTotalTable[r][3];
+                newRow[0] = tot > 0 ? Math.round(newRow[0] * 10000 / tot)/100 : 0;
             }
             finalCsvArray.push(newRow);
         }
