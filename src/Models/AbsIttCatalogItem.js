@@ -99,7 +99,7 @@ var AbsIttCatalogItem = function(application) {
      * @type {Boolean}
      * @default true
      */
-    this.displayPercent = true;
+    this.displayPercent = false;
 
     knockout.track(this, ['url', 'dataSetID', 'regionType', 'regionConcept', 'filter', '_absDataset', 'opacity', 'displayPercent']);
 
@@ -118,6 +118,13 @@ var AbsIttCatalogItem = function(application) {
     }, this);
 
     knockout.getObservable(this, 'displayPercent').subscribe(function(newValue) {
+        if (newValue) {
+//            this._csvCatalogItem._minDisplayValue = 0.0;
+//            this._csvCatalogItem._maxDisplayValue = 100.0;
+        } else {
+            this._csvCatalogItem._minDisplayValue = undefined;
+            this._csvCatalogItem._maxDisplayValue = undefined;
+        }
         updateAbsResults(this, true);
     }, this);
 };
@@ -571,6 +578,10 @@ function updateAbsResults(absItem, forceUpdate) {
 
         finalCsvArray.push([absItem.displayPercent ? "Region Percent" : "Region Total", absItem.regionType]);
         var cols = [];
+        if (csvArray[0].indexOf('Description') !== -1) {
+            finalCsvArray[0].push('Description');
+            cols.push(csvArray[0].indexOf('Description'));
+        }
         for (var f = 0; f < currentFilterList.length; f++) {
             var idx = getFilterDataIndex(currentFilterList[f].filter);
             var colName = absItem._filterColumnMap[idx].colName;
@@ -584,9 +595,11 @@ function updateAbsResults(absItem, forceUpdate) {
             var newRow = [0, csvArray[r][regionCol]];
             for (var c = 0; c < cols.length; c++) {
                 var val = csvArray[r][cols[c]];
-                newRow[0] += val;
                 newRow.push(val);
-            }
+                if (typeof val !== 'string') {
+                    newRow[0] += val;
+                }
+             }
             if (absItem.displayPercent) {
                 var tot = absItem._absTotalTable[r][3];
                 newRow[0] = tot > 0 ? Math.round(newRow[0] * 10000 / tot)/100 : 0;

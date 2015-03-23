@@ -381,8 +381,8 @@ TableDataSource.prototype.getLegendGraphic = function () {
     
         //text
     var val;
-    var minText = (val = this.dataset.getMinVal()) === undefined ? 'und.' : val.toString();
-    var maxText = (val = this.dataset.getMaxVal()) === undefined ? 'und.' : val.toString();
+    var minText = (val = this.minDisplayValue || this.dataset.getMinVal()) === undefined ? 'und.' : val.toString();
+    var maxText = (val = this.maxDisplayValue || this.dataset.getMaxVal()) === undefined ? 'und.' : val.toString();
     var varText = this.dataset.getCurrentVariable();
     
     ctx.setTransform(1,0,0,1,0,0);

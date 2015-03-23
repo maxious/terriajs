@@ -45,6 +45,8 @@ var CsvCatalogItem = function(application, url) {
 
     this._tableDataSource = undefined;
     this._regionMapped = false;
+    this._minDisplayValue = undefined;
+    this._maxDisplayValue = undefined;
 
     /**
      * Gets or sets the URL from which to retrieve CSV data.  This property is ignored if
@@ -82,35 +84,12 @@ var CsvCatalogItem = function(application, url) {
      */
     this.opacity = 0.6;
 
-    /**
-     * Gets or sets the maximum value of the data item for presentation purposes.
-     * This property is observable.
-     * @type {Number}
-     * @default undefined
-     */
-    this.maxDisplayValue = undefined;
-
-    /**
-     * Gets or sets the minimum value of the data item for presentation purposes.
-     * This property is observable.
-     * @type {Number}
-     * @default undefined
-     */
-    this.minDisplayValue = undefined;
-
-    knockout.track(this, ['url', 'data', 'dataSourceUrl', 'colorByValue', 'opacity', 'maxDataValue', 'minDataValue']);
+    knockout.track(this, ['url', 'data', 'dataSourceUrl', 'colorByValue', 'opacity']);
 
     knockout.getObservable(this, 'opacity').subscribe(function(newValue) {
         updateOpacity(this);
     }, this);
 
-    knockout.getObservable(this, 'maxDataValue').subscribe(function(newValue) {
-        this.dynamicUpdate(this.data);
-    }, this);
-
-    knockout.getObservable(this, 'minDataValue').subscribe(function(newValue) {
-        this.dynamicUpdate(this.data);
-    }, this);
 };
 
 inherit(CatalogItem, CsvCatalogItem);
@@ -524,9 +503,8 @@ function loadTable(csvItem, text) {
     }    
     csvItem._tableDataSource.loadText(text);
 
-    var curVar = csvItem._tableDataSource.dataset.getCurrentVariable();
-    csvItem._tableDataSource.dataset.variables[curVar].maxDisplayValue = csvItem.maxDisplayValue;
-    csvItem._tableDataSource.dataset.variables[curVar].minDisplayValue = csvItem.minDisplayValue;
+    csvItem._tableDataSource.maxDisplayValue = csvItem._maxDisplayValue;
+    csvItem._tableDataSource.minDisplayValue = csvItem._minDisplayValue;
 
     if (!csvItem._tableDataSource.dataset.hasLocationData()) {
         console.log('No locaton date found in csv file - trying to match based on region');
