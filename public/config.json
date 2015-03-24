@@ -8,6 +8,7 @@
         "www.abc.net.au"
     ],
     "initializationUrls" : [
+        "abs",
         "nm"
     ]
 }
