@@ -188,7 +188,7 @@ Dataset.prototype.loadJson = function (jsonTable) {
         this.variables = {};
         var columnNames = jsonTable[0];
         for (var c = 0; c < columnNames.length; c++) {
-            var name = columnNames[c];
+            var name = columnNames[c].trim();
             var variable = new Variable();
             for (var i = 1; i < jsonTable.length; ++i) {
                 variable.vals.push(jsonTable[i][c]);
