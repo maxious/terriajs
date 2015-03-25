@@ -9,7 +9,7 @@
         "unep.ch:8080"
    ],
     "initializationUrls" : [
-        "init_un.json"
+        "un"
     ]
 }
 
