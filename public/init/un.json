@@ -588,7 +588,7 @@
                 },
                 {
                     "type": "group",
-                    "name": "Insurance",
+                    "name": "Insurance Coverage",
                     "isOpen": true,
                     "items": [
                         {
