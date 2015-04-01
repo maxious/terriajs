@@ -38,7 +38,6 @@ var SingleTileImageryProvider = require('../../third_party/cesium/Source/Scene/S
 var Transforms = require('../../third_party/cesium/Source/Core/Transforms');
 var Tween = require('../../third_party/cesium/Source/ThirdParty/Tween');
 var Viewer = require('../../third_party/cesium/Source/Widgets/Viewer/Viewer');
-var when = require('../../third_party/cesium/Source/ThirdParty/when');
 
 var Animation = require('../../third_party/cesium/Source/Widgets/Animation/Animation');
 var AnimationViewModel = require('../../third_party/cesium/Source/Widgets/Animation/AnimationViewModel');
@@ -371,7 +370,9 @@ AusGlobeViewer.prototype._createCesiumViewer = function(container) {
         terrainProvider : terrainProvider,
         imageryProvider : new SingleTileImageryProvider({ url: 'images/nicta.png' }),
         timeControlsInitiallyVisible : false,
-        scene3DOnly: true
+        scene3DOnly: true,
+        selectionIndicator: false,
+        infoBox: false
     };
 
     // Workaround for Firefox bug with WebGL and printing:
@@ -406,19 +407,6 @@ us via email at nationalmap@lists.nicta.com.au.'
             }
         }
     });
-
-
-    var lastHeight = 0;
-    viewer.scene.preRender.addEventListener(function(scene, time) {
-        var container = viewer._container;
-        var height = container.clientHeight;
-
-        if (height !== lastHeight) {
-            viewer.infoBox.viewModel.maxHeight = Math.max(height - 300, 100);
-            lastHeight = height;
-        }
-    });
-
 
     var scene = viewer.scene;
     var globe = scene.globe;
@@ -521,11 +509,13 @@ AusGlobeViewer.prototype.selectViewer = function(bCesium) {
 
         map.infoBox = new InfoBox(document.body);
 
+        var leaflet = new Leaflet(this.application, map);
+
         if (!defined(this.leafletVisualizer)) {
             this.leafletVisualizer = new LeafletVisualizer();
         }
         this.dataSourceDisplay = new DataSourceDisplay({
-            scene : map,
+            scene : leaflet.scene,
             dataSourceCollection : map.dataSources,
             visualizersCallback: this.leafletVisualizer.visualizersCallback
         });
@@ -566,21 +556,9 @@ AusGlobeViewer.prototype.selectViewer = function(bCesium) {
         //redisplay data
         this.map = map;
 
-        this.application.leaflet = new Leaflet(this.application, map);
+        this.application.leaflet = leaflet;
         this.application.cesium = undefined;
         this.application.currentViewer = this.application.leaflet;
-
-        map.on('click', function(e) {
-            selectFeatureLeaflet(that, e.latlng);
-        });
-
-        map.on('preclick', function(e) {
-            preClickLeaflet(that);
-        });
-
-        map.on('popupopen', function(e) {
-            popupOpenLeaflet(that);
-        });
 
         this.application.leaflet.zoomTo(rect, 0.0);
     }
@@ -876,6 +854,7 @@ function zoomCamera(scene, distFactor, pos) {
 function zoomIn(scene, pos) { zoomCamera(scene, 2.0/3.0, pos); }
 function zoomOut(scene, pos) { zoomCamera(scene, -2.0, pos); }
 
+<<<<<<< HEAD
 function preClickLeaflet(viewer) {
     viewer._popupSinceLastClick = false;
 }
@@ -945,4 +924,6 @@ function selectFeatureLeaflet(viewer, latlng) {
     });
 }
 
+=======
+>>>>>>> 4671799f61cc794a251365bc2dd8bf60e24cea60
 module.exports = AusGlobeViewer;

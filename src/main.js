@@ -66,12 +66,14 @@ if (start) {
     var DistanceLegendViewModel = require('./ViewModels/DistanceLegendViewModel');
     var DragDropViewModel = require('./ViewModels/DragDropViewModel');
     var ExplorerPanelViewModel = require('./ViewModels/ExplorerPanelViewModel');
+    var FeatureInfoPanelViewModel = require('./ViewModels/FeatureInfoPanelViewModel');
     var GazetteerSearchProviderViewModel = require('./ViewModels/GazetteerSearchProviderViewModel');
     var LocationBarViewModel = require('./ViewModels/LocationBarViewModel');
     var MenuBarViewModel = require('./ViewModels/MenuBarViewModel');
     var MenuBarItemViewModel = require('./ViewModels/MenuBarItemViewModel');
     var NavigationViewModel = require('./ViewModels/NavigationViewModel');
     var NowViewingTabViewModel = require('./ViewModels/NowViewingTabViewModel');
+    var OnePanelOpenInTopRight = require('./ViewModels/OnePanelOpenInTopRight');
     var SearchTabViewModel = require('./ViewModels/SearchTabViewModel');
     var SettingsPanelViewModel = require('./ViewModels/SettingsPanelViewModel');
     var SharePopupViewModel = require('./ViewModels/SharePopupViewModel');
@@ -144,7 +146,7 @@ if (start) {
         // Create the various base layer options.
         var naturalEarthII = new WebMapServiceCatalogItem(application);
         naturalEarthII.name = 'Natural Earth II';
-        naturalEarthII.url = 'http://geoserver-nm.nicta.com.au/imagery/natural-earth-ii/wms';
+        naturalEarthII.url = 'http://geoserver.nationalmap.nicta.com.au/imagery/natural-earth-ii/wms';
         naturalEarthII.layers = 'natural-earth-ii:NE2_HR_LC_SR_W_DR';
         naturalEarthII.parameters = {
             tiled: true
@@ -161,7 +163,7 @@ if (start) {
 
         var blackMarble = new WebMapServiceCatalogItem(application);
         blackMarble.name = 'NASA Black Marble';
-        blackMarble.url = 'http://geoserver-nm.nicta.com.au/imagery/nasa-black-marble/wms';
+        blackMarble.url = 'http://geoserver.nationalmap.nicta.com.au/imagery/nasa-black-marble/wms';
         blackMarble.layers = 'nasa-black-marble:dnb_land_ocean_ice.2012.54000x27000_geo';
         blackMarble.parameters = {
             tiled: true
@@ -348,6 +350,17 @@ if (start) {
 
             application.currentViewer.notifyRepaintRequired();
         });
+
+        var featureInfo = new FeatureInfoPanelViewModel({
+            application: application,
+            container: ui,
+            viewerElement: 'cesiumContainer'
+        });
+
+        // Make sure only one panel is open in the top right at any time.
+        var onePanelOpenInTopRight = new OnePanelOpenInTopRight();
+        onePanelOpenInTopRight.addPanel(settingsPanel);
+        onePanelOpenInTopRight.addPanel(featureInfo);
 
         document.getElementById('loadingIndicator').style.display = 'none';
     });
