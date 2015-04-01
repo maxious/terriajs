@@ -136,6 +136,11 @@
                             "url": "test/2011Census_AUST_SA4.csv"
                         },
                         {
+                            "name": "Country Regions",
+                            "type": "csv",
+                            "url": "test/countries.csv"
+                        },
+                        {
                             "name": "Large feature info box (CZML)",
                             "type": "czml",
                             "url": "test/bigInfobox.czml"
