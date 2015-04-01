@@ -642,8 +642,15 @@ var regionWmsMap = {
         "regionProp": "SSC_CODE",
         "aliases": ['ssc', 'suburb'],
         "digits": 5
+    },
+    'UN': {
+        "name":"region_map:FID_TM_WORLD_BORDERS",
+        "regionProp": "UN",
+        "aliases": ['un', 'country'],
+        "digits": 3
     }
 };
+
 
 //TODO: if we add enum capability and then can work with any unique field
 function loadRegionIDs(regionDescriptor) {
