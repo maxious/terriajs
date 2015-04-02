@@ -378,6 +378,19 @@ Dataset.prototype.getDataValues = function (varName) {
 
 
 /**
+* Get all of the enum values
+*
+* @param {String} Variable name
+*
+* @returns {Array} Array of values for the variable
+*/
+Dataset.prototype.getEnumValues = function (varName) {
+    if (!defined(this.variables[varName]) || !defined(this.variables[varName].enumList)) {
+        return undefined;
+    }
+    return this.variables[varName].enumList;
+};
+/**
 * Return a boolean as to whether this is a nodata item
 *
 * @param {Float} ptVal The value to check
