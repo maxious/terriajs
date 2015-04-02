@@ -388,7 +388,12 @@ Dataset.prototype.getEnumValues = function (varName) {
     if (!defined(this.variables[varName]) || !defined(this.variables[varName].enumList)) {
         return undefined;
     }
-    return this.variables[varName].enumList;
+    var vals = this.getDataValues(varName);
+    var enumVals = [];
+    for (var i = 0; i < vals.length; i++) {
+        enumVals.push(this.variables[varName].enumList[vals[i]]);
+    }
+    return enumVals;
 };
 /**
 * Return a boolean as to whether this is a nodata item

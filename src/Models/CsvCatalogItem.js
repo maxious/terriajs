@@ -289,7 +289,7 @@ CsvCatalogItem.prototype._showInCesium = function() {
             return when(featurePromise, function(results) {
                 if (defined(results)) {
                     var id = results[0].data.properties[that.regionProp];
-                    var properties = that.rowProperties(parseInt(id,10));
+                    var properties = that.rowProperties(id);
                     results[0].description = that._tableDataSource.describe(properties);
                 }
                 return results;
@@ -358,17 +358,6 @@ CsvCatalogItem.prototype._showInLeaflet = function() {
                 }
            }).render();
         });
-        this.wmsFeatureInfoFilter = function(result) {
-                if (defined(result)) {
-                    var properties = result.features[0].properties;
-                    var id = properties[that.regionProp];
-                    properties = combine(properties, that.rowProperties(parseInt(id,10)));
-                    properties.FID = undefined;
-                    properties[that.regionProp] = undefined;
-                    result.features[0].properties = properties;
-                }
-                return result;
-            };
 
         map.addLayer(this._imageryLayer);
     }
@@ -464,7 +453,7 @@ CsvCatalogItem.prototype.pickFeaturesInLeaflet = function(mapExtent, mapWidth, m
     return pickFeaturesPromise.then(function(results) {
         if (defined(results)) {
             var id = results[0].data.properties[that.regionProp];
-            var properties = that.rowProperties(parseInt(id,10));
+            var properties = that.rowProperties(id);
             results[0].description = that._tableDataSource.describe(properties);
         }
         return results;
@@ -508,7 +497,6 @@ function loadTable(csvItem, text) {
 
     if (!csvItem._tableDataSource.dataset.hasLocationData()) {
         console.log('No locaton date found in csv file - trying to match based on region');
-//        csvItem.data = text;
         return when(addRegionMap(csvItem), function() {
             if (csvItem._regionMapped !== true) {
                 throw new ModelError({
@@ -643,16 +631,21 @@ var regionWmsMap = {
         "aliases": ['ssc', 'suburb'],
         "digits": 5
     },
+    'CNT': {
+        "name":"region_map:FID_TM_WORLD_BORDERS",
+        "regionProp": "ISO3",
+        "aliases": ['country'],
+        "digits": 3
+    },
     'UN': {
         "name":"region_map:FID_TM_WORLD_BORDERS",
         "regionProp": "UN",
-        "aliases": ['un', 'country'],
+        "aliases": ['un'],
         "digits": 3
     }
 };
 
 
-//TODO: if we add enum capability and then can work with any unique field
 function loadRegionIDs(regionDescriptor) {
     if (defined(regionDescriptor.idMap)) {
         return;
@@ -672,7 +665,7 @@ function loadRegionIDs(regionDescriptor) {
         var idMap = [];
             //this turns ids into numbers since they are that way in table data
         for (var i = 0; i < obj.member.length; i++) {
-            idMap.push(parseInt(obj.member[i][regionDescriptor.regionProp],10));
+            idMap.push(obj.member[i][regionDescriptor.regionProp]);
         }
         regionDescriptor.idMap = idMap;
     }, function(err) {
@@ -756,14 +749,17 @@ function createRegionLookupFunc(csvItem) {
     var dataset = dataSource.dataset;
     var regionDescriptor = regionWmsMap[csvItem.regionType];
  
-    var codes = dataset.getDataValues(csvItem.regionVar);
+    var codes = dataset.getEnumValues(csvItem.regionVar) || dataset.getDataValues(csvItem.regionVar);
     var vals = dataset.getDataValues(dataset.getCurrentVariable());
     var ids = regionDescriptor.idMap;
     var colors = new Array(ids.length);
     // set color for each code
     for (var i = 0; i < codes.length; i++) {
-        var id = ids.indexOf(codes[i]);
+        var id = ids.indexOf(codes[i].toString());
         colors[id] = dataSource._mapValue2Color(vals[i]);
+        if (vals[i] === 204) {
+            console.log('here');
+        }
     }
     //   color lookup function used by the region mapper
     csvItem.colorFunc = function(id) {
