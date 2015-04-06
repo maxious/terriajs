@@ -44,6 +44,9 @@ var CsvCatalogItem = function(application, url) {
     CatalogItem.call(this, application);
 
     this._tableDataSource = undefined;
+    this._clock = undefined;
+    this._clockTickUnsubscribe = undefined;
+
     this._regionMapped = false;
     this._minDisplayValue = undefined;
     this._maxDisplayValue = undefined;
@@ -84,12 +87,30 @@ var CsvCatalogItem = function(application, url) {
      */
     this.opacity = 0.6;
 
-    knockout.track(this, ['url', 'data', 'dataSourceUrl', 'colorByValue', 'opacity']);
+    knockout.track(this, ['url', 'data', 'dataSourceUrl', 'colorByValue', 'opacity', '_clock']);
 
     knockout.getObservable(this, 'opacity').subscribe(function(newValue) {
         updateOpacity(this);
     }, this);
 
+    delete this.__knockoutObservables.clock;
+    knockout.defineProperty(this, 'clock', {
+        get : function() {
+            return this._clock;
+        },
+        set : function(value) {
+            this._clock = value;
+        }
+    });
+
+    // Subscribe to isShown changing and add/remove the clock tick subscription as necessary.
+    knockout.getObservable(this, 'isShown').subscribe(function() {
+        updateClockSubscription(this);
+    }, this);
+
+    knockout.getObservable(this, 'clock').subscribe(function() {
+        updateClockSubscription(this);
+    }, this);
 };
 
 inherit(CatalogItem, CsvCatalogItem);
@@ -484,6 +505,50 @@ function updateOpacity(csvItem) {
     }
 }
 
+function updateClockSubscription(csvItem) {
+    if (csvItem.isShown && defined(csvItem.clock)) {
+        // Subscribe
+        if (!defined(csvItem._clockTickSubscription)) {
+            csvItem._clockTickSubscription = csvItem.application.clock.onTick.addEventListener(onClockTick.bind(undefined, csvItem));
+        }
+    } else {
+        // Unsubscribe
+        if (defined(csvItem._clockTickSubscription)) {
+            csvItem._clockTickSubscription();
+            csvItem._clockTickSubscription = undefined;
+        }
+    }
+}
+
+function onClockTick(csvItem, clock) {
+    var hasTimeData = csvItem._tableDataSource.dataset.hasTimeData();
+    if (hasTimeData || !csvItem.isEnabled || !csvItem.isShown) {
+        return;
+    }
+
+    //update list of things to present if necessary
+    console.log('got a clock update event')
+}
+
+function getRegionMappingClock(csvItem) {
+    var dataSource = csvItem._tableDataSource;
+    if (defined(dataSource) && defined(dataSource.dataset) && dataSource.dataset.hasTimeData()) {
+        var startTime = dataset.getMinTime();
+        var stopTime = dataset.getMaxTime();
+
+        // Average about 5 seconds per interval.
+        var totalDuration = JulianDate.secondsDifference(stopTime, startTime);
+        var timePerSecond = totalDuration / 600;
+
+        newClock = new DataSourceClock();
+        newClock.startTime = startTime;
+        newClock.stopTime = stopTime;
+        newClock.currentTime = startTime;
+        newClock.multiplier = timePerSecond;
+    }
+    return newClock;
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 function loadTable(csvItem, text) {
@@ -508,6 +573,7 @@ a region mapping column.'
                 });
             }
             else {
+                csvItem.clock = getRegionMappingClock(csvItem);
                 csvItem.legendUrl = csvItem._tableDataSource.getLegendGraphic();
                 csvItem.application.currentViewer.notifyRepaintRequired();
             }
