@@ -534,6 +534,8 @@ function onClockTick(csvItem, clock) {
 
     //TODO!!!  Fix algo, it currently overwrites the original file in dynamicUpdate
 
+    //TODO!!!  Just get a points list and update the color function
+
     //get records based on the time
     var recs = csvItem._tableDataSource.getDataPointList(clock.currentTime);
     var vars = [csvItem._tableDataSource.dataset.getVarList()];
