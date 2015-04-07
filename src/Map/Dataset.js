@@ -35,7 +35,7 @@ Dataset.prototype.hasLocationData = function () {
 };
 
 Dataset.prototype.hasTimeData = function () {
-    return (this.varTypeSet[VarType.TIME]);
+    return (defined(this.varTypeSet[VarType.TIME]));
 };
 
 Dataset.prototype.getVarID = function (type) {
@@ -113,9 +113,7 @@ Dataset.prototype.getMaxTime = function () {
 Dataset.prototype.getVarList = function () {
     var ret = [];
     for (var v in this.variables) {
-        if (this.variables[v].varType === VarType.SCALAR || this.variables[v].varType === VarType.ENUM) {
-            ret.push(v);
-        }
+        ret.push(v);
     }
     return ret;
 };
@@ -344,7 +342,7 @@ Dataset.prototype.getDataValue = function (varName, idx) {
 };
 
 /**
-* Get a data row
+* Get a data row as object
 *
 * @param {Integer} Index of row
 *
@@ -360,6 +358,25 @@ Dataset.prototype.getDataRow = function (idx) {
         }
     }
     return rowObj;
+};
+
+/**
+* Get a data row as array
+*
+* @param {Integer} Index of row
+*
+* @returns {Object} Object containing all row members
+*/
+Dataset.prototype.getDataRowArray = function (idx) {
+    var rowArray = [];
+    if (defined(idx)) {
+        for (var id in this.variables) {
+            if (this.variables.hasOwnProperty(id)) {
+                rowArray.push(this.getDataValue(id, idx));
+            }
+        }
+    }
+    return rowArray;
 };
 
 /**

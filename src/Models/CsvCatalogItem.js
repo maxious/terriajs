@@ -6,12 +6,14 @@ var Cartesian2 = require('../../third_party/cesium/Source/Core/Cartesian2');
 var CesiumMath = require('../../third_party/cesium/Source/Core/Math');
 var clone = require('../../third_party/cesium/Source/Core/clone');
 var combine = require('../../third_party/cesium/Source/Core/combine');
+var DataSourceClock = require('../../third_party/cesium/Source/DataSources/DataSourceClock');
 var defaultValue = require('../../third_party/cesium/Source/Core/defaultValue');
 var defined = require('../../third_party/cesium/Source/Core/defined');
 var defineProperties = require('../../third_party/cesium/Source/Core/defineProperties');
 var DeveloperError = require('../../third_party/cesium/Source/Core/DeveloperError');
 var ImageryLayer = require('../../third_party/cesium/Source/Scene/ImageryLayer');
 var freezeObject = require('../../third_party/cesium/Source/Core/freezeObject');
+var JulianDate = require('../../third_party/cesium/Source/Core/JulianDate');
 var knockout = require('../../third_party/cesium/Source/ThirdParty/knockout');
 var loadText = require('../../third_party/cesium/Source/Core/loadText');
 var Rectangle = require('../../third_party/cesium/Source/Core/Rectangle');
@@ -506,7 +508,7 @@ function updateOpacity(csvItem) {
 }
 
 function updateClockSubscription(csvItem) {
-    if (csvItem.isShown && defined(csvItem.clock)) {
+    if (csvItem.isShown && defined(csvItem.clock) && csvItem._regionMapped) {
         // Subscribe
         if (!defined(csvItem._clockTickSubscription)) {
             csvItem._clockTickSubscription = csvItem.application.clock.onTick.addEventListener(onClockTick.bind(undefined, csvItem));
@@ -522,29 +524,48 @@ function updateClockSubscription(csvItem) {
 
 function onClockTick(csvItem, clock) {
     var hasTimeData = csvItem._tableDataSource.dataset.hasTimeData();
-    if (hasTimeData || !csvItem.isEnabled || !csvItem.isShown) {
+    if (!hasTimeData || !csvItem.isEnabled || !csvItem.isShown) {
         return;
     }
+    //check if time has changed
+    if (defined(csvItem.lastTime) && JulianDate.equals(clock.currentTime, csvItem.lastTime)) {
+        return;    }
+    csvItem.lastTime = clock.currentTime;
 
-    //update list of things to present if necessary
-    console.log('got a clock update event')
+    //TODO!!!  Fix algo, it currently overwrites the original file in dynamicUpdate
+
+    //get records based on the time
+    var recs = csvItem._tableDataSource.getDataPointList(clock.currentTime);
+    var vars = [csvItem._tableDataSource.dataset.getVarList()];
+    var csvArray = vars.concat(recs);
+        //Serialize the arrays
+    var joinedRows = csvArray.map(function(arr) {
+        return arr.join(',');
+    });
+    var csvText = joinedRows.join('\n');
+    //check if record data has changed
+    if (defined(csvItem.lastCsvText) && csvText === csvItem.lastCsvText) {
+        return;
+    }
+    csvItem.lastCsvText = csvText;
+
+    console.log(csvText);
+    csvItem.dynamicUpdate(csvText);
 }
 
 function getRegionMappingClock(csvItem) {
+    var newClock;
     var dataSource = csvItem._tableDataSource;
     if (defined(dataSource) && defined(dataSource.dataset) && dataSource.dataset.hasTimeData()) {
-        var startTime = dataset.getMinTime();
-        var stopTime = dataset.getMaxTime();
-
-        // Average about 5 seconds per interval.
+        var startTime = dataSource.dataset.getMinTime();
+        var stopTime = dataSource.dataset.getMaxTime();
         var totalDuration = JulianDate.secondsDifference(stopTime, startTime);
-        var timePerSecond = totalDuration / 600;
 
         newClock = new DataSourceClock();
         newClock.startTime = startTime;
         newClock.stopTime = stopTime;
         newClock.currentTime = startTime;
-        newClock.multiplier = timePerSecond;
+        newClock.multiplier = totalDuration / 60;
     }
     return newClock;
 }
@@ -573,7 +594,9 @@ a region mapping column.'
                 });
             }
             else {
-                csvItem.clock = getRegionMappingClock(csvItem);
+                if (!defined(csvItem.clock)) {
+                    csvItem.clock = getRegionMappingClock(csvItem);
+                }
                 csvItem.legendUrl = csvItem._tableDataSource.getLegendGraphic();
                 csvItem.application.currentViewer.notifyRepaintRequired();
             }
@@ -634,7 +657,7 @@ function recolorImageWithCanvas(csvCatalogItem, img, colorFunc) {
 }
 
 
-var regionServer = 'http://geoserver.nationalmap.nicta.com.au/region_map/ows';
+var regionServer = 'http://geoserver-nm.nicta.com.au/region_map/ows';
 var regionWmsMap = {
     'STE': {
         "name":"region_map:FID_STE_2011_AUST",
@@ -697,10 +720,16 @@ var regionWmsMap = {
         "aliases": ['ssc', 'suburb'],
         "digits": 5
     },
-    'CNT': {
+    'CNT2': {
+        "name":"region_map:FID_TM_WORLD_BORDERS",
+        "regionProp": "ISO2",
+        "aliases": ['iso2'],
+        "digits": 2
+    },
+    'CNT3': {
         "name":"region_map:FID_TM_WORLD_BORDERS",
         "regionProp": "ISO3",
-        "aliases": ['country'],
+        "aliases": ['country', 'iso3'],
         "digits": 3
     },
     'UN': {

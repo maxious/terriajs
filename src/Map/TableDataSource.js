@@ -157,7 +157,7 @@ TableDataSource.prototype.loadText = function (text) {
     this.setLeadTimeByPercent(0.0);
     this.setTrailTimeByPercent(1.0);
     if (this.dataset.hasLocationData()) {
-        this.czmlDataSource.load(this.getDataPointList());
+        this.czmlDataSource.load(this.getCzmlDataPointList());
     }
 };
 
@@ -170,7 +170,7 @@ TableDataSource.prototype.loadText = function (text) {
 TableDataSource.prototype.setCurrentVariable = function (varName) {
     this.dataset.setCurrentVariable({ variable: varName});
     if (this.dataset.hasLocationData()) {
-        this.czmlDataSource.load(this.getDataPointList());
+        this.czmlDataSource.load(this.getCzmlDataPointList());
     }
 };
 
@@ -254,19 +254,17 @@ TableDataSource.prototype.czmlRecFromPoint = function (point) {
 
 
 /**
-* Get a list of display records for the current point list.
-*  Currently defaults to a czml based output
+* Get a list of display records for the current point list in czml format.
 *
 * @memberof TableDataSource
 *
 */
-TableDataSource.prototype.getDataPointList = function () {
-    var data = this.dataset;
-    if (data.loadingData) {
+TableDataSource.prototype.getCzmlDataPointList = function () {
+    if (this.dataset.loadingData) {
         return;
     }
-    //update the datapoint collection
-    var pointList = data.getPointList();
+
+    var pointList = this.dataset.getPointList();
     
     var dispRecords = [{
         id : 'document',
@@ -276,20 +274,53 @@ TableDataSource.prototype.getDataPointList = function () {
     for (var i = 0; i < pointList.length; i++) {
         //set position, scale, color, and display time
         var rec = this.czmlRecFromPoint(pointList[i]);
-        rec.description = this.describe(data.getDataRow(pointList[i].row));
+        rec.description = this.describe(this.dataset.getDataRow(pointList[i].row));
         dispRecords.push(rec);
     }
     return dispRecords;
 };
 
 
+/**
+* Get a list of display records for the current point list.
+*
+* @memberof TableDataSource
+*
+*/
+TableDataSource.prototype.getDataPointList = function (time) {
+    if (this.dataset.loadingData) {
+        return;
+    }
+
+    var pointList = this.dataset.getPointList();
+    
+    var dispRecords = [];
+    
+    var start, finish;
+    if (this.dataset.hasTimeData()) {
+        start = JulianDate.addMinutes(time, -this.leadTimeMin, startScratch);
+        finish = JulianDate.addMinutes(time, this.trailTimeMin, endScratch);
+    }
+    for (var i = 0; i < pointList.length; i++) {
+        if (this.dataset.hasTimeData()) {
+            if (JulianDate.lessThan(pointList[i].time, start) || 
+                JulianDate.greaterThan(pointList[i].time, finish)) {
+                continue;
+            }
+        }
+        var rowArray = this.dataset.getDataRowArray(pointList[i].row);
+        dispRecords.push(rowArray);
+    }
+    return dispRecords;
+};
+
+
 TableDataSource.prototype._getNormalizedPoint = function (pntVal) {
-    var data = this.dataset;
-    if (data === undefined || data.isNoData(pntVal)) {
+    if (this.dataset === undefined || this.dataset.isNoData(pntVal)) {
         return undefined;
     }
-    var minVal = this.minDisplayValue || data.getMinVal();
-    var maxVal = this.maxDisplayValue || data.getMaxVal();
+    var minVal = this.minDisplayValue || this.dataset.getMinVal();
+    var maxVal = this.maxDisplayValue || this.dataset.getMaxVal();
     var normPoint = (maxVal === minVal) ? 0 : (pntVal - minVal) / (maxVal - minVal);
     return normPoint;
 };
@@ -329,9 +360,9 @@ TableDataSource.prototype._mapValue2Color = function (pntVal) {
 *
 */
 TableDataSource.prototype.setLeadTimeByPercent = function (pct) {
-    if (this.dataset && this.dataset.hasTimeData()) {
+    if (this.dataset && this.dataset.hasTimeData() && defined(this.dataset.getMaxTime())) {
         var data = this.dataset;
-        this.leadTimeMin = JulianDate.secondsDifference(data.getMaxTime(), data.getMinTime()) * pct / (60.0 * 100.0);
+        this.leadTimeMin = JulianDate.secondsDifference(this.dataset.getMaxTime(), this.dataset.getMinTime()) * pct / (60.0 * 100.0);
     }
 };
 
@@ -342,9 +373,8 @@ TableDataSource.prototype.setLeadTimeByPercent = function (pct) {
 *
 */
 TableDataSource.prototype.setTrailTimeByPercent = function (pct) {
-    if (this.dataset && this.dataset.hasTimeData()) {
-        var data = this.dataset;
-        this.trailTimeMin = JulianDate.secondsDifference(data.getMaxTime(), data.getMinTime()) * pct / (60.0 * 100.0);
+    if (this.dataset && this.dataset.hasTimeData() && defined(this.dataset.getMaxTime())) {
+        this.trailTimeMin = JulianDate.secondsDifference(this.dataset.getMaxTime(), this.dataset.getMinTime()) * pct / (60.0 * 100.0);
     }
 };
 
