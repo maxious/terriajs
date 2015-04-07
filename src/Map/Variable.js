@@ -69,16 +69,12 @@ Variable.prototype._calculateTimeMinMax = function () {
 * Convert input time variable to Cesium Time variable
 *
 */
-Variable.prototype.processTimeVar = function () {
+Variable.prototype.processTimeVariable = function () {
     if (this.varType !== VarType.TIME) {
         return;
     }
     
-    function _isNumber(n) {
-        return !isNaN(parseFloat(n)) && isFinite(n);
-    }
-
-    function _swapDateFormat(v) {
+    function swapDateFormat(v) {
         var part = v.split(/[/-]/);
         if (part.length === 3) {
             v = part[1] + '/' + part[0] + '/' + part[2];
@@ -86,66 +82,33 @@ Variable.prototype.processTimeVar = function () {
         return v;
     }
 
-    //time parsing functions
-    function timeString(v) { //  9/2/94 0:56
-        return JulianDate.fromDate(new Date(v));
-    }
-    function timeExcel(v) {   // 40544.4533
-        var date = JulianDate.fromDate(new Date('January 1, 1970 0:00:00'));
-        date = JulianDate.addDays(date, Math.floor(v) - 25569.0, date); //account for offset to 1900
-        date = JulianDate.addSeconds(date, (v - Math.floor(v)) * 60 * 60 * 24, date);
-        return date;
-    }
-    function timeUtc(v) {   //12321231414434
-        return JulianDate.fromDate(Date.setTime(v));
-    }
-    function timeSosus(v) {   //19912410952050
-        var dateString = v.toString();
-        var year = parseInt(dateString.substring(0, 4), 10);
-        var dayofyear = parseInt(dateString.substring(4, 7), 10);
-        if (dateString.length !== 14 || year < 1950 || year > 2050 || dayofyear > 366) {
-            return new JulianDate(0.0, 0.0);
-        }
-        var d = new Date();
-        d.setUTCFullYear(year);
-        d.setUTCHours(dateString.substring(7, 9), dateString.substring(9, 11), dateString.substring(11, 13));
-        var date = JulianDate.addDays(JulianDate.fromDate(d), dayofyear, new JulianDate());
-        return date;
-    }
     //create new Cessium time variable to attach to the variable
     var timeVar = new Variable();
     var vals = this.vals;
-    //select time parsing function
-    var parseFunc;
-    if (parseInt(vals[0], 10) > 500000) {
-        if (timeSosus(vals[0]).dayNumber !== 0) {
-            parseFunc = timeSosus;
-        }
-        else {
-            parseFunc = timeUtc;
-        }
-    }
-    else if (_isNumber(vals[0])) {
-        parseFunc = timeExcel;
-    }
-    else {
-        parseFunc = timeString;
-    }
-    //parse the time values
+
+    //parse the time values trying iso and javascript date parsing
     var bSuccess = false;
     try {
         for (var i = 0; i < vals.length; i++) {
-            timeVar.vals[i] = parseFunc(vals[i]);
+            timeVar.vals[i] = JulianDate.fromIso8601(vals[i]);
         }
         bSuccess = true;
     }
     catch (err) {
-        if (parseFunc === timeString) {
+        console.log('Trying Javascript Date.parse');
+        timeVar.vals = [];
+        try {
+            for (var i = 0; i < vals.length; i++) {
+                timeVar.vals[i] = JulianDate.fromDate(new Date(vals[i].toString()));
+            }
+            bSuccess = true;
+        }
+        catch (err) {
             console.log('Trying swap of day and month in date strings');
             timeVar.vals = [];
             try {
                 for (var i = 0; i < vals.length; i++) {
-                    timeVar.vals[i] = parseFunc(_swapDateFormat(vals[i]));
+                    timeVar.vals[i] = JulianDate.fromDate(new Date(swapDateFormat(vals[i])));
                 }
                 bSuccess = true;
             }
@@ -168,7 +131,7 @@ Variable.prototype.processTimeVar = function () {
 * Convert input enum variable to values and enumList
 *
 */
-Variable.prototype.processEnumVar = function () {
+Variable.prototype.processEnumVariable = function () {
     if (this.varType !== VarType.ENUM) {
         return;
     }
@@ -198,7 +161,7 @@ Variable.prototype.processEnumVar = function () {
 * @param {String} name Make an initial guess at the variable type based on its name
 *
 */
-Variable.prototype.guessVarType = function (name) {
+Variable.prototype.guessVariableType = function (name) {
     //functions to try to figure out position and time variables.
     function matchColumn(name, hints) {
         name = name.toLowerCase();
@@ -217,7 +180,7 @@ Variable.prototype.guessVarType = function (name) {
         { hints: ['lon'], type: VarType.LON },
         { hints: ['lat'], type: VarType.LAT },
         { hints: ['depth', 'height', 'elevation'], type: VarType.ALT },
-        { hints: ['time', 'date'], type: VarType.TIME }];
+        { hints: ['time', 'date', 'year'], type: VarType.TIME }];
 
     for (var vt in hintSet) {
         if (matchColumn(name, hintSet[vt].hints)) {

@@ -427,7 +427,7 @@ AbsIttCatalogItem.prototype.pickFeaturesInLeaflet = function(mapExtent, mapWidth
     if (defined(this._csvCatalogItem)) {
         return this._csvCatalogItem.pickFeaturesInLeaflet(mapExtent, mapWidth, mapHeight, pickX, pickY);
     }
-}
+};
 
 function cleanAndProxyUrl(application, url) {
     return proxyUrl(application, cleanUrl(url));

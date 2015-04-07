@@ -113,7 +113,9 @@ Dataset.prototype.getMaxTime = function () {
 Dataset.prototype.getVarList = function () {
     var ret = [];
     for (var v in this.variables) {
-        ret.push(v);
+        if (this.variables.hasOwnProperty(v)) {
+            ret.push(v);
+        }
     }
     return ret;
 };
@@ -127,10 +129,10 @@ Dataset.prototype._processVariables = function () {
             var variable = this.variables[id];
             //guess var type if not set
             if (!defined(variable.varType)) {
-                variable.guessVarType(id);
+                variable.guessVariableType(id);
             }
             if (variable.varType === VarType.TIME) {
-                variable.processTimeVar();            //calculate time variables
+                variable.processTimeVariable();            //calculate time variables
                 //if failed then default type to scalar
                 if (!defined(variable.timeVar)) {
                     variable.varType = VarType.SCALAR;
@@ -142,7 +144,7 @@ Dataset.prototype._processVariables = function () {
             //deal with enumerated variables
             if (variable.varType === VarType.SCALAR && variable.minVal > variable.maxVal) {
                 variable.varType = VarType.ENUM;
-                variable.processEnumVar();            //calculate enum variables
+                variable.processEnumVariable();            //calculate enum variables
             }
 
             //set the varIDs
@@ -256,22 +258,19 @@ Dataset.prototype.loadUrl = function (description) {
 /**
 * Set the current variable
 *
-* @param {Object} description Object with the following properties:
-* @param {String} [description.variable] The initial variable to show
+* @param {String} [variable] The initial variable to show
 *
 */
-Dataset.prototype.setCurrentVariable = function (description) {
-    if (!defined(this.variables) || !this.variables[description.variable] || 
-        this.variables[description.variable].vals.length === 0) {
+Dataset.prototype.setCurrentVariable = function (variable) {
+    if (!defined(this.variables) || !this.variables[variable] || 
+        this.variables[variable].vals.length === 0) {
         return;
     }
-    this.varName = description.variable;
+    this.varName = variable;
     if (this.varName.length && this.variables[this.varName]) {
         this.varTypeSet[VarType.SCALAR] = this.varName;
     }
 };
-
-function _float_equals(a, b) { return (Math.abs((a - b) / b) < 0.00001); }
 
 /**
 * Get the current variable name
@@ -361,25 +360,6 @@ Dataset.prototype.getDataRow = function (idx) {
 };
 
 /**
-* Get a data row as array
-*
-* @param {Integer} Index of row
-*
-* @returns {Object} Object containing all row members
-*/
-Dataset.prototype.getDataRowArray = function (idx) {
-    var rowArray = [];
-    if (defined(idx)) {
-        for (var id in this.variables) {
-            if (this.variables.hasOwnProperty(id)) {
-                rowArray.push(this.getDataValue(id, idx));
-            }
-        }
-    }
-    return rowArray;
-};
-
-/**
 * Get all of the data values
 *
 * @param {String} Variable name
@@ -420,6 +400,7 @@ Dataset.prototype.getEnumValues = function (varName) {
 * @returns {Boolean} True if this is NoData
 */
 Dataset.prototype.isNoData = function (ptVal) {
+    function _float_equals(a, b) { return (Math.abs((a - b) / b) < 0.00001); }
     return _float_equals(this.noData, ptVal);
 };
 
