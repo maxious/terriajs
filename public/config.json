@@ -5,11 +5,11 @@
         "csiro.au",
         "arcgis.com",
         "argo.jcommops.org",
-        "www.abc.net.au"
-   ],
+        "www.abc.net.au",
+        "unep.ch:8080"
+  ],
     "initializationUrls" : [
-        "abs",
-        "nm"
+        "un"
     ]
 }
 
