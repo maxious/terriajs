@@ -17,7 +17,7 @@
             "preserveOrder": true,
             "items": [
                 {
-                    "name": "All perils",
+                    "name": "All perils (NA)",
                     "rectangle": [
                         -180,
                         -70.3994689733719,
@@ -26,7 +26,7 @@
                     ],
                     "type": "wms",
                     "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "placeholder"
+                    "layers": "preview:cy_buffers"
                 },
                 {
                     "name": "Cyclones",
@@ -114,19 +114,7 @@
                     "preserveOrder": true,
                     "items": [
                         {
-                            "name": "All perils",
-                            "rectangle": [
-                                -180,
-                                -70.3994689733719,
-                                180.000000000002,
-                                70.93928113025771
-                            ],
-                            "type": "wms",
-                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "placeholder"
-                        },
-                        {
-                            "name": "Cyclones",
+                            "name": "All perils (NA)",
                             "rectangle": [
                                 -180,
                                 -70.3994689733719,
@@ -138,7 +126,19 @@
                             "layers": "preview:cy_buffers"
                         },
                         {
-                            "name": "Cyclone storm surges",
+                            "name": "Cyclones (NA)",
+                            "rectangle": [
+                                -180,
+                                -70.3994689733719,
+                                180.000000000002,
+                                70.93928113025771
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:cy_buffers"
+                        },
+                        {
+                            "name": "Cyclone storm surges (NA)",
                             "rectangle": [
                                 -180,
                                 -52.5916665789274,
@@ -150,7 +150,7 @@
                             "layers": "preview:cs_events"
                         },
                         {
-                            "name": "Earthquakes",
+                            "name": "Earthquakes (NA)",
                             "rectangle": [
                                 -180,
                                 -73.0304652937564,
@@ -162,7 +162,7 @@
                             "layers": "preview:eq_events"
                         },
                         {
-                            "name": "Floods",
+                            "name": "Floods (NA)",
                             "rectangle": [
                                 -101.242196,
                                 -34.5123,
@@ -174,7 +174,7 @@
                             "layers": "preview:fl_events"
                         },
                         {
-                            "name": "Landslides (triggered by precipitations)",
+                            "name": "Landslides (triggered by precipitations) (NA)",
                             "rectangle": [
                                 -180,
                                 -56.01339243784153,
@@ -186,7 +186,7 @@
                             "layers": "preview:ls_pr"
                         },
                         {
-                            "name": "Tsunamis",
+                            "name": "Tsunamis (NA)",
                             "rectangle": [
                                 -179.971008300781,
                                 -62.8770027160645,
@@ -205,19 +205,7 @@
                     "preserveOrder": true,
                     "items": [
                         {
-                            "name": "All perils",
-                            "rectangle": [
-                                -180,
-                                -70.3994689733719,
-                                180.000000000002,
-                                70.93928113025771
-                            ],
-                            "type": "wms",
-                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "placeholder"
-                        },
-                        {
-                            "name": "Cyclones",
+                            "name": "All perils (NA)",
                             "rectangle": [
                                 -180,
                                 -70.3994689733719,
@@ -229,7 +217,19 @@
                             "layers": "preview:cy_buffers"
                         },
                         {
-                            "name": "Cyclone storm surges",
+                            "name": "Cyclones (NA)",
+                            "rectangle": [
+                                -180,
+                                -70.3994689733719,
+                                180.000000000002,
+                                70.93928113025771
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:cy_buffers"
+                        },
+                        {
+                            "name": "Cyclone storm surges (NA)",
                             "rectangle": [
                                 -180,
                                 -52.5916665789274,
@@ -241,7 +241,7 @@
                             "layers": "preview:cs_events"
                         },
                         {
-                            "name": "Earthquakes",
+                            "name": "Earthquakes (NA)",
                             "rectangle": [
                                 -180,
                                 -73.0304652937564,
@@ -253,7 +253,7 @@
                             "layers": "preview:eq_events"
                         },
                         {
-                            "name": "Floods",
+                            "name": "Floods (NA)",
                             "rectangle": [
                                 -101.242196,
                                 -34.5123,
@@ -265,7 +265,7 @@
                             "layers": "preview:fl_events"
                         },
                         {
-                            "name": "Landslides (triggered by precipitations)",
+                            "name": "Landslides (triggered by precipitations) (NA)",
                             "rectangle": [
                                 -180,
                                 -56.01339243784153,
@@ -277,7 +277,7 @@
                             "layers": "preview:ls_pr"
                         },
                         {
-                            "name": "Tsunamis",
+                            "name": "Tsunamis (NA)",
                             "rectangle": [
                                 -179.971008300781,
                                 -62.8770027160645,
@@ -300,13 +300,13 @@
                     "name": "All perils",
                     "rectangle": [
                         -180,
-                        -70.3994689733719,
-                        180.000000000002,
-                        70.93928113025771
+                        -89.99999999999997,
+                        179.99999999985596,
+                        83.99999999993042
                     ],
                     "type": "wms",
                     "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "placeholder"
+                    "layers": "preview:ml_risk"
                 },
                 {
                     "name": "Cyclones",
@@ -355,18 +355,6 @@
                     "type": "wms",
                     "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
                     "layers": "preview:ls_risk"
-                },
-                {
-                    "name": "Multiple Risks",
-                    "rectangle": [
-                        -180,
-                        -89.99999999999997,
-                        179.99999999985596,
-                        83.99999999993042
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:ml_risk"
                 }
             ]
         },
@@ -381,7 +369,7 @@
                     "name": "Social",
                     "items": [
                         {
-                            "name": "All perils",
+                            "name": "All perils (NA)",
                             "rectangle": [
                                 -180,
                                 -70.3994689733719,
@@ -390,7 +378,7 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "placeholder"
+                            "layers": "preview:cy_physexp"
                         },
                         {
                             "name": "Cyclones",
@@ -483,7 +471,7 @@
                     "name": "Economic",
                     "items": [
                         {
-                            "name": "All perils",
+                            "name": "All perils (NA)",
                             "rectangle": [
                                 -180,
                                 -70.3994689733719,
@@ -492,7 +480,7 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "placeholder"
+                            "layers": "preview:cy_ecoexp"
                         },
                         {
                             "name": "Cyclones",
@@ -619,7 +607,7 @@
             "preserveOrder": true,
             "items": [
                 {
-                    "name": "General insurance penetration (TBD)",
+                    "name": "General insurance penetration (NA)",
                     "rectangle": [
                         -180,
                         -76.564826965332,
@@ -631,7 +619,7 @@
                     "layers": "preview:cy_aalcret"
                 },
                 {
-                    "name": "Life insurance penetration (TBD)",
+                    "name": "Life insurance penetration (NA)",
                     "rectangle": [
                         -180,
                         -76.564826965332,
@@ -643,7 +631,7 @@
                     "layers": "preview:cy_pmlcret"
                 },
                 {
-                    "name": "General insurance density (TBD)",
+                    "name": "General insurance density (NA)",
                     "rectangle": [
                         -180,
                         -76.564826965332,
@@ -655,7 +643,7 @@
                     "layers": "preview:eq_aalcret"
                 },
                 {
-                    "name": "Life insurance density (TBD)",
+                    "name": "Life insurance density (NA)",
                     "rectangle": [
                         -180,
                         -76.564826965332,
@@ -674,7 +662,7 @@
             "preserveOrder": true,
             "items": [
                 {
-                    "name": "All perils",
+                    "name": "All perils (NA)",
                     "rectangle": [
                         -180,
                         -70.3994689733719,
@@ -683,7 +671,7 @@
                     ],
                     "type": "wms",
                     "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "placeholder"
+                    "layers": "preview:cy_aalcret"
                 },
                 {
                     "name": "Cyclones",
@@ -717,7 +705,7 @@
             "preserveOrder": true,
             "items": [
                 {
-                    "name": "All perils",
+                    "name": "All perils (NA)",
                     "rectangle": [
                         -180,
                         -70.3994689733719,
@@ -726,7 +714,7 @@
                     ],
                     "type": "wms",
                     "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "placeholder"
+                    "layers": "preview:cy_pmlcret"
                 },
                 {
                     "name": "Cyclones",
