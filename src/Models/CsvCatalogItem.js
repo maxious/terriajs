@@ -532,27 +532,19 @@ function onClockTick(csvItem, clock) {
         return;    }
     csvItem.lastTime = clock.currentTime;
 
-    //TODO!!!  Fix algo, it currently overwrites the original file in dynamicUpdate
-
-    //TODO!!!  Just get a points list and update the color function
-
     //get records based on the time
     var recs = csvItem._tableDataSource.getDataPointList(clock.currentTime);
-    var vars = [csvItem._tableDataSource.dataset.getVarList()];
-    var csvArray = vars.concat(recs);
-        //Serialize the arrays
-    var joinedRows = csvArray.map(function(arr) {
-        return arr.join(',');
-    });
-    var csvText = joinedRows.join('\n');
+    var recText = JSON.stringify(recs);
     //check if record data has changed
-    if (defined(csvItem.lastCsvText) && csvText === csvItem.lastCsvText) {
+    if (defined(csvItem.lastRecText) && recText === csvItem.lastRecText) {
         return;
     }
-    csvItem.lastCsvText = csvText;
+    csvItem.lastRecText = recText;
+    console.log(recText);
 
-    console.log(csvText);
-    csvItem.dynamicUpdate(csvText);
+    csvItem.recs = recs;
+    createRegionLookupFunc(csvItem);
+    csvItem._rebuild();
 }
 
 function getRegionMappingClock(csvItem) {
@@ -619,20 +611,19 @@ a region mapping column.'
 function recolorImage(image, colorFunc) {
     var length = image.data.length;  //pixel count * 4
     for (var i = 0; i < length; i += 4) {
-        if (image.data[i+3] < 255) {
+        if (image.data[i+3] < 255 || image.data[i] !== 0) {
+            image.data[i+3] = 0;
             continue;
         }
-        if (image.data[i] === 0) {
-            var idx = image.data[i+1] * 0x100 + image.data[i+2];
-            var clr = colorFunc(idx);
-            if (defined(clr)) {
-                for (var j = 0; j < 4; j++) {
-                    image.data[i+j] = clr[j];
-                }
+        var idx = image.data[i+1] * 0x100 + image.data[i+2];
+        var clr = colorFunc(idx);
+        if (defined(clr)) {
+            for (var j = 0; j < 4; j++) {
+                image.data[i+j] = clr[j];
             }
-            else {
-                image.data[i+3] = 0;
-            }
+        }
+        else {
+            image.data[i+3] = 0;
         }
     }
     return image;
@@ -850,26 +841,48 @@ function createRegionLookupFunc(csvItem) {
     var vals = dataset.getDataValues(dataset.getCurrentVariable());
     var ids = regionDescriptor.idMap;
     var colors = new Array(ids.length);
+    for (var c = 0; c < colors.length; c++) {
+        colors[c] = [0, 0, 0, 0];
+    }
+
     // set color for each code
-    for (var i = 0; i < codes.length; i++) {
-        var id = ids.indexOf(codes[i].toString());
-        colors[id] = dataSource._mapValue2Color(vals[i]);
-        if (vals[i] === 204) {
-            console.log('here');
+    var row, index, codeMap = [];
+    if (!defined(csvItem.recs)) {
+        for (row = 0; row < codes.length; row++) {
+            index = ids.indexOf(codes[row].toString());
+            colors[index] = dataSource._mapValue2Color(vals[row]);
+        }
+    } else {
+        for (var i = 0; i < csvItem.recs.length; i++) {
+            row  = csvItem.recs[i];
+            index = ids.indexOf(codes[row].toString());
+            colors[index] = dataSource._mapValue2Color(vals[row]);
+            codeMap[i] = codes[row];
         }
     }
+
     //   color lookup function used by the region mapper
     csvItem.colorFunc = function(id) {
         return colors[id];
     };
     // used to get current variable data
     csvItem.valFunc = function(code) {
-        var rowIndex = codes.indexOf(code);
+        var rowIndex;
+        if (codeMap.length > 0) {
+            rowIndex = csvItem.recs[codeMap.indexOf(code)];
+        } else {
+            rowIndex = codes.indexOf(code);
+        }
         return vals[rowIndex];
     };
     // used to get all region data properties
     csvItem.rowProperties = function(code) {
-        var rowIndex = codes.indexOf(code);
+        var rowIndex;
+        if (codeMap.length > 0) {
+            rowIndex = csvItem.recs[codeMap.indexOf(code)];
+        } else {
+            rowIndex = codes.indexOf(code);
+        }
         return dataset.getDataRow(rowIndex);
     };
 }

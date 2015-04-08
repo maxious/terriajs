@@ -308,8 +308,7 @@ TableDataSource.prototype.getDataPointList = function (time) {
                 continue;
             }
         }
-        var rowArray = this.dataset.getDataRowArray(pointList[i].row);
-        dispRecords.push(rowArray);
+        dispRecords.push(pointList[i].row);
     }
     return dispRecords;
 };
@@ -361,7 +360,6 @@ TableDataSource.prototype._mapValue2Color = function (pntVal) {
 */
 TableDataSource.prototype.setLeadTimeByPercent = function (pct) {
     if (this.dataset && this.dataset.hasTimeData() && defined(this.dataset.getMaxTime())) {
-        var data = this.dataset;
         this.leadTimeMin = JulianDate.secondsDifference(this.dataset.getMaxTime(), this.dataset.getMinTime()) * pct / (60.0 * 100.0);
     }
 };

@@ -113,7 +113,9 @@ Dataset.prototype.getMaxTime = function () {
 Dataset.prototype.getVarList = function () {
     var ret = [];
     for (var v in this.variables) {
-        ret.push(v);
+        if (this.variables.hasOwnProperty(v)) {
+            ret.push(v);
+        }
     }
     return ret;
 };
