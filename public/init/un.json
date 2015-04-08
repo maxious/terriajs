@@ -607,52 +607,64 @@
             "preserveOrder": true,
             "items": [
                 {
-                    "name": "General insurance penetration (NA)",
-                    "rectangle": [
-                        -180,
-                        -76.564826965332,
-                        180.000015258789,
-                        83.6274108886719
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:cy_aalcret"
+                    "name": "Non-life insurance penetration",
+                    "type": "csv",
+                    "url": "data/insurance2013.csv",
+                    "tableStyle": {
+                        "dataVariable": "Non-life penetration",
+                        "regionVariable": "Country code",
+                        "regionType": "CNT2"
+                    }
                 },
                 {
-                    "name": "Life insurance penetration (NA)",
-                    "rectangle": [
-                        -180,
-                        -76.564826965332,
-                        180.000015258789,
-                        83.6274108886719
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:cy_pmlcret"
+                    "name": "Life insurance penetration",
+                    "type": "csv",
+                    "url": "data/insurance2013.csv",
+                    "tableStyle": {
+                        "dataVariable": "Life penetration",
+                        "regionVariable": "Country code",
+                        "regionType": "CNT2"
+                    }
                 },
                 {
-                    "name": "General insurance density (NA)",
-                    "rectangle": [
-                        -180,
-                        -76.564826965332,
-                        180.000015258789,
-                        83.6274108886719
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:eq_aalcret"
+                    "name": "Total insurance penetration",
+                    "type": "csv",
+                    "url": "data/insurance2013.csv",
+                    "tableStyle": {
+                        "dataVariable": "Total penetration",
+                        "regionVariable": "Country code",
+                        "regionType": "CNT2"
+                    }
                 },
                 {
-                    "name": "Life insurance density (NA)",
-                    "rectangle": [
-                        -180,
-                        -76.564826965332,
-                        180.000015258789,
-                        83.6274108886719
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:eq_pmlcret"
+                    "name": "Non-life insurance density",
+                    "type": "csv",
+                    "url": "data/insurance2013.csv",
+                    "tableStyle": {
+                        "dataVariable": "Non-life density",
+                        "regionVariable": "Country code",
+                        "regionType": "CNT2"
+                    }
+                },
+                {
+                    "name": "Life insurance density",
+                    "type": "csv",
+                    "url": "data/insurance2013.csv",
+                    "tableStyle": {
+                        "dataVariable": "Life density",
+                        "regionVariable": "Country code",
+                        "regionType": "CNT2"
+                    }
+                },
+                {
+                    "name": "Total insurance density",
+                    "type": "csv",
+                    "url": "data/insurance2013.csv",
+                    "tableStyle": {
+                        "dataVariable": "Total density",
+                        "regionVariable": "Country code",
+                        "regionType": "CNT2"
+                    }
                 }
             ]
         },
