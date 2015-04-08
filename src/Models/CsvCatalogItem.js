@@ -74,6 +74,12 @@ var CsvCatalogItem = function(application, url) {
     this.dataSourceUrl = undefined;
 
     /**
+     * Gets or sets the tableStyle object
+     * @type {Object}
+     */
+    this.tableStyle = undefined;
+
+    /**
      * Gets or sets a value indicating whether data points in the CSV are color-coded based on the
      * value column.
      * @type {Boolean}
@@ -89,7 +95,7 @@ var CsvCatalogItem = function(application, url) {
      */
     this.opacity = 0.6;
 
-    knockout.track(this, ['url', 'data', 'dataSourceUrl', 'colorByValue', 'opacity', '_clock']);
+    knockout.track(this, ['url', 'data', 'dataSourceUrl', 'colorByValue', 'tableStyle', 'opacity', '_clock']);
 
     knockout.getObservable(this, 'opacity').subscribe(function(newValue) {
         updateOpacity(this);
@@ -214,7 +220,7 @@ freezeObject(CsvCatalogItem.defaultPropertiesForSharing);
 
 
 CsvCatalogItem.prototype._getValuesThatInfluenceLoad = function() {
-    return [this.url, this.data, this.colorByValue];
+    return [this.url, this.data, this.colorByValue, this.tableStyle];
 };
 
 CsvCatalogItem.prototype._load = function() {
@@ -401,43 +407,6 @@ CsvCatalogItem.prototype._hideInLeaflet = function() {
     }
 };
 
-CsvCatalogItem.prototype._redisplay = function() {
-    if (defined(this.application.cesium)) {
-        this._hideInCesium();
-        this._showInCesium();
-    } else {
-        this._hideInLeaflet();
-        this._showInLeaflet();
-    }
-};
-
-CsvCatalogItem.prototype.dynamicUpdate = function(text) {
-    this.data = text;  //TODO: is this causing 2 draws??
-    var that = this;
-
-    if (defined(this._tableDataSource)) {
-        if (defined(this.application.cesium)) {
-            if (defined(this._imageryLayer)) {
-                this._hideInCesium();
-            }
-            return when(this.load()).then(function () {
-                that._showInCesium();
-            });
-        }
-        else {
-            if (defined(this._imageryLayer)) {
-                this._hideInLeaflet();
-            }
-            return when(this.load()).then(function () {
-                that._showInLeaflet();
-            });
-        }
-    }
-    else {
-        return this.load();
-    }
-};
-
 CsvCatalogItem.prototype.pickFeaturesInLeaflet = function(mapExtent, mapWidth, mapHeight, pickX, pickY) {
     if (!this._regionMapped) {
         return undefined;
@@ -507,6 +476,43 @@ function updateOpacity(csvItem) {
     }
 }
 
+CsvCatalogItem.prototype._redisplay = function() {
+    if (defined(this.application.cesium)) {
+        this._hideInCesium();
+        this._showInCesium();
+    } else {
+        this._hideInLeaflet();
+        this._showInLeaflet();
+    }
+};
+
+CsvCatalogItem.prototype.dynamicUpdate = function(text) {
+    this.data = text;
+    var that = this;
+
+    if (defined(this._tableDataSource)) {
+        if (defined(this.application.cesium)) {
+            if (defined(this._imageryLayer)) {
+                this._hideInCesium();
+            }
+            return when(this.load()).then(function () {
+                that._showInCesium();
+            });
+        }
+        else {
+            if (defined(this._imageryLayer)) {
+                this._hideInLeaflet();
+            }
+            return when(this.load()).then(function () {
+                that._showInLeaflet();
+            });
+        }
+    }
+    else {
+        return this.load();
+    }
+};
+
 function updateClockSubscription(csvItem) {
     if (csvItem.isShown && defined(csvItem.clock) && csvItem._regionMapped) {
         // Subscribe
@@ -527,7 +533,7 @@ function onClockTick(csvItem, clock) {
     if (!hasTimeData || !csvItem.isEnabled || !csvItem.isShown) {
         return;
     }
-        //check if time has changed
+    //check if time has changed
     if (defined(csvItem.lastTime) && JulianDate.equals(clock.currentTime, csvItem.lastTime)) {
         return;    
     }
@@ -574,6 +580,9 @@ function loadTable(csvItem, text) {
         return;
     }    
     csvItem._tableDataSource.loadText(text);
+    if (defined(csvItem.tableStyle)) {
+        csvItem._tableDataSource.setCurrentVariable(csvItem.tableStyle.dataVariable);
+    }
 
     csvItem._tableDataSource.maxDisplayValue = csvItem._maxDisplayValue;
     csvItem._tableDataSource.minDisplayValue = csvItem._minDisplayValue;
@@ -851,14 +860,18 @@ function createRegionLookupFunc(csvItem) {
     if (!defined(csvItem.recs)) {
         for (row = 0; row < codes.length; row++) {
             index = ids.indexOf(codes[row].toString());
-            colors[index] = dataSource._mapValue2Color(vals[row]);
+            if (index >= 0 && colors[index][3] === 0) {
+                colors[index] = dataSource._mapValue2Color(vals[row]);
+            }
         }
     } else {
         for (var i = 0; i < csvItem.recs.length; i++) {
             row  = csvItem.recs[i];
-            index = ids.indexOf(codes[row].toString());
-            colors[index] = dataSource._mapValue2Color(vals[row]);
             codeMap[i] = codes[row];
+            index = ids.indexOf(codes[row].toString());
+            if (index >= 0 && colors[index][3] === 0) {
+                colors[index] = dataSource._mapValue2Color(vals[row]);
+            }
         }
     }
 
@@ -951,8 +964,8 @@ function addRegionMap(csvItem) {
         return;
     }
 
-    //if csvItem includes style/var info then use that
-    if (!defined(csvItem.style) || !defined(csvItem.style.table)) {
+    //if csvItem includes style info then use that
+    if (!defined(csvItem.tableStyle)) {
         var result = determineRegionType(dataset);
         if (!defined(result) || !defined(result.regionType)) {
             return;
@@ -965,28 +978,26 @@ function addRegionMap(csvItem) {
             dataVar = (vars.indexOf(result.regionVar) === 0) ? vars[1] : vars[0];
         }
             //set default style if none set
-        var style = {line: {}, point: {}, polygon: {}, table: {}};
-        style.table.lat = undefined;
-        style.table.lon = undefined;
-        style.table.alt = undefined;
-        style.table.regionVar = result.regionVar;
-        style.table.regionType = result.regionType;
-        style.table.time = dataset.getVarID(VarType.TIME);
-        style.table.data = dataVar;
-        style.table.colorMap = [
-            {offset: 0.0, color: 'rgba(239,210,193,1.00)'},
-            {offset: 0.25, color: 'rgba(221,139,116,1.0)'},
-            {offset: 0.5, color: 'rgba(255,127,46,1.0)'},
-            {offset: 0.75, color: 'rgba(255,65,43,1.0)'},
-            {offset: 1.0, color: 'rgba(111,0,54,1.0)'}
-        ];
-        csvItem.style = style;
+        var tableStyle = {
+            'regionVariable' : result.regionVar,
+            'regionType' : result.regionType,
+            'dataVariable' : dataVar,
+            'timeVariable' : dataset.getVarID(VarType.TIME),
+            'colorMap' : [
+                {offset: 0.0, color: 'rgba(239,210,193,1.00)'},
+                {offset: 0.25, color: 'rgba(221,139,116,1.0)'},
+                {offset: 0.5, color: 'rgba(255,127,46,1.0)'},
+                {offset: 0.75, color: 'rgba(255,65,43,1.0)'},
+                {offset: 1.0, color: 'rgba(111,0,54,1.0)'}
+            ]
+        };
+        csvItem.tableStyle = tableStyle;
     }
 
-    if (defined(csvItem.style.table.colorMap)) {
-        dataSource.setColorGradient(csvItem.style.table.colorMap);
+    if (defined(csvItem.tableStyle.colorMap)) {
+        dataSource.setColorGradient(csvItem.tableStyle.colorMap);
     }
-    dataSource.setCurrentVariable(csvItem.style.table.data);
+    dataSource.setCurrentVariable(csvItem.tableStyle.dataVariable);
 
     //to make lint happy
     if (false) {
@@ -996,7 +1007,7 @@ function addRegionMap(csvItem) {
     
     //TODO: figure out how sharing works or doesn't
     
-    return setRegionVariable(csvItem, csvItem.style.table.regionVar, csvItem.style.table.regionType);
+    return setRegionVariable(csvItem, csvItem.tableStyle.regionVariable, csvItem.tableStyle.regionType);
 }
 
 

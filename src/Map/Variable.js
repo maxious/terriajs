@@ -90,27 +90,8 @@ Variable.prototype.processTimeVar = function () {
     function timeString(v) { //  9/2/94 0:56
         return JulianDate.fromDate(new Date(v));
     }
-    function timeExcel(v) {   // 40544.4533
-        var date = JulianDate.fromDate(new Date('January 1, 1970 0:00:00'));
-        date = JulianDate.addDays(date, Math.floor(v) - 25569.0, date); //account for offset to 1900
-        date = JulianDate.addSeconds(date, (v - Math.floor(v)) * 60 * 60 * 24, date);
-        return date;
-    }
     function timeUtc(v) {   //12321231414434
         return JulianDate.fromDate(Date.setTime(v));
-    }
-    function timeSosus(v) {   //19912410952050
-        var dateString = v.toString();
-        var year = parseInt(dateString.substring(0, 4), 10);
-        var dayofyear = parseInt(dateString.substring(4, 7), 10);
-        if (dateString.length !== 14 || year < 1950 || year > 2050 || dayofyear > 366) {
-            return new JulianDate(0.0, 0.0);
-        }
-        var d = new Date();
-        d.setUTCFullYear(year);
-        d.setUTCHours(dateString.substring(7, 9), dateString.substring(9, 11), dateString.substring(11, 13));
-        var date = JulianDate.addDays(JulianDate.fromDate(d), dayofyear, new JulianDate());
-        return date;
     }
     //create new Cessium time variable to attach to the variable
     var timeVar = new Variable();
@@ -118,15 +99,7 @@ Variable.prototype.processTimeVar = function () {
     //select time parsing function
     var parseFunc;
     if (parseInt(vals[0], 10) > 500000) {
-        if (timeSosus(vals[0]).dayNumber !== 0) {
-            parseFunc = timeSosus;
-        }
-        else {
-            parseFunc = timeUtc;
-        }
-    }
-    else if (_isNumber(vals[0])) {
-        parseFunc = timeExcel;
+        parseFunc = timeUtc;
     }
     else {
         parseFunc = timeString;

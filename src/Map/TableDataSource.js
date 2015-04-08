@@ -36,12 +36,13 @@ var TableDataSource = function () {
     //TODO: create style object to encapsulate these properties
     this.color = [64, 64, 255, 256];
     this.scale = 1.0;
-    this.imageUrl = "./images/circle32.png";
+    this.imageUrl = './images/circle32.png'; //currently not used
+    
     this.scaleValue = false;
     this.colorByValue = true;
+
     this.leadTimeMin = 0;
     this.trailTimeMin = 60;
-
     this.minDisplayValue = undefined;
     this.maxDisplayValue = undefined;
 
