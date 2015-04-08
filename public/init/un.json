@@ -17,7 +17,7 @@
             "preserveOrder": true,
             "items": [
                 {
-                    "name": "All perils (NA)",
+                    "name": "All perils (N/A)",
                     "rectangle": [
                         -180,
                         -70.3994689733719,
@@ -77,7 +77,7 @@
                     "layers": "preview:fl_events"
                 },
                 {
-                    "name": "Landslides (triggered by precipitations)",
+                    "name": "Landslides (due to precipitation)",
                     "rectangle": [
                         -180,
                         -56.01339243784153,
@@ -114,7 +114,7 @@
                     "preserveOrder": true,
                     "items": [
                         {
-                            "name": "All perils (NA)",
+                            "name": "All perils (N/A)",
                             "rectangle": [
                                 -180,
                                 -70.3994689733719,
@@ -126,7 +126,7 @@
                             "layers": "preview:cy_buffers"
                         },
                         {
-                            "name": "Cyclones (NA)",
+                            "name": "Cyclones (N/A)",
                             "rectangle": [
                                 -180,
                                 -70.3994689733719,
@@ -138,7 +138,7 @@
                             "layers": "preview:cy_buffers"
                         },
                         {
-                            "name": "Cyclone storm surges (NA)",
+                            "name": "Cyclone storm surges (N/A)",
                             "rectangle": [
                                 -180,
                                 -52.5916665789274,
@@ -150,7 +150,7 @@
                             "layers": "preview:cs_events"
                         },
                         {
-                            "name": "Earthquakes (NA)",
+                            "name": "Earthquakes (N/A)",
                             "rectangle": [
                                 -180,
                                 -73.0304652937564,
@@ -162,7 +162,7 @@
                             "layers": "preview:eq_events"
                         },
                         {
-                            "name": "Floods (NA)",
+                            "name": "Floods (N/A)",
                             "rectangle": [
                                 -101.242196,
                                 -34.5123,
@@ -174,7 +174,7 @@
                             "layers": "preview:fl_events"
                         },
                         {
-                            "name": "Landslides (triggered by precipitations) (NA)",
+                            "name": "Landslides (due to precipitation) (N/A)",
                             "rectangle": [
                                 -180,
                                 -56.01339243784153,
@@ -186,7 +186,7 @@
                             "layers": "preview:ls_pr"
                         },
                         {
-                            "name": "Tsunamis (NA)",
+                            "name": "Tsunamis (N/A)",
                             "rectangle": [
                                 -179.971008300781,
                                 -62.8770027160645,
@@ -205,7 +205,7 @@
                     "preserveOrder": true,
                     "items": [
                         {
-                            "name": "All perils (NA)",
+                            "name": "All perils (N/A)",
                             "rectangle": [
                                 -180,
                                 -70.3994689733719,
@@ -217,7 +217,7 @@
                             "layers": "preview:cy_buffers"
                         },
                         {
-                            "name": "Cyclones (NA)",
+                            "name": "Cyclones (N/A)",
                             "rectangle": [
                                 -180,
                                 -70.3994689733719,
@@ -229,7 +229,7 @@
                             "layers": "preview:cy_buffers"
                         },
                         {
-                            "name": "Cyclone storm surges (NA)",
+                            "name": "Cyclone storm surges (N/A)",
                             "rectangle": [
                                 -180,
                                 -52.5916665789274,
@@ -241,7 +241,7 @@
                             "layers": "preview:cs_events"
                         },
                         {
-                            "name": "Earthquakes (NA)",
+                            "name": "Earthquakes (N/A)",
                             "rectangle": [
                                 -180,
                                 -73.0304652937564,
@@ -253,7 +253,7 @@
                             "layers": "preview:eq_events"
                         },
                         {
-                            "name": "Floods (NA)",
+                            "name": "Floods (N/A)",
                             "rectangle": [
                                 -101.242196,
                                 -34.5123,
@@ -265,7 +265,7 @@
                             "layers": "preview:fl_events"
                         },
                         {
-                            "name": "Landslides (triggered by precipitations) (NA)",
+                            "name": "Landslides (due to precipitation) (N/A)",
                             "rectangle": [
                                 -180,
                                 -56.01339243784153,
@@ -277,7 +277,7 @@
                             "layers": "preview:ls_pr"
                         },
                         {
-                            "name": "Tsunamis (NA)",
+                            "name": "Tsunamis (N/A)",
                             "rectangle": [
                                 -179.971008300781,
                                 -62.8770027160645,
@@ -345,7 +345,7 @@
                     "layers": "preview:fl_risk"
                 },
                 {
-                    "name": "Landslides",
+                    "name": "Landslides (due to precipitation)",
                     "rectangle": [
                         -180,
                         -89.99999999992872,
@@ -369,7 +369,7 @@
                     "name": "Social",
                     "items": [
                         {
-                            "name": "All perils (NA)",
+                            "name": "All perils (N/A)",
                             "rectangle": [
                                 -180,
                                 -70.3994689733719,
@@ -429,7 +429,7 @@
                             "layers": "preview:fl_physexp"
                         },
                         {
-                            "name": "Landslides (triggered by precipitations)",
+                            "name": "Landslides (due to precipitation)",
                             "rectangle": [
                                 -180,
                                 -89.9999999999281,
@@ -471,7 +471,7 @@
                     "name": "Economic",
                     "items": [
                         {
-                            "name": "All perils (NA)",
+                            "name": "All perils (N/A)",
                             "rectangle": [
                                 -180,
                                 -70.3994689733719,
@@ -531,19 +531,7 @@
                             "layers": "preview:fl_ecoexp"
                         },
                         {
-                            "name": "Landslides (triggered by earthquakes)",
-                            "rectangle": [
-                                -180,
-                                -89.9999999999281,
-                                179.99999999985602,
-                                89.99166666666659
-                            ],
-                            "type": "wms",
-                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:ls_ecoexp"
-                        },
-                        {
-                            "name": "Landslides (triggered by precipitations)",
+                            "name": "Landslides (due to precipitation)",
                             "rectangle": [
                                 -180,
                                 -89.9999999999281,
@@ -674,7 +662,7 @@
             "preserveOrder": true,
             "items": [
                 {
-                    "name": "All perils (NA)",
+                    "name": "All perils (N/A)",
                     "rectangle": [
                         -180,
                         -70.3994689733719,
@@ -717,7 +705,7 @@
             "preserveOrder": true,
             "items": [
                 {
-                    "name": "All perils (NA)",
+                    "name": "All perils (N/A)",
                     "rectangle": [
                         -180,
                         -70.3994689733719,
