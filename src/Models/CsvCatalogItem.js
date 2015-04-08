@@ -401,7 +401,7 @@ CsvCatalogItem.prototype._hideInLeaflet = function() {
     }
 };
 
-CsvCatalogItem.prototype._rebuild = function() {
+CsvCatalogItem.prototype._redisplay = function() {
     if (defined(this.application.cesium)) {
         this._hideInCesium();
         this._showInCesium();
@@ -527,27 +527,30 @@ function onClockTick(csvItem, clock) {
     if (!hasTimeData || !csvItem.isEnabled || !csvItem.isShown) {
         return;
     }
-    //check if time has changed
+        //check if time has changed
     if (defined(csvItem.lastTime) && JulianDate.equals(clock.currentTime, csvItem.lastTime)) {
-        return;    }
+        return;    
+    }
     csvItem.lastTime = clock.currentTime;
 
-    //get records based on the time
+    //check if record data has changed
     var recs = csvItem._tableDataSource.getDataPointList(clock.currentTime);
     var recText = JSON.stringify(recs);
-    //check if record data has changed
     if (defined(csvItem.lastRecText) && recText === csvItem.lastRecText) {
         return;
     }
     csvItem.lastRecText = recText;
-    console.log(recText);
 
+    //redisplay if we have new data
     csvItem.recs = recs;
     createRegionLookupFunc(csvItem);
-    csvItem._rebuild();
+    csvItem._redisplay();
 }
 
-function getRegionMappingClock(csvItem) {
+function createRegionMappingClock(csvItem) {
+    if (defined(csvItem.clock)) {
+        return;
+    }
     var newClock;
     var dataSource = csvItem._tableDataSource;
     if (defined(dataSource) && defined(dataSource.dataset) && dataSource.dataset.hasTimeData()) {
@@ -588,9 +591,7 @@ a region mapping column.'
                 });
             }
             else {
-                if (!defined(csvItem.clock)) {
-                    csvItem.clock = getRegionMappingClock(csvItem);
-                }
+                csvItem.clock = createRegionMappingClock(csvItem);
                 csvItem.legendUrl = csvItem._tableDataSource.getLegendGraphic();
                 csvItem.application.currentViewer.notifyRepaintRequired();
             }
