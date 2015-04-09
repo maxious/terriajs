@@ -37,8 +37,8 @@ var TableDataSource = function () {
     this.color = [64, 64, 255, 256];
     this.scale = 1.0;
     this.imageUrl = './images/circle32.png'; //currently not used
-    
-    this.scaleValue = false;
+
+    this.scaleByValue = false;
     this.colorByValue = true;
 
     this.leadTimeMin = 0;
@@ -185,6 +185,9 @@ TableDataSource.prototype.describe = function(properties) {
         if (properties.hasOwnProperty(key)) {
             var value = properties[key];
             if (defined(value)) {
+                if (value instanceof JulianDate) {
+                    value = JulianDate.toIso8601(value, 0);
+                }
                 if (typeof value === 'object') {
                     html += '<tr><td>' + key + '</td><td>' + this.describe(value) + '</td></tr>';
                 } else {
@@ -330,7 +333,7 @@ TableDataSource.prototype._mapValue2Scale = function (pntVal) {
     var scale = this.scale;
     var normPoint = this._getNormalizedPoint(pntVal);
     if (defined(normPoint) && normPoint === normPoint) {
-        scale *= (this.scaleValue ? 1.0 * normPoint + 0.5 : 1.0);
+        scale *= (this.scaleByValue ? 1.0 * normPoint + 0.5 : 1.0);
     }
     return scale;
 };
@@ -432,9 +435,11 @@ TableDataSource.prototype.getLegendGraphic = function () {
 *
 */
 TableDataSource.prototype.setColorGradient = function (colorGradient) {
-    if (colorGradient !== undefined) {
-        this.colorGradient = colorGradient;
+    if (colorGradient === undefined) {
+        return;
     }
+    
+    this.colorGradient = colorGradient;
     
     var canvas = document.createElement("canvas");
     if (!defined(canvas)) {

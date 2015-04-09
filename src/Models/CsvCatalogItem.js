@@ -220,7 +220,7 @@ freezeObject(CsvCatalogItem.defaultPropertiesForSharing);
 
 
 CsvCatalogItem.prototype._getValuesThatInfluenceLoad = function() {
-    return [this.url, this.data, this.colorByValue, this.tableStyle];
+    return [this.url, this.data];
 };
 
 CsvCatalogItem.prototype._load = function() {
@@ -582,6 +582,7 @@ function loadTable(csvItem, text) {
     csvItem._tableDataSource.loadText(text);
     if (defined(csvItem.tableStyle)) {
         csvItem._tableDataSource.setCurrentVariable(csvItem.tableStyle.dataVariable);
+        csvItem._tableDataSource.setColorGradient(csvItem.tableStyle.colorMap);
     }
 
     csvItem._tableDataSource.maxDisplayValue = csvItem._maxDisplayValue;
@@ -786,14 +787,14 @@ function determineRegionVar(vars, aliases) {
 function determineRegionType(dataset) {
     var vars = dataset.getVarList();
 
-    var regionType, regionVar, region;
+    var regionType, regionVariable, region;
     //try to figure out the region variable
     for (region in regionWmsMap) {
         if (regionWmsMap.hasOwnProperty(region)) {
             var idx = determineRegionVar(vars, regionWmsMap[region].aliases);
             if (idx !== -1) {
                 regionType = region;
-                regionVar = vars[idx];
+                regionVariable = vars[idx];
                 break;
             }
         }
@@ -831,12 +832,12 @@ function determineRegionType(dataset) {
             }
         }
         if (defined(regionType)) {
-            regionVar = regionType;
+            regionVariable = regionType;
             dataset.variables[regionType] = dataset.variables[absRegion];
             delete dataset.variables[absRegion];
         }
     }
-    return { regionType: regionType, regionVar: regionVar };
+    return { regionType: regionType, regionVariable: regionVariable };
 }
 
 function createRegionLookupFunc(csvItem) {
@@ -847,9 +848,17 @@ function createRegionLookupFunc(csvItem) {
     var dataset = dataSource.dataset;
     var regionDescriptor = regionWmsMap[csvItem.regionType];
  
-    var codes = dataset.getEnumValues(csvItem.regionVar) || dataset.getDataValues(csvItem.regionVar);
-    var vals = dataset.getDataValues(dataset.getCurrentVariable());
+    var numericCodes = false;
+    var codes = dataset.getEnumValues(csvItem.regionVariable);
     var ids = regionDescriptor.idMap;
+    if (!defined(codes)) {
+        numericCodes = true;
+        codes = dataset.getDataValues(csvItem.regionVariable);
+        for (var n = 0; n < ids.length; n++) {
+            ids[n] = parseInt(ids[n],10);
+        }
+    }
+    var vals = dataset.getDataValues(dataset.getCurrentVariable());
     var colors = new Array(ids.length);
     for (var c = 0; c < colors.length; c++) {
         colors[c] = [0, 0, 0, 0];
@@ -859,7 +868,7 @@ function createRegionLookupFunc(csvItem) {
     var row, index, codeMap = [];
     if (!defined(csvItem.recs)) {
         for (row = 0; row < codes.length; row++) {
-            index = ids.indexOf(codes[row].toString());
+            index = ids.indexOf(codes[row]);
             if (index >= 0 && colors[index][3] === 0) {
                 colors[index] = dataSource._mapValue2Color(vals[row]);
             }
@@ -868,7 +877,7 @@ function createRegionLookupFunc(csvItem) {
         for (var i = 0; i < csvItem.recs.length; i++) {
             row  = csvItem.recs[i];
             codeMap[i] = codes[row];
-            index = ids.indexOf(codes[row].toString());
+            index = ids.indexOf(codes[row]);
             if (index >= 0 && colors[index][3] === 0) {
                 colors[index] = dataSource._mapValue2Color(vals[row]);
             }
@@ -879,34 +888,30 @@ function createRegionLookupFunc(csvItem) {
     csvItem.colorFunc = function(id) {
         return colors[id];
     };
+
+    function getRowIndex(code) {
+        if (codeMap.length > 0) {
+            return csvItem.recs[codeMap.indexOf(code)];
+        }
+        return codes.indexOf(numericCodes ? parseInt(code,10) : code);
+    }
+
     // used to get current variable data
     csvItem.valFunc = function(code) {
-        var rowIndex;
-        if (codeMap.length > 0) {
-            rowIndex = csvItem.recs[codeMap.indexOf(code)];
-        } else {
-            rowIndex = codes.indexOf(code);
-        }
-        return vals[rowIndex];
+        return vals[getRowIndex(code)];
     };
     // used to get all region data properties
     csvItem.rowProperties = function(code) {
-        var rowIndex;
-        if (codeMap.length > 0) {
-            rowIndex = csvItem.recs[codeMap.indexOf(code)];
-        } else {
-            rowIndex = codes.indexOf(code);
-        }
-        return dataset.getDataRow(rowIndex);
+        return dataset.getDataRow(getRowIndex(code));
     };
 }
 
-function setRegionVariable(csvItem, regionVar, regionType) {
+function setRegionVariable(csvItem, regionVariable, regionType) {
     if (!(csvItem._tableDataSource instanceof TableDataSource)) {
         return;
     }
 
-    csvItem.regionVar = regionVar;
+    csvItem.regionVariable = regionVariable;
     var regionDescriptor = regionWmsMap[regionType];
     if (csvItem.regionType !== regionType) {
         csvItem.regionType = regionType;
@@ -916,7 +921,7 @@ function setRegionVariable(csvItem, regionVar, regionType) {
 
         csvItem.regionProp = regionDescriptor.regionProp;
     }
-    console.log('Region type:', csvItem.regionType, ', Region var:', csvItem.regionVar);
+    console.log('Region type:', csvItem.regionType, ', Region var:', csvItem.regionVariable);
         
     return when(loadRegionIDs(regionDescriptor), function() {
         createRegionLookupFunc(csvItem);
@@ -974,15 +979,14 @@ function addRegionMap(csvItem) {
         var dataVar = dataset.getCurrentVariable();
         var vars = dataset.getVarList();
 
-        if (vars.indexOf(dataVar) === -1 || dataVar === result.regionVar) {
-            dataVar = (vars.indexOf(result.regionVar) === 0) ? vars[1] : vars[0];
+        if (vars.indexOf(dataVar) === -1 || dataVar === result.regionVariable) {
+            dataVar = (vars.indexOf(result.regionVariable) === 0) ? vars[1] : vars[0];
         }
             //set default style if none set
         var tableStyle = {
-            'regionVariable' : result.regionVar,
-            'regionType' : result.regionType,
             'dataVariable' : dataVar,
-            'timeVariable' : dataset.getVarID(VarType.TIME),
+            'regionVariable' : result.regionVariable,
+            'regionType' : result.regionType,
             'colorMap' : [
                 {offset: 0.0, color: 'rgba(239,210,193,1.00)'},
                 {offset: 0.25, color: 'rgba(221,139,116,1.0)'},
@@ -994,9 +998,7 @@ function addRegionMap(csvItem) {
         csvItem.tableStyle = tableStyle;
     }
 
-    if (defined(csvItem.tableStyle.colorMap)) {
-        dataSource.setColorGradient(csvItem.tableStyle.colorMap);
-    }
+    dataSource.setColorGradient(csvItem.tableStyle.colorMap);
     dataSource.setCurrentVariable(csvItem.tableStyle.dataVariable);
 
     //to make lint happy

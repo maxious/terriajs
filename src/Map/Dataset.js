@@ -129,10 +129,10 @@ Dataset.prototype._processVariables = function () {
             var variable = this.variables[id];
             //guess var type if not set
             if (!defined(variable.varType)) {
-                variable.guessVarType(id);
+                variable.guessVariableType(id);
             }
             if (variable.varType === VarType.TIME) {
-                variable.processTimeVar();            //calculate time variables
+                variable.processTimeVariable();            //calculate time variables
                 //if failed then default type to scalar
                 if (!defined(variable.timeVar)) {
                     variable.varType = VarType.SCALAR;
@@ -144,7 +144,7 @@ Dataset.prototype._processVariables = function () {
             //deal with enumerated variables
             if (variable.varType === VarType.SCALAR && variable.minVal > variable.maxVal) {
                 variable.varType = VarType.ENUM;
-                variable.processEnumVar();            //calculate enum variables
+                variable.processEnumVariable();            //calculate enum variables
             }
 
             //set the varIDs
@@ -360,25 +360,6 @@ Dataset.prototype.getDataRow = function (idx) {
         }
     }
     return rowObj;
-};
-
-/**
-* Get a data row as array
-*
-* @param {Integer} Index of row
-*
-* @returns {Object} Object containing all row members
-*/
-Dataset.prototype.getDataRowArray = function (idx) {
-    var rowArray = [];
-    if (defined(idx)) {
-        for (var id in this.variables) {
-            if (this.variables.hasOwnProperty(id)) {
-                rowArray.push(this.getDataValue(id, idx));
-            }
-        }
-    }
-    return rowArray;
 };
 
 /**
