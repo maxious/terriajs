@@ -30,7 +30,6 @@ var Metadata = require('./Metadata');
 var ModelError = require('./ModelError');
 var readText = require('../Core/readText');
 var TableDataSource = require('../Map/TableDataSource');
-var VarType = require('../Map/VarType');
 
 /**
  * A {@link CatalogItem} representing CSV data.
@@ -50,8 +49,6 @@ var CsvCatalogItem = function(application, url) {
     this._clockTickUnsubscribe = undefined;
 
     this._regionMapped = false;
-    this._minDisplayValue = undefined;
-    this._maxDisplayValue = undefined;
 
     /**
      * Gets or sets the URL from which to retrieve CSV data.  This property is ignored if
@@ -79,15 +76,7 @@ var CsvCatalogItem = function(application, url) {
      */
     this.tableStyle = undefined;
 
-    /**
-     * Gets or sets a value indicating whether data points in the CSV are color-coded based on the
-     * value column.
-     * @type {Boolean}
-     * @default true
-     */
-    this.colorByValue = true;
-
-    /**
+   /**
      * Gets or sets the opacity (alpha) of the data item, where 0.0 is fully transparent and 1.0 is
      * fully opaque.  This property is observable.
      * @type {Number}
@@ -581,12 +570,11 @@ function loadTable(csvItem, text) {
     }    
     csvItem._tableDataSource.loadText(text);
     if (defined(csvItem.tableStyle)) {
-        csvItem._tableDataSource.setCurrentVariable(csvItem.tableStyle.dataVariable);
-        csvItem._tableDataSource.setColorGradient(csvItem.tableStyle.colorMap);
+        csvItem._tableDataSource.maxDisplayValue = csvItem._maxDisplayValue;
+        csvItem._tableDataSource.minDisplayValue = csvItem._minDisplayValue;
+        csvItem._tableDataSource.setTableStyle(csvItem.tableStyle);
     }
 
-    csvItem._tableDataSource.maxDisplayValue = csvItem._maxDisplayValue;
-    csvItem._tableDataSource.minDisplayValue = csvItem._minDisplayValue;
 
     if (!csvItem._tableDataSource.dataset.hasLocationData()) {
         console.log('No locaton date found in csv file - trying to match based on region');
@@ -735,12 +723,6 @@ var regionWmsMap = {
         "regionProp": "ISO3",
         "aliases": ['country', 'iso3'],
         "digits": 3
-    },
-    'UN': {
-        "name":"region_map:FID_TM_WORLD_BORDERS",
-        "regionProp": "UN",
-        "aliases": ['un'],
-        "digits": 3
     }
 };
 
@@ -820,6 +802,7 @@ function determineRegionType(dataset) {
                 new_vals.push(parseInt(id,10));
             }
             dataset.variables[absRegion].vals = new_vals;
+            dataset.variables[absRegion].enumList = undefined;
         } else {
             var digits = code.toString().length;
             for (region in regionWmsMap) {
@@ -937,12 +920,12 @@ function setRegionDataVariable(csvItem, newVar) {
 
     var dataSource = csvItem._tableDataSource;
     var dataset = dataSource.dataset;
-    dataset.setCurrentVariable({ variable: newVar});
+    dataset.setCurrentVariable(newVar);
     createRegionLookupFunc(csvItem);
     
     console.log('Var set to:', newVar);
 
-    csvItem._rebuild();
+    csvItem._redisplay();
 }
 
 function setRegionColorMap(csvItem, dataColorMap) {
@@ -953,7 +936,7 @@ function setRegionColorMap(csvItem, dataColorMap) {
     csvItem._tableDataSource.setColorGradient(dataColorMap);
     createRegionLookupFunc(csvItem);
 
-    csvItem._rebuild();
+    csvItem._redisplay();
 }
 
 
@@ -969,37 +952,39 @@ function addRegionMap(csvItem) {
         return;
     }
 
-    //if csvItem includes style info then use that
-    if (!defined(csvItem.tableStyle)) {
+        //fill in missing tableStyle settings
+    var tableStyle = csvItem.tableStyle || {};
+    if (!defined(tableStyle.regionType) || !defined(tableStyle.regionVariable)) {
         var result = determineRegionType(dataset);
         if (!defined(result) || !defined(result.regionType)) {
             return;
         }
-            //change current var if necessary
+        tableStyle.regionVariable = result.regionVariable;
+        tableStyle.regionType = result.regionType;
+    }
+        //change current var if necessary
+    if (!defined(tableStyle.dataVariable)) {
         var dataVar = dataset.getCurrentVariable();
         var vars = dataset.getVarList();
-
-        if (vars.indexOf(dataVar) === -1 || dataVar === result.regionVariable) {
-            dataVar = (vars.indexOf(result.regionVariable) === 0) ? vars[1] : vars[0];
+        if (vars.indexOf(dataVar) === -1 || dataVar === tableStyle.regionVariable) {
+            tableStyle.dataVariable = (vars.indexOf(tableStyle.regionVariable) === 0) ? vars[1] : vars[0];
         }
-            //set default style if none set
-        var tableStyle = {
-            'dataVariable' : dataVar,
-            'regionVariable' : result.regionVariable,
-            'regionType' : result.regionType,
-            'colorMap' : [
-                {offset: 0.0, color: 'rgba(239,210,193,1.00)'},
-                {offset: 0.25, color: 'rgba(221,139,116,1.0)'},
-                {offset: 0.5, color: 'rgba(255,127,46,1.0)'},
-                {offset: 0.75, color: 'rgba(255,65,43,1.0)'},
-                {offset: 1.0, color: 'rgba(111,0,54,1.0)'}
-            ]
-        };
-        csvItem.tableStyle = tableStyle;
+        tableStyle.dataVariable = dataVar;
+        dataSource.setCurrentVariable(dataVar);
+    }
+        //build an interesting color map if none present
+    if (!defined(tableStyle.colorMap)) {
+        tableStyle.colorMap = [
+            {offset: 0.0, color: 'rgba(239,210,193,1.00)'},
+            {offset: 0.25, color: 'rgba(221,139,116,1.0)'},
+            {offset: 0.5, color: 'rgba(255,127,46,1.0)'},
+            {offset: 0.75, color: 'rgba(255,65,43,1.0)'},
+            {offset: 1.0, color: 'rgba(111,0,54,1.0)'}
+        ];
+        dataSource.setColorGradient(tableStyle.colorMap);
     }
 
-    dataSource.setColorGradient(csvItem.tableStyle.colorMap);
-    dataSource.setCurrentVariable(csvItem.tableStyle.dataVariable);
+    csvItem.tableStyle = tableStyle;
 
     //to make lint happy
     if (false) {
@@ -1009,7 +994,7 @@ function addRegionMap(csvItem) {
     
     //TODO: figure out how sharing works or doesn't
     
-    return setRegionVariable(csvItem, csvItem.tableStyle.regionVariable, csvItem.tableStyle.regionType);
+    return setRegionVariable(csvItem, tableStyle.regionVariable, tableStyle.regionType);
 }
 
 

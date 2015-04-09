@@ -29,6 +29,23 @@
                             "url": "test/earthquakes.csv"
                         },
                         {
+                            "name": "Auto Incidents (CSV)",
+                            "type": "csv",
+                            "url": "test/incidents.csv",
+                            "tableStyle": {
+                                "dataVariable": "incident_severity",
+                                "scale": 1.2,
+                                "scaleByValue": true,
+                                "imageUrl": "images/pow32.png",
+                                "minDisplayValue": 2,
+                                "maxDisplayValue": 5,
+                                "colorMap": [
+                                    { "offset": 0.0, "color": "rgba(100,0,0,1.00)" },
+                                    { "offset": 1.0, "color": "rgba(255,0,0,1.0)" }
+                                ]
+                            }
+                        },
+                        {
                             "name": "Auto Incidents No Time (CSV)",
                             "type": "csv",
                             "url": "test/incidents_notime.csv"
@@ -78,31 +95,8 @@
                                 "regionVariable": "POA_CODE",
                                 "regionType": "POA",
                                 "colorMap": [
-                                    {
-                                        "offset": 0.0,
-                                        "color": "rgba(0,0,0,1.00)"
-                                    }, {
-                                        "offset": 1.0,
-                                        "color": "rgba(0,200,0,1.0)"
-                                    }
-                                ]
-                            }
-                        },
-                        {
-                            "name": "Auto Incidents (CSV)",
-                            "type": "csv",
-                            "url": "test/incidents.csv",
-                            "tableStyle": {
-                                "dataVariable": "incident_severity",
-                                "colorMap": [
-                                    {
-                                        "offset": 0.0,
-                                        "color": "rgba(0,0,255,1.00)"
-                                    },
-                                    {
-                                        "offset": 1.0,
-                                        "color": "rgba(255,0,0,1.0)"
-                                    }
+                                    { "offset": 0.0, "color": "rgba(0,0,0,1.00)" },
+                                    { "offset": 1.0, "color": "rgba(0,200,0,1.0)" }
                                 ]
                             }
                         },
@@ -130,7 +124,18 @@
                             "name": "Country Regions",
                             "type": "csv",
                             "url": "test/countries.csv",
-                            "dataVariable": "ITU-T Telephone Code"
+                            "tableStyle": {
+                                "dataVariable": "ITU-T Telephone Code"
+                            }
+                        },
+                        {
+                            "name": "Droughts by Country",
+                            "type": "csv",
+                            "url": "test/droughts.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total affected",
+                                "displayTime" : 525600
+                            }
                         },
                         {
                             "name": "Large feature info box (CZML)",

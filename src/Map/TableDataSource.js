@@ -33,28 +33,21 @@ var TableDataSource = function () {
     this.dataset = new Dataset();
     this.show = true;
 
-    //TODO: create style object to encapsulate these properties
-    this.color = [64, 64, 255, 256];
-    this.scale = 1.0;
-    this.imageUrl = './images/circle32.png'; //currently not used
-
-    this.scaleByValue = false;
-    this.colorByValue = true;
-
-    this.leadTimeMin = 0;
-    this.trailTimeMin = 60;
-    this.minDisplayValue = undefined;
-    this.maxDisplayValue = undefined;
-
-    var rainbowGradient = [
-        {offset: 0.0, color: 'rgba(32,0,200,1.0)'},
-        {offset: 0.25, color: 'rgba(0,200,200,1.0)'},
-        {offset: 0.5, color: 'rgba(0,200,0,1.0)'},
-        {offset: 0.75, color: 'rgba(200,200,0,1.0)'},
-        {offset: 1.0, color: 'rgba(200,0,0,1.0)'}
-    ];
-
-    this.setColorGradient(rainbowGradient);
+    this.setTableStyle( {
+        scale: 1.0,
+        scaleByValue: false,
+        imageUrl: '',
+        displayTime: 60,
+        minDisplayValue: undefined,
+        maxDisplayValue: undefined,
+        colorMap: [
+            {offset: 0.0, color: 'rgba(32,0,200,1.0)'},
+            {offset: 0.25, color: 'rgba(0,200,200,1.0)'},
+            {offset: 0.5, color: 'rgba(0,200,0,1.0)'},
+            {offset: 0.75, color: 'rgba(200,200,0,1.0)'},
+            {offset: 1.0, color: 'rgba(200,0,0,1.0)'}
+        ]
+    });
 };
 
 defineProperties(TableDataSource.prototype, {
@@ -132,6 +125,24 @@ defineProperties(TableDataSource.prototype, {
         }
 });
 
+
+
+TableDataSource.prototype.setTableStyle = function (tableStyle) {
+    if (!defined(tableStyle)) {
+        return;
+    }
+
+    this.scale = tableStyle.scale || this.scale;
+    this.scaleByValue = tableStyle.scaleByValue || this.scaleByValue;
+    this.imageUrl = tableStyle.imageUrl || this.imageUrl;
+    this.displayTime = tableStyle.displayTime || this.displayTime;
+    this.minDisplayValue = tableStyle.minDisplayValue;
+    this.maxDisplayValue = tableStyle.maxDisplayValue;
+
+    this.setColorGradient(tableStyle.colorMap);
+    this.setCurrentVariable(tableStyle.dataVariable);
+};
+
 /**
  * Asynchronously loads the Table at the provided url, replacing any existing data.
  *
@@ -155,8 +166,7 @@ TableDataSource.prototype.loadUrl = function (url) {
  */
 TableDataSource.prototype.loadText = function (text) {
     this.dataset.loadText(text);
-    this.setLeadTimeByPercent(0.0);
-    this.setTrailTimeByPercent(1.0);
+    this.setDisplayTimeByPercent(1.0);
     if (this.dataset.hasLocationData()) {
         this.czmlDataSource.load(this.getCzmlDataPointList());
     }
@@ -169,13 +179,12 @@ TableDataSource.prototype.loadText = function (text) {
 *
 */
 TableDataSource.prototype.setCurrentVariable = function (varName) {
-    this.dataset.setCurrentVariable({ variable: varName});
+    this.dataset.setCurrentVariable(varName);
     if (this.dataset.hasLocationData()) {
         this.czmlDataSource.load(this.getCzmlDataPointList());
     }
 };
 
-var startScratch = new JulianDate();
 var endScratch = new JulianDate();
 
 
@@ -210,49 +219,63 @@ TableDataSource.prototype.describe = function(properties) {
 TableDataSource.prototype.czmlRecFromPoint = function (point) {
 
     var rec = {
-        name: "Site Data",
-        description: "empty",
-        point: {
-            color: { "rgba" : [255, 0, 0, 255] },
-            outlineColor: { "rgba" : [0, 0, 0, 255] },
-            outlineWidth: 1,
-            pixelSize: 8,
-            show: [
-                {
-                    boolean: false
-                },
-                {
-                    interval: "2011-02-04T16:00:00Z/2011-04-04T18:00:00Z",
-                    boolean: true
-                }
-            ],
-        },
-        position: {
-            cartographicDegrees: [0, 0, 0]
+        "name": "Site Data",
+        "description": "empty",
+        "position" : {
+            "cartographicDegrees" : [0, 0, 0]
         }
     };
     
-    if (this.colorByValue) {
-        rec.point.color.rgba = this._mapValue2Color(point.val);
-    } else {
-        rec.point.color.rgba = this.color;
-    }
+    var color = this._mapValue2Color(point.val);
+    var scale = this._mapValue2Scale(point.val);
 
-    rec.point.pixelSize *= this._mapValue2Scale(point.val);
     for (var p = 0; p < 3; p++) {
         rec.position.cartographicDegrees[p] = point.pos[p];
     }
 
+    var show = [
+        {
+            "boolean" : false
+        },
+        {
+            "interval" : "2011-02-04T16:00:00Z/2011-04-04T18:00:00Z",
+            "boolean" : true
+        }
+    ];
+
+
     if (this.dataset.hasTimeData()) {
-        var start = JulianDate.addMinutes(point.time, -this.leadTimeMin, startScratch);
-        var finish = JulianDate.addMinutes(point.time, this.trailTimeMin, endScratch);
-        rec.point.show[1].interval = JulianDate.toIso8601(start) + '/' + JulianDate.toIso8601(finish);
-        rec.availability = rec.point.show[1].interval;
+        var start = point.time;
+        var finish = JulianDate.addMinutes(point.time, this.displayTime, endScratch);
+        rec.availability = JulianDate.toIso8601(start) + '/' + JulianDate.toIso8601(finish);
+        show[1].interval = rec.availability;
     }
     else {
-        rec.point.show[0].boolean = true;
-        rec.point.show[1].interval = undefined;
+        show[0].boolean = true;
+        show[1].interval = undefined;
     }
+
+        //no image so use point
+    if (!defined(this.imageUrl) || this.imageUrl === '') {
+        rec.point = {
+            outlineColor: { "rgba" : [0, 0, 0, 255] },
+            outlineWidth: 1,
+            pixelSize: 8 * scale,
+            color: { "rgba" : color },
+            show: show
+        };
+    }
+    else {
+        rec.billboard = {
+            horizontalOrigin : "CENTER",
+            verticalOrigin : "BOTTOM",
+            image : this.imageUrl,
+            scale : scale,
+            color : { "rgba" : color },
+            show : show
+        };
+    }
+
     return rec;
 };
 
@@ -302,8 +325,8 @@ TableDataSource.prototype.getDataPointList = function (time) {
     
     var start, finish;
     if (this.dataset.hasTimeData()) {
-        start = JulianDate.addMinutes(time, -this.leadTimeMin, startScratch);
-        finish = JulianDate.addMinutes(time, this.trailTimeMin, endScratch);
+        start = time;
+        finish = JulianDate.addMinutes(time, this.displayTime, endScratch);
     }
     for (var i = 0; i < pointList.length; i++) {
         if (this.dataset.hasTimeData()) {
@@ -351,38 +374,49 @@ TableDataSource.prototype._mapValue2Color = function (pntVal) {
         color[0] = colors.data[colorIndex];
         color[1] = colors.data[colorIndex + 1];
         color[2] = colors.data[colorIndex + 2];
-        color[3] = colors.data[colorIndex + 3] * (this.color[3] / 255.0);
+        color[3] = colors.data[colorIndex + 3];
     }
     return color;
 };
 
 /**
-* Set the lead time by percent
+* Set the point display time by percent
 *
 * @memberof TableDataSource
 *
 */
-TableDataSource.prototype.setLeadTimeByPercent = function (pct) {
-    if (this.dataset && this.dataset.hasTimeData() && defined(this.dataset.getMaxTime())) {
-        this.leadTimeMin = JulianDate.secondsDifference(this.dataset.getMaxTime(), this.dataset.getMinTime()) * pct / (60.0 * 100.0);
+TableDataSource.prototype.setDisplayTimeByMinutes = function (minutes) {
+    if (!defined(minutes) || (typeof minutes !== 'number')) {
+        return;
     }
+    this.displayTime = minutes;
 };
+
 
 /**
-* Set the trailing time by percent
+* Set the point display time by percent
 *
 * @memberof TableDataSource
 *
 */
-TableDataSource.prototype.setTrailTimeByPercent = function (pct) {
+TableDataSource.prototype.setDisplayTimeByPercent = function (pct) {
+    if (!defined(pct) || (typeof pct !== 'number')) {
+        return;
+    }
     if (this.dataset && this.dataset.hasTimeData() && defined(this.dataset.getMaxTime())) {
-        this.trailTimeMin = JulianDate.secondsDifference(this.dataset.getMaxTime(), this.dataset.getMinTime()) * pct / (60.0 * 100.0);
+        this.displayTime = JulianDate.secondsDifference(this.dataset.getMaxTime(), this.dataset.getMinTime()) * pct / (60.0 * 100.0);
     }
 };
 
 
+/**
+* Get a data url that holds the image for the legend
+*
+* @memberof TableDataSource
+*
+*/
 TableDataSource.prototype.getLegendGraphic = function () {
-    if (!this.colorByValue) {
+    if (this.singleColor) {
         return undefined;
     }
 
@@ -440,7 +474,7 @@ TableDataSource.prototype.setColorGradient = function (colorGradient) {
     }
     
     this.colorGradient = colorGradient;
-    
+
     var canvas = document.createElement("canvas");
     if (!defined(canvas)) {
         return;
@@ -452,8 +486,15 @@ TableDataSource.prototype.setColorGradient = function (colorGradient) {
     // Create Linear Gradient
     var grad = this.colorGradient;
     var linGrad = ctx.createLinearGradient(0,0,0,h);
-    for (var i = 0; i < grad.length; i++) {
-        linGrad.addColorStop(grad[i].offset, grad[i].color);
+    if (grad.length === 1) {
+        this.singleColor = true;
+        linGrad.addColorStop(0.0, grad[0].color);
+        linGrad.addColorStop(1.0, grad[0].color);
+    } 
+    else {
+        for (var i = 0; i < grad.length; i++) {
+            linGrad.addColorStop(grad[i].offset, grad[i].color);
+        }
     }
     ctx.fillStyle = linGrad;
     ctx.fillRect(0,0,w,h);

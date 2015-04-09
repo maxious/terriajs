@@ -258,22 +258,19 @@ Dataset.prototype.loadUrl = function (description) {
 /**
 * Set the current variable
 *
-* @param {Object} description Object with the following properties:
-* @param {String} [description.variable] The initial variable to show
+* @param {String} [variable] The initial variable to show
 *
 */
-Dataset.prototype.setCurrentVariable = function (description) {
-    if (!defined(this.variables) || !this.variables[description.variable] || 
-        this.variables[description.variable].vals.length === 0) {
+Dataset.prototype.setCurrentVariable = function (variable) {
+    if (!defined(this.variables) || !this.variables[variable] || 
+        this.variables[variable].vals.length === 0) {
         return;
     }
-    this.varName = description.variable;
+    this.varName = variable;
     if (this.varName.length && this.variables[this.varName]) {
         this.varTypeSet[VarType.SCALAR] = this.varName;
     }
 };
-
-function _float_equals(a, b) { return (Math.abs((a - b) / b) < 0.00001); }
 
 /**
 * Get the current variable name
@@ -403,6 +400,7 @@ Dataset.prototype.getEnumValues = function (varName) {
 * @returns {Boolean} True if this is NoData
 */
 Dataset.prototype.isNoData = function (ptVal) {
+    function _float_equals(a, b) { return (Math.abs((a - b) / b) < 0.00001); }
     return _float_equals(this.noData, ptVal);
 };
 
