@@ -100,7 +100,7 @@ var AbsIttCatalogItem = function(application) {
      * @type {Boolean}
      * @default true
      */
-    this.displayPercent = false;
+    this.displayPercent = true;
 
     knockout.track(this, ['url', 'dataSetID', 'regionType', 'regionConcept', 'filter', '_absDataset', 'opacity', 'displayPercent']);
 
@@ -237,6 +237,7 @@ AbsIttCatalogItem.prototype._getValuesThatInfluenceLoad = function() {
 };
 
 //TODO: look at exposing these
+//      use region or regiontype concept to decide on region
 function skipConcept(concept, regionConcept) {
     var conceptMask = ["STATE","REGIONTYPE","FREQUENCY",regionConcept];
     for (var i = 0; i < conceptMask.length; i++) {
@@ -247,8 +248,6 @@ function skipConcept(concept, regionConcept) {
     return false;
 }
 
-
-//TODO: use region or regiontype concept to decide on region
 
 AbsIttCatalogItem.prototype._load = function() {
     //HACK for now
@@ -507,7 +506,7 @@ function updateAbsDataText(absItem) {
 
     //build filters from activeCodes
     var queryFilters = [];
-    var queryNames = [];  //TODO: make an object?
+    var queryNames = [];
     function buildQueryFilters(idxConcept, filterIn, nameIn) {
         for (var i = 0; i < activeCodes[idxConcept].length; i++) {
             var filter = filterIn.slice();
@@ -622,7 +621,7 @@ function updateAbsDataText(absItem) {
              }
             if (absItem.displayPercent) {
                 var tot = absItem._absTotalTable[r][3];
-                newRow[0] = tot > 0 ? Math.round(newRow[0] * 10000 / tot)/100 : 0;
+                newRow[0] = tot <= 0 ? 0 : Math.min(100.0, Math.round(newRow[0] * 10000 / tot)/100);
             }
             finalCsvArray.push(newRow);
         }
