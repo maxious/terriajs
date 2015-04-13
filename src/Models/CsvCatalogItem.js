@@ -477,11 +477,11 @@ CsvCatalogItem.prototype._redisplay = function() {
     }
 };
 
-CsvCatalogItem.prototype.dynamicUpdate = function(text) {
+CsvCatalogItem.prototype.csvDynamicUpdate = function(text) {
     this.data = text;
     var that = this;
 
-    return when(this.loadTable()).then(function () {
+    return when(this.load()).then(function () {
         that._redisplay();
     });
 };
@@ -549,9 +549,9 @@ function createRegionMappingClock(csvItem) {
 //////////////////////////////////////////////////////////////////////////
 
 function loadTable(csvItem, text) {
-    if (text.length === 0) {
-        return;
-    }    
+ //   if (text.length === 0) {
+ //       return;
+ //   }    
     csvItem._tableDataSource.loadText(text);
     if (defined(csvItem.tableStyle)) {
         csvItem._tableDataSource.maxDisplayValue = csvItem._maxDisplayValue;

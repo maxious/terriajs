@@ -251,8 +251,12 @@ function skipConcept(concept, regionConcept) {
 //TODO: use region or regiontype concept to decide on region
 
 AbsIttCatalogItem.prototype._load = function() {
+    //HACK for now
+    if (defined(this._absDataset)) {
+        return;
+    }
+
     this._csvCatalogItem = new CsvCatalogItem(this.application);
-    this._csvCatalogItem.opacity = this.opacity;
     this._csvCatalogItem.opacity = this.opacity;
 
     var that = this;
@@ -453,7 +457,7 @@ function updateAbsResults(absItem, forceUpdate) {
 //    }
 
     return when(updateAbsDataText(absItem)).then(function() {
-        return when(absItem._csvCatalogItem.dynamicUpdate(absItem._absDataText)).then(function() {
+        return when(absItem._csvCatalogItem.csvDynamicUpdate(absItem._absDataText)).then(function() {
             absItem.legendUrl = absItem._csvCatalogItem.legendUrl;
             absItem.application.currentViewer.notifyRepaintRequired();
         });
@@ -466,6 +470,7 @@ function updateAbsDataText(absItem) {
     //walk tree to get active codes
     var activeCodes = [];
     absItem.filter = [];
+    absItem._absDataText = '';
     function appendActiveCodes(parent, idxConcept, conceptCode) {
         for (var i = 0; i < parent.items.length; i++) {
             var node = parent.items[i];
@@ -494,7 +499,7 @@ function updateAbsDataText(absItem) {
 
     if (!bValidSelection) {
         console.log('No display because each concept must have at least one code selected.');
-        return when(absItem._csvCatalogItem.dynamicUpdate('')).then(function() {
+        return when(absItem._csvCatalogItem.csvDynamicUpdate('')).then(function() {
             absItem.legendUrl = '';
             absItem.application.currentViewer.notifyRepaintRequired();
        });
@@ -624,7 +629,7 @@ function updateAbsDataText(absItem) {
 
         //check that the created csvArray is ok
         if (!defined(finalCsvArray) || finalCsvArray.length === 0) {
-            return when(absItem._csvCatalogItem.dynamicUpdate('')).then(function() {
+            return when(absItem._csvCatalogItem.csvDynamicUpdate('')).then(function() {
                 absItem.legendUrl = '';
                 absItem.application.currentViewer.notifyRepaintRequired();
             });
