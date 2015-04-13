@@ -40,6 +40,7 @@ var AbsIttCatalogItem = function(application) {
     this._metadata = undefined;
     this._absDataset = undefined;
     this._absDataTable = undefined;
+    this._absDataText = undefined;
     this._filterColumnMap = [];
 
     this._regionTypeActive = false;
@@ -381,10 +382,9 @@ AbsIttCatalogItem.prototype._load = function() {
         }
         return when.all(promises).then( function(results) {
 
-            that._absDataset.isLoading = false;
-
-            //keep checking if this is necessary
-            return updateAbsResults(that);
+            return when(updateAbsResults(that, true)).then(function() {
+                that._absDataset.isLoading = false;
+            })
 
         });
     }).otherwise(function(e) {
@@ -412,8 +412,6 @@ AbsIttCatalogItem.prototype._disable = function() {
 AbsIttCatalogItem.prototype._show = function() {
     if (defined(this._csvCatalogItem)) {
         this._csvCatalogItem._show();
-        updateAbsResults(this, true);
-        this.initialShow = false;
     }
 };
 
@@ -450,9 +448,20 @@ function proxyUrl(application, url) {
 
 function updateAbsResults(absItem, forceUpdate) {
 
-    if (!forceUpdate && !absItem.isShown) {
-        return;
-    }
+//    if (!forceUpdate && !absItem.isShown) {
+//        return;
+//    }
+
+    return when(updateAbsDataText(absItem)).then(function() {
+        return when(absItem._csvCatalogItem.dynamicUpdate(absItem._absDataText)).then(function() {
+            absItem.legendUrl = absItem._csvCatalogItem.legendUrl;
+            absItem.application.currentViewer.notifyRepaintRequired();
+        });
+    })
+}
+
+
+function updateAbsDataText(absItem) {
 
     //walk tree to get active codes
     var activeCodes = [];
@@ -625,12 +634,7 @@ function updateAbsResults(absItem, forceUpdate) {
         var joinedRows = finalCsvArray.map(function(arr) {
             return arr.join(',');
         });
-        var text = joinedRows.join('\n');
-
-        return when(absItem._csvCatalogItem.dynamicUpdate(text)).then(function() {
-            absItem.legendUrl = absItem._csvCatalogItem.legendUrl;
-            absItem.application.currentViewer.notifyRepaintRequired();
-        });
+        absItem._absDataText = joinedRows.join('\n');
     });
 }
 
