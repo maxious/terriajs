@@ -139,7 +139,7 @@ if (start) {
             elements: [
                 '<a target="_blank" href="http://www.gov.au/"><img src="images/UNEPFI.png" height="52" /></a>',
                 '<a target="_blank" href="http://www.gov.au/"><img src="images/PSI.png" height="52" /></a>',
-                '<div class="brand-bar-name"><a target="_blank" href="http://www.unisdr.org/">UN Global<br/> Resilience</a></div>',
+                '<div class="brand-bar-name"><a target="_blank" href="http://www.unisdr.org/">Global<br/> Risk Map</a></div>',
                 '<a target="_blank" href="http://www.nicta.com.au"><img src="images/nicta.png" height="52" /></a>'
             ]
         });
