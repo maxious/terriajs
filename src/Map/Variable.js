@@ -19,6 +19,7 @@ var VarType = require('./VarType');
 * @constructor
 */
 var Variable = function () {
+    this.name = '';
     this.vals = [];
     this.varType = undefined;
     this.noData = 1e-34;

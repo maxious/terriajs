@@ -232,6 +232,7 @@ AbsIttCatalogItem.defaultPropertiesForSharing.push('opacity');
 AbsIttCatalogItem.defaultPropertiesForSharing.push('filter');
 AbsIttCatalogItem.defaultPropertiesForSharing.push('regionConcept');
 AbsIttCatalogItem.defaultPropertiesForSharing.push('displayPercent');
+//TODO: need to store csv style with the shared properties
 freezeObject(AbsIttCatalogItem.defaultPropertiesForSharing);
 
 
