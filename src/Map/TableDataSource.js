@@ -40,6 +40,7 @@ var TableDataSource = function () {
         displayTime: 60,
         minDisplayValue: undefined,
         maxDisplayValue: undefined,
+        filterOuterValues: false,
         colorMap: [
             {offset: 0.0, color: 'rgba(32,0,200,1.0)'},
             {offset: 0.25, color: 'rgba(0,200,200,1.0)'},
@@ -138,6 +139,7 @@ TableDataSource.prototype.setTableStyle = function (tableStyle) {
     this.displayTime = tableStyle.displayTime || this.displayTime;
     this.minDisplayValue = tableStyle.minDisplayValue;
     this.maxDisplayValue = tableStyle.maxDisplayValue;
+    this.filterOuterValues = tableStyle.filterOuterValues || this.filterOuterValues;
 
     this.setColorGradient(tableStyle.colorMap);
     this.setCurrentVariable(tableStyle.dataVariable);
@@ -348,6 +350,9 @@ TableDataSource.prototype._getNormalizedPoint = function (pntVal) {
     var minVal = this.minDisplayValue || this.dataset.getMinVal();
     var maxVal = this.maxDisplayValue || this.dataset.getMaxVal();
     var normPoint = (maxVal === minVal) ? 0 : (pntVal - minVal) / (maxVal - minVal);
+    if (!this.filterOuterValues) {
+        normPoint = Math.max(0.0, Math.min(1.0, normPoint));
+    }
     return normPoint;
 };
 
@@ -426,7 +431,7 @@ TableDataSource.prototype.getLegendGraphic = function () {
     }
     var w = canvas.width = 210;
     var h = canvas.height = 160;
-    var gradW = 40;
+    var gradW = 30;
     var gradH = 128;
     var ctx = canvas.getContext('2d');
 
@@ -437,7 +442,7 @@ TableDataSource.prototype.getLegendGraphic = function () {
         linGrad.addColorStop(grad[i].offset, grad[i].color);
     }
         //white background
-    ctx.fillStyle = "#FFFFFF";
+    ctx.fillStyle = "#2F353C";
     ctx.fillRect(0,0,w,h);
         //put 0 at bottom
     ctx.translate(gradW + 15, h-5);
@@ -453,7 +458,7 @@ TableDataSource.prototype.getLegendGraphic = function () {
     
     ctx.setTransform(1,0,0,1,0,0);
     ctx.font = "16px Arial Narrow";
-    ctx.fillStyle = "#000000";
+    ctx.fillStyle = "#FFFFFF";
     ctx.fillText(varText, 5, 15);
     ctx.fillText(maxText, gradW + 25, 15+h-gradH-5);
     ctx.fillText(minText, gradW + 25, h-5);

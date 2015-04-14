@@ -180,7 +180,7 @@ Variable.prototype.guessVariableType = function (name) {
         { hints: ['lon'], type: VarType.LON },
         { hints: ['lat'], type: VarType.LAT },
         { hints: ['depth', 'height', 'elevation'], type: VarType.ALT },
-        { hints: ['time', 'date'], type: VarType.TIME }];
+        { hints: ['time', 'date', 'year'], type: VarType.TIME }];    //UN Global Risk
 
     for (var vt in hintSet) {
         if (matchColumn(name, hintSet[vt].hints)) {
