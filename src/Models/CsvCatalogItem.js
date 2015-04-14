@@ -466,40 +466,24 @@ function updateOpacity(csvItem) {
 }
 
 CsvCatalogItem.prototype._redisplay = function() {
-    if (defined(this.application.cesium)) {
-        this._hideInCesium();
-        this._showInCesium();
-    } else {
-        this._hideInLeaflet();
-        this._showInLeaflet();
+    if (defined(this._imageryLayer)) {
+        if (defined(this.application.cesium)) {
+            this._hideInCesium();
+            this._showInCesium();
+        } else {
+            this._hideInLeaflet();
+            this._showInLeaflet();
+        }
     }
 };
 
-CsvCatalogItem.prototype.dynamicUpdate = function(text) {
+CsvCatalogItem.prototype.csvDynamicUpdate = function(text) {
     this.data = text;
     var that = this;
 
-    if (defined(this._tableDataSource)) {
-        if (defined(this.application.cesium)) {
-            if (defined(this._imageryLayer)) {
-                this._hideInCesium();
-            }
-            return when(this.load()).then(function () {
-                that._showInCesium();
-            });
-        }
-        else {
-            if (defined(this._imageryLayer)) {
-                this._hideInLeaflet();
-            }
-            return when(this.load()).then(function () {
-                that._showInLeaflet();
-            });
-        }
-    }
-    else {
-        return this.load();
-    }
+    return when(this.load()).then(function () {
+        that._redisplay();
+    });
 };
 
 function updateClockSubscription(csvItem) {
@@ -565,9 +549,9 @@ function createRegionMappingClock(csvItem) {
 //////////////////////////////////////////////////////////////////////////
 
 function loadTable(csvItem, text) {
-    if (text.length === 0) {
-        return;
-    }    
+ //   if (text.length === 0) {
+ //       return;
+ //   }    
     csvItem._tableDataSource.loadText(text);
     if (defined(csvItem.tableStyle)) {
         csvItem._tableDataSource.maxDisplayValue = csvItem._maxDisplayValue;

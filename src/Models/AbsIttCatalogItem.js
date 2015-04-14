@@ -40,6 +40,7 @@ var AbsIttCatalogItem = function(application) {
     this._metadata = undefined;
     this._absDataset = undefined;
     this._absDataTable = undefined;
+    this._absDataText = undefined;
     this._filterColumnMap = [];
 
     this._regionTypeActive = false;
@@ -99,7 +100,7 @@ var AbsIttCatalogItem = function(application) {
      * @type {Boolean}
      * @default true
      */
-    this.displayPercent = false;
+    this.displayPercent = true;
 
     knockout.track(this, ['url', 'dataSetID', 'regionType', 'regionConcept', 'filter', '_absDataset', 'opacity', 'displayPercent']);
 
@@ -236,6 +237,7 @@ AbsIttCatalogItem.prototype._getValuesThatInfluenceLoad = function() {
 };
 
 //TODO: look at exposing these
+//      use region or regiontype concept to decide on region
 function skipConcept(concept, regionConcept) {
     var conceptMask = ["STATE","REGIONTYPE","FREQUENCY",regionConcept];
     for (var i = 0; i < conceptMask.length; i++) {
@@ -247,11 +249,13 @@ function skipConcept(concept, regionConcept) {
 }
 
 
-//TODO: use region or regiontype concept to decide on region
-
 AbsIttCatalogItem.prototype._load = function() {
+    //HACK for now
+    if (defined(this._absDataset)) {
+        return;
+    }
+
     this._csvCatalogItem = new CsvCatalogItem(this.application);
-    this._csvCatalogItem.opacity = this.opacity;
     this._csvCatalogItem.opacity = this.opacity;
 
     var that = this;
@@ -381,10 +385,9 @@ AbsIttCatalogItem.prototype._load = function() {
         }
         return when.all(promises).then( function(results) {
 
-            that._absDataset.isLoading = false;
-
-            //keep checking if this is necessary
-            return updateAbsResults(that);
+            return when(updateAbsResults(that, true)).then(function() {
+                that._absDataset.isLoading = false;
+            })
 
         });
     }).otherwise(function(e) {
@@ -412,8 +415,6 @@ AbsIttCatalogItem.prototype._disable = function() {
 AbsIttCatalogItem.prototype._show = function() {
     if (defined(this._csvCatalogItem)) {
         this._csvCatalogItem._show();
-        updateAbsResults(this, true);
-        this.initialShow = false;
     }
 };
 
@@ -450,13 +451,25 @@ function proxyUrl(application, url) {
 
 function updateAbsResults(absItem, forceUpdate) {
 
-    if (!forceUpdate && !absItem.isShown) {
-        return;
-    }
+//    if (!forceUpdate && !absItem.isShown) {
+//        return;
+//    }
+
+    return when(updateAbsDataText(absItem)).then(function() {
+        return when(absItem._csvCatalogItem.csvDynamicUpdate(absItem._absDataText)).then(function() {
+            absItem.legendUrl = absItem._csvCatalogItem.legendUrl;
+            absItem.application.currentViewer.notifyRepaintRequired();
+        });
+    })
+}
+
+
+function updateAbsDataText(absItem) {
 
     //walk tree to get active codes
     var activeCodes = [];
     absItem.filter = [];
+    absItem._absDataText = '';
     function appendActiveCodes(parent, idxConcept, conceptCode) {
         for (var i = 0; i < parent.items.length; i++) {
             var node = parent.items[i];
@@ -485,7 +498,7 @@ function updateAbsResults(absItem, forceUpdate) {
 
     if (!bValidSelection) {
         console.log('No display because each concept must have at least one code selected.');
-        return when(absItem._csvCatalogItem.dynamicUpdate('')).then(function() {
+        return when(absItem._csvCatalogItem.csvDynamicUpdate('')).then(function() {
             absItem.legendUrl = '';
             absItem.application.currentViewer.notifyRepaintRequired();
        });
@@ -493,7 +506,7 @@ function updateAbsResults(absItem, forceUpdate) {
 
     //build filters from activeCodes
     var queryFilters = [];
-    var queryNames = [];  //TODO: make an object?
+    var queryNames = [];
     function buildQueryFilters(idxConcept, filterIn, nameIn) {
         for (var i = 0; i < activeCodes[idxConcept].length; i++) {
             var filter = filterIn.slice();
@@ -608,14 +621,14 @@ function updateAbsResults(absItem, forceUpdate) {
              }
             if (absItem.displayPercent) {
                 var tot = absItem._absTotalTable[r][3];
-                newRow[0] = tot > 0 ? Math.round(newRow[0] * 10000 / tot)/100 : 0;
+                newRow[0] = tot <= 0 ? 0 : Math.min(100.0, Math.round(newRow[0] * 10000 / tot)/100);
             }
             finalCsvArray.push(newRow);
         }
 
         //check that the created csvArray is ok
         if (!defined(finalCsvArray) || finalCsvArray.length === 0) {
-            return when(absItem._csvCatalogItem.dynamicUpdate('')).then(function() {
+            return when(absItem._csvCatalogItem.csvDynamicUpdate('')).then(function() {
                 absItem.legendUrl = '';
                 absItem.application.currentViewer.notifyRepaintRequired();
             });
@@ -625,12 +638,7 @@ function updateAbsResults(absItem, forceUpdate) {
         var joinedRows = finalCsvArray.map(function(arr) {
             return arr.join(',');
         });
-        var text = joinedRows.join('\n');
-
-        return when(absItem._csvCatalogItem.dynamicUpdate(text)).then(function() {
-            absItem.legendUrl = absItem._csvCatalogItem.legendUrl;
-            absItem.application.currentViewer.notifyRepaintRequired();
-        });
+        absItem._absDataText = joinedRows.join('\n');
     });
 }
 
