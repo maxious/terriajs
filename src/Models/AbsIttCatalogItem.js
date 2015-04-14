@@ -387,7 +387,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
             return when(updateAbsResults(that, true)).then(function() {
                 that._absDataset.isLoading = false;
-            })
+            });
 
         });
     }).otherwise(function(e) {
@@ -460,7 +460,7 @@ function updateAbsResults(absItem, forceUpdate) {
             absItem.legendUrl = absItem._csvCatalogItem.legendUrl;
             absItem.application.currentViewer.notifyRepaintRequired();
         });
-    })
+    });
 }
 
 
