@@ -9,8 +9,6 @@ For the time being it acts as a layer on top of a CzmlDataSource
 And writes a czml file for it to display
 */
 
-//TODO: DOCUMENT using model in GeoJsonDataSource
-
 var defined = require('../../third_party/cesium/Source/Core/defined');
 var CzmlDataSource = require('../../third_party/cesium/Source/DataSources/CzmlDataSource');
 var defineProperties = require('../../third_party/cesium/Source/Core/defineProperties');
@@ -32,6 +30,8 @@ var TableDataSource = function () {
     this.czmlDataSource = new CzmlDataSource();
     this.dataset = new Dataset();
     this.show = true;
+
+    this._colorByValue = true;  //set to false by having only 1 entry in colorMap
 
     this.setTableStyle( {
         scale: 1.0,
@@ -422,7 +422,8 @@ TableDataSource.prototype.setDisplayTimeByPercent = function (pct) {
 *
 */
 TableDataSource.prototype.getLegendGraphic = function () {
-    if (this.singleColor) {
+    //Check if fixed color for all points and if so no legend
+    if (!this._colorByValue) {
         return undefined;
     }
 
@@ -493,7 +494,7 @@ TableDataSource.prototype.setColorGradient = function (colorGradient) {
     var grad = this.colorGradient;
     var linGrad = ctx.createLinearGradient(0,0,0,h);
     if (grad.length === 1) {
-        this.singleColor = true;
+        this._colorByValue = false;
         linGrad.addColorStop(0.0, grad[0].color);
         linGrad.addColorStop(1.0, grad[0].color);
     } 

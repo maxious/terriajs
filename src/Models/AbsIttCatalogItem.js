@@ -41,6 +41,7 @@ var AbsIttCatalogItem = function(application) {
     this._absDataset = undefined;
     this._absDataTable = undefined;
     this._absDataText = undefined;
+
     this._filterColumnMap = [];
 
     this._regionTypeActive = false;
@@ -126,7 +127,7 @@ var AbsIttCatalogItem = function(application) {
             this._csvCatalogItem._minDisplayValue = undefined;
             this._csvCatalogItem._maxDisplayValue = undefined;
         }
-        updateAbsResults(this, true);
+        updateAbsResults(this);
     }, this);
 };
 
@@ -229,11 +230,14 @@ defineProperties(AbsIttCatalogItem.prototype, {
 AbsIttCatalogItem.defaultPropertiesForSharing = clone(CatalogItem.defaultPropertiesForSharing);
 AbsIttCatalogItem.defaultPropertiesForSharing.push('opacity');
 AbsIttCatalogItem.defaultPropertiesForSharing.push('filter');
+AbsIttCatalogItem.defaultPropertiesForSharing.push('regionConcept');
+AbsIttCatalogItem.defaultPropertiesForSharing.push('displayPercent');
 freezeObject(AbsIttCatalogItem.defaultPropertiesForSharing);
 
 
+//Just the items that would influence the load from the abs server or the file (w/regionType)
 AbsIttCatalogItem.prototype._getValuesThatInfluenceLoad = function() {
-    return [this.url, this.dataSetID, this.regionType, this.regionConcept, this.filter];
+    return [this.url, this.dataSetID, this.regionType];
 };
 
 //TODO: look at exposing these
@@ -250,10 +254,6 @@ function skipConcept(concept, regionConcept) {
 
 
 AbsIttCatalogItem.prototype._load = function() {
-    //HACK for now
-    if (defined(this._absDataset)) {
-        return;
-    }
 
     this._csvCatalogItem = new CsvCatalogItem(this.application);
     this._csvCatalogItem.opacity = this.opacity;
@@ -264,6 +264,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
     this._absDataset = new AbsDataset();
 
+    //generage the url or filename to load
     if (this.dataSetID === 'FILE') {
         loadPromises.push(loadText(this.url + '_' + this.regionType + '_short.csv').then( function(text) {
             that._absDataTable = $.csv.toArrays(text, {
@@ -308,6 +309,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
     return when.all(loadPromises).then(function() {
         //call GetDatasetConcepts and then GetCodeListValue to build up a tree
+        //  describing the layout of the data
 
         var promises = [];
 
@@ -316,7 +318,7 @@ AbsIttCatalogItem.prototype._load = function() {
 
             var codes = json.codes;
 
-            function absCodeUpdate() { return updateAbsResults(that, false); }
+            function absCodeUpdate() { return updateAbsResults(that); }
             if (createDefaultFilter) {
                 for (var i = 0; i < codes.length; ++i) {
                     if (codes[i].parentCode === "") {
@@ -385,7 +387,7 @@ AbsIttCatalogItem.prototype._load = function() {
         }
         return when.all(promises).then( function(results) {
 
-            return when(updateAbsResults(that, true)).then(function() {
+            return when(updateAbsResults(that)).then(function() {
                 that._absDataset.isLoading = false;
             });
 
@@ -449,22 +451,17 @@ function proxyUrl(application, url) {
     return url;
 }
 
-function updateAbsResults(absItem, forceUpdate) {
-
-//    if (!forceUpdate && !absItem.isShown) {
-//        return;
-//    }
-
-    return when(updateAbsDataText(absItem)).then(function() {
-        return when(absItem._csvCatalogItem.csvDynamicUpdate(absItem._absDataText)).then(function() {
-            absItem.legendUrl = absItem._csvCatalogItem.legendUrl;
+function updateAbsResults(absItem) {
+    return when(updateAbsDataCsvText(absItem)).then(function() {
+        return when(absItem._csvCatalogItem.dynamicUpdate(absItem._absDataText)).then(function() {
+            absItem.legendUrl = absItem._absDataText === '' ? '' : absItem._csvCatalogItem.legendUrl;
             absItem.application.currentViewer.notifyRepaintRequired();
         });
     });
 }
 
 
-function updateAbsDataText(absItem) {
+function updateAbsDataCsvText(absItem) {
 
     //walk tree to get active codes
     var activeCodes = [];
@@ -498,10 +495,7 @@ function updateAbsDataText(absItem) {
 
     if (!bValidSelection) {
         console.log('No display because each concept must have at least one code selected.');
-        return when(absItem._csvCatalogItem.csvDynamicUpdate('')).then(function() {
-            absItem.legendUrl = '';
-            absItem.application.currentViewer.notifyRepaintRequired();
-       });
+        return;
     }
 
     //build filters from activeCodes
@@ -589,8 +583,8 @@ function updateAbsDataText(absItem) {
         promises.push(loadFilterData(url, filterItem));
     }
 
-    return when.all(promises).then( function(results) {
         //When promises all done then sum up date for final csv
+    return when.all(promises).then( function(results) {
         var csvArray = absItem._absDataTable;
         var finalCsvArray = [];
         var regionCol = csvArray[0].indexOf(absItem.regionConcept);
@@ -627,18 +621,13 @@ function updateAbsDataText(absItem) {
         }
 
         //check that the created csvArray is ok
-        if (!defined(finalCsvArray) || finalCsvArray.length === 0) {
-            return when(absItem._csvCatalogItem.csvDynamicUpdate('')).then(function() {
-                absItem.legendUrl = '';
-                absItem.application.currentViewer.notifyRepaintRequired();
+        if (defined(finalCsvArray) && finalCsvArray.length > 0) {
+            //Serialize the arrays
+            var joinedRows = finalCsvArray.map(function(arr) {
+                return arr.join(',');
             });
+            absItem._absDataText = joinedRows.join('\n');
         }
-
-        //Serialize the arrays
-        var joinedRows = finalCsvArray.map(function(arr) {
-            return arr.join(',');
-        });
-        absItem._absDataText = joinedRows.join('\n');
     });
 }
 

@@ -24,7 +24,6 @@ var Rectangle = require('../../third_party/cesium/Source/Core/Rectangle');
 var Dataset = function() {
     this.noData = 1e-34;
     this.rowCount = 0;
-    this.dataShape = undefined;
     this.varTypeSet = [];
     this.variables = undefined;
     this.loadingData = false;
@@ -168,11 +167,6 @@ Dataset.prototype._processVariables = function () {
     }
     //set point count
     this.rowCount = this.variables[this.varTypeSet[VarType.SCALAR]].vals.length;
-
-    //save the shape information
-    if (!defined(this.dataShape)) {
-        this.dataShape = [this.rowCount];
-    }
 };
 
 

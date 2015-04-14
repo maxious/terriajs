@@ -65,12 +65,6 @@ var CsvCatalogItem = function(application, url) {
     this.data = undefined;
 
     /**
-     * Gets or sets the URL from which the {@link CsvCatalogItem#data} was obtained.
-     * @type {String}
-     */
-    this.dataSourceUrl = undefined;
-
-    /**
      * Gets or sets the tableStyle object
      * @type {Object}
      */
@@ -84,7 +78,7 @@ var CsvCatalogItem = function(application, url) {
      */
     this.opacity = 0.6;
 
-    knockout.track(this, ['url', 'data', 'dataSourceUrl', 'colorByValue', 'tableStyle', 'opacity', '_clock']);
+    knockout.track(this, ['url', 'data', 'tableStyle', 'opacity', '_clock']);
 
     knockout.getObservable(this, 'opacity').subscribe(function(newValue) {
         updateOpacity(this);
@@ -205,6 +199,7 @@ defineProperties(CsvCatalogItem.prototype, {
  */
 CsvCatalogItem.defaultPropertiesForSharing = clone(CatalogItem.defaultPropertiesForSharing);
 CsvCatalogItem.defaultPropertiesForSharing.push('opacity');
+CsvCatalogItem.defaultPropertiesForSharing.push('tableStyle');
 freezeObject(CsvCatalogItem.defaultPropertiesForSharing);
 
 
@@ -218,7 +213,6 @@ CsvCatalogItem.prototype._load = function() {
     }
 
     this._tableDataSource = new TableDataSource();
-    this._tableDataSource.colorByValue = this.colorByValue;
 
     var that = this;
 
@@ -477,7 +471,7 @@ CsvCatalogItem.prototype._redisplay = function() {
     }
 };
 
-CsvCatalogItem.prototype.csvDynamicUpdate = function(text) {
+CsvCatalogItem.prototype.dynamicUpdate = function(text) {
     this.data = text;
     var that = this;
 
@@ -549,9 +543,7 @@ function createRegionMappingClock(csvItem) {
 //////////////////////////////////////////////////////////////////////////
 
 function loadTable(csvItem, text) {
- //   if (text.length === 0) {
- //       return;
- //   }    
+
     csvItem._tableDataSource.loadText(text);
     if (defined(csvItem.tableStyle)) {
         csvItem._tableDataSource.maxDisplayValue = csvItem._maxDisplayValue;
@@ -970,7 +962,7 @@ function addRegionMap(csvItem) {
 
     csvItem.tableStyle = tableStyle;
 
-    //to make lint happy
+    //to keep lint happy
     if (false) {
         setRegionColorMap();
         setRegionDataVariable();
