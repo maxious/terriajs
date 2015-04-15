@@ -22,9 +22,9 @@ var Rectangle = require('../../third_party/cesium/Source/Core/Rectangle');
 * @constructor
 */
 var Dataset = function() {
-    this.noData = 1e-34;
-    this.activeVarSet = {};
     this.variables = {};
+    this.selected = {};
+    this.noData = 1e-34;
     this.loadingData = false;
 };
 
@@ -34,7 +34,7 @@ var Dataset = function() {
 * @returns {Boolean} True if a lat and lon variables are present
 */
 Dataset.prototype.hasLocationData = function () {
-    return (this.activeVarSet.LON && this.activeVarSet.LAT);
+    return (defined(this.selected.lon) && defined(this.selected.lat));
 };
 
 /**
@@ -43,7 +43,7 @@ Dataset.prototype.hasLocationData = function () {
 * @returns {Boolean} True if a time variable is present
 */
 Dataset.prototype.hasTimeData = function () {
-    return (defined(this.activeVarSet.TIME));
+    return (defined(this.selected.time));
 };
 
 /**
@@ -52,8 +52,8 @@ Dataset.prototype.hasTimeData = function () {
 * @returns {Object} The extent of the data points
 */
 Dataset.prototype.getExtent = function () {
-    var lonVar = this.variables[this.activeVarSet.LON];
-    var latVar = this.variables[this.activeVarSet.LAT];
+    var lonVar = this.variables[this.selected.lon];
+    var latVar = this.variables[this.selected.lat];
     if (defined(lonVar) && defined(latVar)) {
         Rectangle.fromDegrees(lonVar.minVal, latVar.minVal, lonVar.maxVal, latVar.maxVal);
     }
@@ -65,8 +65,8 @@ Dataset.prototype.getExtent = function () {
 * @returns {Object} The minimum time value in Cesium JulianTime
 */
 Dataset.prototype.getMinTime = function () {
-    if (defined(this.activeVarSet.TIME)) {
-        return this.variables[this.activeVarSet.TIME].timeVar.minVal;
+    if (defined(this.selected.time)) {
+        return this.variables[this.selected.time].timeVar.minVal;
     }
 };
 
@@ -76,8 +76,8 @@ Dataset.prototype.getMinTime = function () {
 * @returns {Object} The maximum time value in Cesium JulianTime
 */
 Dataset.prototype.getMaxTime = function () {
-    if (defined(this.activeVarSet.TIME)) {
-        return this.variables[this.activeVarSet.TIME].timeVar.maxVal;
+    if (defined(this.selected.time)) {
+        return this.variables[this.selected.time].timeVar.maxVal;
     }
 };
 
@@ -87,8 +87,8 @@ Dataset.prototype.getMaxTime = function () {
 * @returns {Float} The minimum data value
 */
 Dataset.prototype.getMinDataValue = function () {
-    if (defined(this.activeVarSet.DATA)) {
-        return this.variables[this.activeVarSet.DATA].minVal;
+    if (defined(this.selected.data)) {
+        return this.variables[this.selected.data].minVal;
     }
 };
 
@@ -98,8 +98,8 @@ Dataset.prototype.getMinDataValue = function () {
 * @returns {Float} The maximum data value
 */
 Dataset.prototype.getMaxDataValue = function () {
-    if (defined(this.activeVarSet.DATA)) {
-        return this.variables[this.activeVarSet.DATA].maxVal;
+    if (defined(this.selected.data)) {
+        return this.variables[this.selected.data].maxVal;
     }
 };
 
@@ -109,8 +109,8 @@ Dataset.prototype.getMaxDataValue = function () {
 * @returns {Integer} The maximum time value in Cesium JulianTime
 */
 Dataset.prototype.getRowCount = function () {
-    if (defined(this.activeVarSet.DATA)) {
-        return this.variables[this.activeVarSet.DATA].vals.length;
+    if (defined(this.selected.data)) {
+        return this.variables[this.selected.data].vals.length;
     }
     return 0;
 };
@@ -156,7 +156,7 @@ Dataset.prototype.getVarListByType = function (varType) {
 
 // Determine the min, max, and type of each variable
 Dataset.prototype._processVariables = function () {
-    this.activeVarSet = {};
+    this.selected = {};
 
     for (var id in this.variables) {
         if (this.variables.hasOwnProperty(id)) {
@@ -165,17 +165,19 @@ Dataset.prototype._processVariables = function () {
             if (!defined(variable.varType)) {
                 variable.guessVariableType(id);
             }
+                //process time variables
             if (variable.varType === VarType.TIME) {
-                variable.processTimeVariable();            //calculate time variables
+                variable.processTimeVariable();
                 //if failed then default type to scalar
                 if (!defined(variable.timeVar)) {
                     variable.varType = VarType.SCALAR;
                 }
             }
+                //calculate var min/max
             if (variable.varType !== VarType.TIME) {
-                variable._calculateVarMinMax();            //calculate var min/max
+                variable._calculateVarMinMax();
             }
-            //handle enumerated variables
+                //if min/max failed then handle as enumerated variables
             if (variable.varType === VarType.SCALAR && variable.minVal > variable.maxVal) {
                 variable.varType = VarType.ENUM;
                 variable.processEnumVariable();            //calculate enum variables
@@ -183,12 +185,12 @@ Dataset.prototype._processVariables = function () {
         }
     }
 
-    //set default variables
-    this.activeVarSet.LAT = this.getVarListByType(VarType.LAT)[0];
-    this.activeVarSet.LON = this.getVarListByType(VarType.LON)[0];
-    this.activeVarSet.ALT = this.getVarListByType(VarType.ALT)[0];
-    this.activeVarSet.TIME = this.getVarListByType(VarType.TIME)[0];
-    this.activeVarSet.DATA = this.getVarListByType([VarType.SCALAR,VarType.ENUM])[0];
+    //set default active variables
+    this.selected.lat = this.getVarListByType(VarType.LAT)[0];
+    this.selected.lon = this.getVarListByType(VarType.LON)[0];
+    this.selected.alt = this.getVarListByType(VarType.ALT)[0];
+    this.selected.time = this.getVarListByType(VarType.TIME)[0];
+    this.selected.data = this.getVarListByType([VarType.SCALAR,VarType.ENUM])[0];
 };
 
 
@@ -244,7 +246,7 @@ Dataset.prototype.setDataVariable = function (varName) {
     if (!defined(this.variables[varName])) {
         return;
     }
-    this.activeVarSet.DATA = varName;
+    this.selected.data = varName;
 };
 
 /**
@@ -254,7 +256,7 @@ Dataset.prototype.setDataVariable = function (varName) {
 *
 */
 Dataset.prototype.getDataVariable = function () {
-    return this.activeVarSet.DATA;
+    return this.selected.data;
 };
 
 /**
@@ -360,15 +362,15 @@ Dataset.prototype.isNoData = function (ptVal) {
 *
 */
 Dataset.prototype.getPointList = function (maxPts) {
-    if (!defined(this.variables[this.activeVarSet.DATA])) {
+    if (!defined(this.variables[this.selected.data])) {
         return [];
     }
 
-    var lon = defined(this.activeVarSet.LON) ? this.variables[this.activeVarSet.LON].vals : undefined;
-    var lat = defined(this.activeVarSet.LAT) ? this.variables[this.activeVarSet.LAT].vals : undefined;
-    var alt = defined(this.activeVarSet.ALT) ? this.variables[this.activeVarSet.ALT].vals : undefined;
-    var time = this.activeVarSet.TIME ? this.variables[this.activeVarSet.TIME].timeVar.vals : undefined;
-    var vals = this.variables[this.activeVarSet.DATA].vals;
+    var lon = defined(this.selected.lon) ? this.variables[this.selected.lon].vals : undefined;
+    var lat = defined(this.selected.lat) ? this.variables[this.selected.lat].vals : undefined;
+    var alt = defined(this.selected.alt) ? this.variables[this.selected.alt].vals : undefined;
+    var time = this.selected.time ? this.variables[this.selected.time].timeVar.vals : undefined;
+    var vals = this.variables[this.selected.data].vals;
     if (!defined(maxPts)) {
         maxPts = vals.length;
     }
@@ -386,7 +388,6 @@ Dataset.prototype.getPointList = function (maxPts) {
     }
     return ret;
 };
-
 
 /**
 * Destroy the object and release resources
