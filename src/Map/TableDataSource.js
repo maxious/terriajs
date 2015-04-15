@@ -37,7 +37,7 @@ var TableDataSource = function () {
         scale: 1.0,
         scaleByValue: false,
         imageUrl: '',
-        displayTime: 60,
+        displayTime: 60,  //minutes
         minDisplayValue: undefined,
         maxDisplayValue: undefined,
         filterOuterValues: false,

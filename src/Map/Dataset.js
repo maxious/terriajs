@@ -23,9 +23,8 @@ var Rectangle = require('../../third_party/cesium/Source/Core/Rectangle');
 */
 var Dataset = function() {
     this.noData = 1e-34;
-    this.rowCount = 0;
     this.varTypeSet = {};
-    this.variables = undefined;
+    this.variables = {};
     this.loadingData = false;
 };
 
@@ -61,7 +60,7 @@ Dataset.prototype.getExtent = function () {
 * @returns {Float} The minimum data value
 */
 Dataset.prototype.getMinVal = function () {
-    if (defined(this.variables) && defined(this.varTypeSet.SCALAR)) {
+    if (defined(this.varTypeSet.SCALAR)) {
         return this.variables[this.varTypeSet.SCALAR].minVal;
     }
 };
@@ -72,7 +71,7 @@ Dataset.prototype.getMinVal = function () {
 * @returns {Float} The maximum data value
 */
 Dataset.prototype.getMaxVal = function () {
-    if (defined(this.variables) && defined(this.varTypeSet.SCALAR)) {
+    if (defined(this.varTypeSet.SCALAR)) {
         return this.variables[this.varTypeSet.SCALAR].maxVal;
     }
 };
@@ -83,7 +82,7 @@ Dataset.prototype.getMaxVal = function () {
 * @returns {Object} The minimum time value in Cesium JulianTime
 */
 Dataset.prototype.getMinTime = function () {
-    if (defined(this.variables) && defined(this.varTypeSet.TIME)) {
+    if (defined(this.varTypeSet.TIME)) {
         return this.variables[this.varTypeSet.TIME].timeVar.minVal;
     }
 };
@@ -94,11 +93,22 @@ Dataset.prototype.getMinTime = function () {
 * @returns {Object} The maximum time value in Cesium JulianTime
 */
 Dataset.prototype.getMaxTime = function () {
-    if (defined(this.variables) && defined(this.varTypeSet.TIME)) {
+    if (defined(this.varTypeSet.TIME)) {
         return this.variables[this.varTypeSet.TIME].timeVar.maxVal;
     }
 };
 
+/**
+* Return the number of rows in the dataset
+*
+* @returns {Object} The maximum time value in Cesium JulianTime
+*/
+Dataset.prototype.getRowCount = function () {
+    if (defined(this.varTypeSet.SCALAR)) {
+        return this.variables[this.varTypeSet.SCALAR].vals.length;
+    }
+    return 0;
+};
 
 /**
 * Get a list of available scalar and enum type variables
@@ -117,12 +127,12 @@ Dataset.prototype.getVarList = function () {
 
 // Determine the min, max, and type of each variable
 Dataset.prototype._processVariables = function () {
-    this.varTypeSet = [];
+    this.varTypeSet = {};
 
     for (var id in this.variables) {
         if (this.variables.hasOwnProperty(id)) {
             var variable = this.variables[id];
-            //guess var type if not set
+                //guess var type if not set
             if (!defined(variable.varType)) {
                 variable.guessVariableType(id);
             }
@@ -161,8 +171,6 @@ Dataset.prototype._processVariables = function () {
     if (!defined(this.varTypeSet.SCALAR)) {
         this.varTypeSet.SCALAR = this.varTypeSet.ENUM;
     }
-    //set point count
-    this.rowCount = this.variables[this.varTypeSet.SCALAR].vals.length;
 };
 
 
@@ -252,14 +260,11 @@ Dataset.prototype.loadUrl = function (description) {
 *
 */
 Dataset.prototype.setCurrentVariable = function (variable) {
-    if (!defined(this.variables) || !this.variables[variable] || 
-        this.variables[variable].vals.length === 0) {
+    if (!defined(this.variables[variable])) {
         return;
     }
     this.varName = variable;
-    if (this.varName.length && this.variables[this.varName]) {
-        this.varTypeSet.SCALAR = this.varName;
-    }
+    this.varTypeSet.SCALAR = this.varName;
 };
 
 /**

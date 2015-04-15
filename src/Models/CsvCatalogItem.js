@@ -924,7 +924,7 @@ function addRegionMap(csvItem) {
     var dataSource = csvItem._tableDataSource;
     var dataset = dataSource.dataset;
     csvItem.colorFunc = function(id) { return [0,0,0,0]; };
-    if (dataset.rowCount === 0) {
+    if (dataset.getRowCount() === 0) {
         return;
     }
 
