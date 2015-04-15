@@ -817,7 +817,7 @@ function createRegionLookupFunc(csvItem) {
             ids[n] = parseInt(ids[n],10);
         }
     }
-    var vals = dataset.getDataValues(dataset.getCurrentVariable());
+    var vals = dataset.getDataValues(dataset.getDataVariable());
     var colors = new Array(ids.length);
     for (var c = 0; c < colors.length; c++) {
         colors[c] = [0, 0, 0, 0];
@@ -896,7 +896,7 @@ function setRegionDataVariable(csvItem, newVar) {
 
     var dataSource = csvItem._tableDataSource;
     var dataset = dataSource.dataset;
-    dataset.setCurrentVariable(newVar);
+    dataset.setDataVariable(newVar);
     createRegionLookupFunc(csvItem);
     
     console.log('Var set to:', newVar);
@@ -940,13 +940,13 @@ function addRegionMap(csvItem) {
     }
         //change current var if necessary
     if (!defined(tableStyle.dataVariable)) {
-        var dataVar = dataset.getCurrentVariable();
+        var dataVar = dataset.getDataVariable();
         var vars = dataset.getVarList();
         if (vars.indexOf(dataVar) === -1 || dataVar === tableStyle.regionVariable) {
             tableStyle.dataVariable = (vars.indexOf(tableStyle.regionVariable) === 0) ? vars[1] : vars[0];
         }
         tableStyle.dataVariable = dataVar;
-        dataSource.setCurrentVariable(dataVar);
+        dataSource.setDataVariable(dataVar);
     }
         //build an interesting color map if none present
     if (!defined(tableStyle.colorMap)) {

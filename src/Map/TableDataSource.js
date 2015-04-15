@@ -30,7 +30,6 @@ var TableDataSource = function () {
     this.czmlDataSource = new CzmlDataSource();
     this.dataset = new Dataset();
     this.show = true;
-
     this._colorByValue = true;  //set to false by having only 1 entry in colorMap
 
     this.setTableStyle( {
@@ -142,7 +141,7 @@ TableDataSource.prototype.setTableStyle = function (tableStyle) {
     this.filterOuterValues = tableStyle.filterOuterValues || this.filterOuterValues;
 
     this.setColorGradient(tableStyle.colorMap);
-    this.setCurrentVariable(tableStyle.dataVariable);
+    this.setDataVariable(tableStyle.dataVariable);
 };
 
 /**
@@ -153,6 +152,9 @@ TableDataSource.prototype.setTableStyle = function (tableStyle) {
  * @returns {Promise} a promise that will resolve when the CZML is processed.
  */
 TableDataSource.prototype.loadUrl = function (url) {
+    if (!defined(url)) {
+        return;
+    }
     var that = this;
     return loadText(url).then(function(text) {
         return that.loadText(text);
@@ -169,9 +171,7 @@ TableDataSource.prototype.loadUrl = function (url) {
 TableDataSource.prototype.loadText = function (text) {
     this.dataset.loadText(text);
     this.setDisplayTimeByPercent(1.0);
-    if (this.dataset.hasLocationData()) {
-        this.czmlDataSource.load(this.getCzmlDataPointList());
-    }
+    this.setDataVariable(this.dataVariable);
 };
 
 /**
@@ -180,8 +180,8 @@ TableDataSource.prototype.loadText = function (text) {
 * @memberof TableDataSource
 *
 */
-TableDataSource.prototype.setCurrentVariable = function (varName) {
-    this.dataset.setCurrentVariable(varName);
+TableDataSource.prototype.setDataVariable = function (varName) {
+    this.dataset.setDataVariable(varName);
     if (this.dataset.hasLocationData()) {
         this.czmlDataSource.load(this.getCzmlDataPointList());
     }
@@ -348,8 +348,8 @@ TableDataSource.prototype._getNormalizedPoint = function (pntVal) {
     if (this.dataset === undefined || this.dataset.isNoData(pntVal)) {
         return undefined;
     }
-    var minVal = this.minDisplayValue || this.dataset.getMinVal();
-    var maxVal = this.maxDisplayValue || this.dataset.getMaxVal();
+    var minVal = this.minDisplayValue || this.dataset.getMinDataValue();
+    var maxVal = this.maxDisplayValue || this.dataset.getMaxDataValue();
     var normPoint = (maxVal === minVal) ? 0 : (pntVal - minVal) / (maxVal - minVal);
     if (!this.filterOuterValues) {
         normPoint = Math.max(0.0, Math.min(1.0, normPoint));
@@ -416,6 +416,16 @@ TableDataSource.prototype.setDisplayTimeByPercent = function (pct) {
 
 
 /**
+* Set the image used to represent the data points
+*
+* @memberof TableDataSource
+*
+*/
+TableDataSource.prototype.setImageUrl = function (imageUrl) {
+    this.imageUrl = imageUrl;
+};
+
+/**
 * Get a data url that holds the image for the legend
 *
 * @memberof TableDataSource
@@ -454,9 +464,9 @@ TableDataSource.prototype.getLegendGraphic = function () {
     
         //text
     var val;
-    var minText = (val = this.minDisplayValue || this.dataset.getMinVal()) === undefined ? 'und.' : val.toString();
-    var maxText = (val = this.maxDisplayValue || this.dataset.getMaxVal()) === undefined ? 'und.' : val.toString();
-    var varText = this.dataset.getCurrentVariable();
+    var minText = (val = this.minDisplayValue || this.dataset.getMinDataValue()) === undefined ? 'und.' : val.toString();
+    var maxText = (val = this.maxDisplayValue || this.dataset.getMaxDataValue()) === undefined ? 'und.' : val.toString();
+    var varText = this.dataset.getDataVariable();
     
     ctx.setTransform(1,0,0,1,0,0);
     ctx.font = "16px Arial Narrow";
@@ -507,16 +517,6 @@ TableDataSource.prototype.setColorGradient = function (colorGradient) {
     ctx.fillRect(0,0,w,h);
 
     this.dataImage = ctx.getImageData(0, 0, 1, 256);
-};
-
-/**
-* Set the image used to represent the data points
-*
-* @memberof TableDataSource
-*
-*/
-TableDataSource.prototype.setImageUrl = function (imageUrl) {
-    this.imageUrl = imageUrl;
 };
 
 /**
