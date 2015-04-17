@@ -13,6 +13,7 @@
         {
             "type": "group",
             "name": "Natural Hazard Events",
+            "isOpen": true,
             "preserveOrder": true,
             "items": [
                 {
