@@ -279,6 +279,7 @@
                 {
                     "type": "group",
                     "name": "Disaster event",
+                    "preserveOrder": true,
                     "items": [
                         {
                             "name": "All perils",
@@ -345,6 +346,7 @@
                 {
                     "type": "group",
                     "name": "Social",
+                    "preserveOrder": true,
                     "items": [
                         {
                             "name": "All perils (N/A)",
@@ -475,6 +477,7 @@
                 {
                     "type": "group",
                     "name": "Economic",
+                    "preserveOrder": true,
                     "items": [
                         {
                             "name": "All perils (N/A)",
@@ -698,7 +701,7 @@
                             }
                         },
                         {
-                            "name": "Improved sanitation facilities (% of population with access)",
+                            "name": "Improved sanitation facilities",
                             "type": "csv",
                             "url": "data/inform.csv",
                             "tableStyle": {
@@ -708,7 +711,7 @@
                             }
                         },
                         {
-                            "name": "Improved water source (% of population with access)",
+                            "name": "Improved water source",
                             "type": "csv",
                             "url": "data/inform.csv",
                             "tableStyle": {
@@ -805,7 +808,7 @@
                             }
                         },
                         {
-                            "name": "One-year-olds fully immunized against measles",
+                            "name": "One-year-olds immunized against measles",
                             "type": "csv",
                             "url": "data/inform.csv",
                             "tableStyle": {
