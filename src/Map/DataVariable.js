@@ -43,6 +43,13 @@ DataVariable.prototype.update = function () {
     if (!defined(this.varType)) {
         this._guessVariableType();
     }
+    if (this.varType === VarType.SCALAR && this.name === 'year') {
+        this.varType = VarType.TIME;
+        for (var i = 0; i < this.vals.length; i++) {
+            this.vals[i] = this.vals[i].toString() + '-01-01';
+        }
+    }
+
         //process time thiss
     if (this.varType === VarType.TIME) {
         this._processTimeVariable();

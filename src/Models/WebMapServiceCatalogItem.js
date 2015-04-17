@@ -343,6 +343,7 @@ WebMapServiceCatalogItem.prototype._createImageryProvider = function(time) {
         getFeatureInfoAsGeoJson : this.getFeatureInfoAsGeoJson,
         getFeatureInfoAsXml : this.getFeatureInfoAsXml,
         parameters : parameters,
+        maximumLevel: 5,     //UN Global Risk
         getFeatureInfoParameters : parameters,
         tilingScheme : defined(this.tilingScheme) ? this.tilingScheme : new WebMercatorTilingScheme(),
         getFeatureInfoXmlContentType : this.getFeatureInfoXmlContentType

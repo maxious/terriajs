@@ -385,6 +385,11 @@ AusGlobeViewer.prototype._createCesiumViewer = function(container) {
      //create CesiumViewer
     var viewer = new Viewer(container, options);
 
+    //TODO: may need to make this timeline dependent
+    viewer.cesiumWidget.scene.skyBox = undefined;  //UN Global Risk
+    viewer.cesiumWidget.scene.sun = undefined;     //UN Global Risk
+    viewer.cesiumWidget.scene.moon = undefined;    //UN Global Risk
+
     viewer.scene.imageryLayers.removeAll();
 
     viewer.clock.shouldAnimate = false;

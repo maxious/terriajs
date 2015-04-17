@@ -242,8 +242,11 @@ TableDataSource.prototype.describe = function(properties) {
             var value = properties[key];
             if (defined(value)) {
                 if (value instanceof JulianDate) {
-//                    value = JulianDate.toIso8601(value, 0);
-                    value = JulianDate.toDate(value).toDateString();
+                    value = JulianDate.toIso8601(value, 0);
+                    if (key === 'year') {
+                        value = value.substring(0,4); //UN Global Risk
+                    }
+//                    value = JulianDate.toDate(value).toDateString();
                 }
                 if (typeof value === 'object') {
                     html += '<tr><td>' + key + '</td><td>' + this.describe(value) + '</td></tr>';
