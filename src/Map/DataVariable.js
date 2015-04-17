@@ -43,6 +43,7 @@ DataVariable.prototype.update = function () {
     if (!defined(this.varType)) {
         this._guessVariableType();
     }
+        //hack for un files
     if (this.varType === VarType.SCALAR && this.name === 'year') {
         this.varType = VarType.TIME;
         for (var i = 0; i < this.vals.length; i++) {

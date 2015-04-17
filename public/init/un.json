@@ -13,7 +13,6 @@
         {
             "type": "group",
             "name": "Natural Hazard Events",
-            "isOpen": true,
             "preserveOrder": true,
             "items": [
                 {
@@ -273,12 +272,6 @@
         },
         {
             "type": "group",
-            "name": "Vulnerability",
-            "items": [
-            ]
-        },
-        {
-            "type": "group",
             "name": "Exposure",
             "isOpen": true,
             "preserveOrder": true,
@@ -448,8 +441,36 @@
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
                             "layers": "preview:xx0707feet"
+                        },
+                        {
+                            "name": "Population density",
+                            "rectangle": [
+                                -180,
+                                -90,
+                                179.99999999985602,
+                                83.99999999993042
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:population"
+                        },
+                        {
+                            "name": "Exposed population (N/A)",
+                            "type": "csv",
+                            "url": "test/countries.csv",
+                            "tableStyle": {
+                                "dataVariable": "ITU-T Telephone Code"
+                            }
+                        },
+                        {
+                            "name": "Social expenditure (N/A)",
+                            "type": "csv",
+                            "url": "test/countries.csv",
+                            "tableStyle": {
+                                "dataVariable": "ITU-T Telephone Code"
+                            }
                         }
-                     ]
+                    ]
                 },
                 {
                     "type": "group",
@@ -538,6 +559,58 @@
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
                             "layers": "preview:ts_ecoexp"
+                        },
+                        {
+                            "name": "GDP",
+                            "rectangle": [
+                                -180,
+                                -90,
+                                179.99999999985602,
+                                83.99999999993042
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:gdp"
+                        },
+                        {
+                            "name": "GDP per capita (N/A)",
+                            "type": "csv",
+                            "url": "test/countries.csv",
+                            "tableStyle": {
+                                "dataVariable": "ITU-T Telephone Code"
+                            }
+                        },
+                        {
+                            "name": "Gross fixed capital formation (N/A)",
+                            "type": "csv",
+                            "url": "test/countries.csv",
+                            "tableStyle": {
+                                "dataVariable": "ITU-T Telephone Code"
+                            }
+                        },
+                        {
+                            "name": "Exposed urban stock (N/A)",
+                            "type": "csv",
+                            "url": "test/countries.csv",
+                            "tableStyle": {
+                                "dataVariable": "ITU-T Telephone Code"
+                            }
+                        },
+                        {
+                            "name": "Exposed rural stock (N/A)",
+                            "type": "csv",
+                            "url": "test/countries.csv",
+                            "tableStyle": {
+                                "dataVariable": "ITU-T Telephone Code"
+                            }
+                        },
+                        {
+                            "name": "Gross savings (N/A)",
+                            "type": "csv",
+                            "url": "test/countries.csv",
+                            "tableStyle": {
+                                "dataVariable": "ITU-T Telephone Code"
+                            }
                         }
                     ]
                 }
@@ -545,32 +618,273 @@
         },
         {
             "type": "group",
-            "name": "Social and economic factors",
+            "name": "Vulnerability",
+            "isOpen": true,
             "preserveOrder": true,
             "items": [
                 {
-                    "name": "Population density",
-                    "rectangle": [
-                        -180,
-                        -90,
-                        179.99999999985602,
-                        83.99999999993042
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:population"
+                    "type": "group",
+                    "name": "Coping capacity",
+                    "preserveOrder": true,
+                    "items": [
+                        {
+                            "name": "HFA scores",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "HFA Scores Last recent",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Government Effectiveness",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Government Effectiveness",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Corruption Perception Index",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Corruption Perception Index",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Access to electricity",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Access to electricity",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Adult literacy rate",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Adult literacy rate",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Internet users",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Internet users",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Mobile cellular subscriptions",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Mobile cellular subscriptions",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Improved sanitation facilities (% of population with access)",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Improved sanitation facilities (% of population with access)",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Improved water source (% of population with access)",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Improved water source (% of population with access)",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        }
+                    ]
                 },
                 {
-                    "name": "GDP",
-                    "rectangle": [
-                        -180,
-                        -90,
-                        179.99999999985602,
-                        83.99999999993042
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:gdp"
+                    "type": "group",
+                    "name": "Socio-Economic Vulnerability",
+                    "preserveOrder": true,
+                    "items": [
+                        {
+                            "name": "Human Development Index",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Human Development Index",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Multidimensional Poverty Index",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Multidimensional Poverty Index",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Humanitarian Aid (FTS)",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Humanitarian Aid (FTS)",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Development Aid (ODA) 2012",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Development Aid (ODA) 2012",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Net ODA received (% of GNI)",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Net ODA received (% of GNI)",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Mortality rate, under-5",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Mortality rate, under-5",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "U5 Under weight",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "U5 Under weight",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Physicians Density",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Physicians Density",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "One-year-olds fully immunized against measles",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "One-year-olds fully immunized against measles",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Tuberculosis prevalence",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Tuberculosis prevalence",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Health expenditure per capita",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Health expenditure per capita",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Malaria death rate",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Malaria death rate",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Gender Inequality Index",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Gender Inequality Index",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Income Gini coefficient",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Income Gini coefficient",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Domestic Food Price Level Index",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Domestic Food Price Level Index",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        },
+                        {
+                            "name": "Domestic Food Price Volatility Index",
+                            "type": "csv",
+                            "url": "data/inform.csv",
+                            "tableStyle": {
+                                "dataVariable": "Domestic Food Price Volatility Index",
+                                "regionVariable": "ISO3",
+                                "regionType": "CNT3"
+                            }
+                        }
+                    ]
                 }
             ]
         },
@@ -580,7 +894,7 @@
             "preserveOrder": true,
             "items": [
                 {
-                    "name": "Non-life insurance penetration",
+                    "name": "General insurance penetration",
                     "type": "csv",
                     "url": "data/insurance2013.csv",
                     "tableStyle": {
@@ -625,7 +939,7 @@
                     }
                 },
                 {
-                    "name": "Non-life insurance density",
+                    "name": "General insurance density",
                     "type": "csv",
                     "url": "data/insurance2013.csv",
                     "tableStyle": {
@@ -699,6 +1013,18 @@
                     "type": "wms",
                     "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
                     "layers": "preview:eq_aalcret"
+                },
+                {
+                    "name": "Floods (N/A)",
+                    "rectangle": [
+                        -180,
+                        -76.564826965332,
+                        180.000015258789,
+                        83.6274108886719
+                    ],
+                    "type": "wms",
+                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                    "layers": "preview:eq_aalcret"
                 }
             ]
         },
@@ -742,8 +1068,25 @@
                     "type": "wms",
                     "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
                     "layers": "preview:eq_pmlcret"
+                },
+                {
+                    "name": "Floods (N/A)",
+                    "rectangle": [
+                        -180,
+                        -76.564826965332,
+                        180.000015258789,
+                        83.6274108886719
+                    ],
+                    "type": "wms",
+                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                    "layers": "preview:eq_pmlcret"
                 }
             ]
+        },
+        {
+            "type": "group",
+            "name": "Average Loss Ratio",
+            "preserveOrder": true
         }
     ]
 }
