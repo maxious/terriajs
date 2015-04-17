@@ -129,8 +129,7 @@
                             "url": "https://programs.communications.gov.au/geoserver/ows",
                             "layers": "public:MyBroadband_ADSL_Quality_no_outline",
                             "parameters": {
-                                "tiled": true,
-                                "styles": "default"
+                                "tiled": true
                             },
                             "dataUrlType": "none",
                             "clipToRectangle": true

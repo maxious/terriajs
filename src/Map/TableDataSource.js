@@ -426,6 +426,12 @@ TableDataSource.prototype._mapValue2Color = function (pntVal) {
     return color;
 };
 
+/**
+* Get a data url that holds the image for the legend
+*
+* @returns {String} A data url that is a png of the legend for the datasource
+*
+*/
 TableDataSource.prototype.getLegendGraphic = function () {
     //Check if fixed color for all points and if so no legend
     if (!this._colorByValue) {

@@ -147,6 +147,7 @@ GeoJsonCatalogItem.prototype._load = function() {
             }
 
             return when(promise, function(json) {
+                that.data = json;
                 return updateModelFromData(that, json);
             });
         });
