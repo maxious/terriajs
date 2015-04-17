@@ -590,7 +590,7 @@ function updateAbsDataCsvText(absItem) {
         var finalCsvArray = [];
         var regionCol = csvArray[0].indexOf(absItem.regionConcept);
 
-        finalCsvArray.push([absItem.displayPercent ? "Region Percent" : "Region Total", absItem.regionType]);
+        finalCsvArray.push([absItem.displayPercent ? "Percent of Region" : "Number in Region", absItem.regionType]);
         var cols = [];
         if (csvArray[0].indexOf('Description') !== -1) {
             finalCsvArray[0].push('Description');

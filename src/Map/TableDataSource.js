@@ -426,6 +426,7 @@ TableDataSource.prototype._mapValue2Color = function (pntVal) {
     return color;
 };
 
+
 /**
 * Get a data url that holds the image for the legend
 *

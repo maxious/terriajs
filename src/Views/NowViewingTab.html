@@ -55,8 +55,10 @@
                 </div>
 
                 <!-- ko if: type === 'abs-itt'-->
-                 <div class="now-viewing-abs-icon clickable" data-bind="click: function(data, event) { displayPercent = !displayPercent; }, cesiumSvgPath: { path: displayPercent ? $root.svgCheckboxChecked : $root.svgCheckboxUnchecked, width: 32, height: 32 }">TEST</div>
-                <div class="now-viewing-abs-percent" data-bind="text: 'Display as Percent of Region'"></div>
+                <div class="now-viewing-abs-controls">
+                     <div class="now-viewing-abs-icon clickable" data-bind="click: function(data, event) { displayPercent = !displayPercent; }, cesiumSvgPath: { path: displayPercent ? $root.svgCheckboxChecked : $root.svgCheckboxUnchecked, width: 32, height: 32 }">TEST</div>
+                    <div class="now-viewing-abs-percent" data-bind="text: 'Display as Percent of Region'"></div>
+                </div>
                 <!-- /ko -->
 
                 <!-- ko if: legendIsImage -->
@@ -78,7 +80,6 @@
                 
                 <!-- ko if: type === 'abs-itt' -->
                 <div class="now-viewing-abs-section">
-                    <h2>Data Filtering</h2>
                     <div class="now-viewing-abs-table">
                         <!-- ko if: absDataset && absDataset.items -->
                         <table data-bind="template: { name: 'now-viewing-abs-item-template', foreach: absDataset.items }">
