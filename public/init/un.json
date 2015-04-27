@@ -12,274 +12,13 @@
     "catalog": [
         {
             "type": "group",
-            "name": "Natural Hazard Events",
-            "isOpen": true,
+            "name": "Peril",
             "preserveOrder": true,
-            "items": [
-                {
-                    "name": "All perils",
-                    "type": "csv",
-                    "url": "data/allperils1965-2014.csv",
-                    "tableStyle": {
-                        "dataVariable": "Occurrence",
-                        "regionVariable": "Country iso",
-                        "regionType": "CNT3",
-                        "displayTime" : 527040
-                    }
-                },
-                {
-                    "name": "Cyclones",
-                    "type": "csv",
-                    "url": "data/cyclones1965-2014.csv",
-                    "tableStyle": {
-                        "dataVariable": "Occurrence",
-                        "regionVariable": "Country iso",
-                        "regionType": "CNT3",
-                        "displayTime" : 527040
-                    }
-                },
-                {
-                    "name": "Cyclone storm surges (N/A)",
-                    "type": "csv",
-                    "url": "data/cyclones1965-2014.csv",
-                    "tableStyle": {
-                        "dataVariable": "Occurrence",
-                        "regionVariable": "Country iso",
-                        "regionType": "CNT3",
-                        "displayTime" : 527040
-                    }
-                },
-                {
-                    "name": "Earthquakes",
-                    "type": "csv",
-                    "url": "data/earthquakes1965-2014.csv",
-                    "tableStyle": {
-                        "dataVariable": "Occurrence",
-                        "regionVariable": "Country iso",
-                        "regionType": "CNT3",
-                        "displayTime" : 527040
-                    }
-                },
-                {
-                    "name": "Floods",
-                    "type": "csv",
-                    "url": "data/floods1965-2014.csv",
-                    "tableStyle": {
-                        "dataVariable": "Occurrence",
-                        "regionVariable": "Country iso",
-                        "regionType": "CNT3",
-                        "displayTime" : 527040
-                    }
-                },
-                {
-                    "name": "Landslides (due to precipitation)",
-                    "type": "csv",
-                    "url": "data/landslides1965-2014.csv",
-                    "tableStyle": {
-                        "dataVariable": "Occurrence",
-                        "regionVariable": "Country iso",
-                        "regionType": "CNT3",
-                        "displayTime" : 527040
-                    }
-                },
-                {
-                    "name": "Tsunamis",
-                    "type": "csv",
-                    "url": "data/tsunamis1965-2014.csv",
-                    "tableStyle": {
-                        "dataVariable": "Occurrence",
-                        "regionVariable": "Country iso",
-                        "regionType": "CNT3",
-                        "displayTime" : 527040
-                    }
-                }
-            ]
-        },
-        {
-            "type": "group",
-            "name": "Costs from events",
             "isOpen": true,
-            "preserveOrder": true,
             "items": [
                 {
                     "type": "group",
-                    "name": "Social",
-                    "preserveOrder": true,
-                    "items": [
-                        {
-                            "name": "All perils",
-                            "type": "csv",
-                            "url": "data/allperils1965-2014.csv",
-                            "tableStyle": {
-                                "dataVariable": "Total affected",
-                                "regionVariable": "Country iso",
-                                "regionType": "CNT3",
-                                "displayTime" : 527040
-                            }
-                        },
-                        {
-                            "name": "Cyclones",
-                            "type": "csv",
-                            "url": "data/cyclones1965-2014.csv",
-                            "tableStyle": {
-                                "dataVariable": "Total affected",
-                                "regionVariable": "Country iso",
-                                "regionType": "CNT3",
-                                "displayTime" : 527040
-                            }
-                        },
-                        {
-                            "name": "Cyclone storm surges (N/A)",
-                            "type": "csv",
-                            "url": "data/cyclones1965-2014.csv",
-                            "tableStyle": {
-                                "dataVariable": "Total affected",
-                                "regionVariable": "Country iso",
-                                "regionType": "CNT3",
-                                "displayTime" : 527040
-                            }
-                        },
-                        {
-                            "name": "Earthquakes",
-                            "type": "csv",
-                            "url": "data/earthquakes1965-2014.csv",
-                            "tableStyle": {
-                                "dataVariable": "Total affected",
-                                "regionVariable": "Country iso",
-                                "regionType": "CNT3",
-                                "displayTime" : 527040
-                            }
-                        },
-                        {
-                            "name": "Floods",
-                            "type": "csv",
-                            "url": "data/floods1965-2014.csv",
-                            "tableStyle": {
-                                "dataVariable": "Total affected",
-                                "regionVariable": "Country iso",
-                                "regionType": "CNT3",
-                                "displayTime" : 527040
-                            }
-                        },
-                        {
-                            "name": "Landslides (due to precipitation)",
-                            "type": "csv",
-                            "url": "data/landslides1965-2014.csv",
-                            "tableStyle": {
-                                "dataVariable": "Total affected",
-                                "regionVariable": "Country iso",
-                                "regionType": "CNT3",
-                                "displayTime" : 527040
-                            }
-                        },
-                        {
-                            "name": "Tsunamis",
-                            "type": "csv",
-                            "url": "data/tsunamis1965-2014.csv",
-                            "tableStyle": {
-                                "dataVariable": "Total affected",
-                                "regionVariable": "Country iso",
-                                "regionType": "CNT3",
-                                "displayTime" : 527040
-                            }
-                        }
-                            ]
-                },
-                {
-                    "type": "group",
-                    "name": "Economic",
-                    "preserveOrder": true,
-                    "items": [
-                        {
-                            "name": "All perils",
-                            "type": "csv",
-                            "url": "data/allperils1965-2014.csv",
-                            "tableStyle": {
-                                "dataVariable": "Total damage ('000 $)",
-                                "regionVariable": "Country iso",
-                                "regionType": "CNT3",
-                                "displayTime" : 527040
-                            }
-                        },
-                        {
-                            "name": "Cyclones",
-                            "type": "csv",
-                            "url": "data/cyclones1965-2014.csv",
-                            "tableStyle": {
-                                "dataVariable": "Total damage ('000 $)",
-                                "regionVariable": "Country iso",
-                                "regionType": "CNT3",
-                                "displayTime" : 527040
-                            }
-                        },
-                        {
-                            "name": "Cyclone storm surges (N/A)",
-                            "type": "csv",
-                            "url": "data/cyclones1965-2014.csv",
-                            "tableStyle": {
-                                "dataVariable": "Total damage ('000 $)",
-                                "regionVariable": "Country iso",
-                                "regionType": "CNT3",
-                                "displayTime" : 527040
-                            }
-                        },
-                        {
-                            "name": "Earthquakes",
-                            "type": "csv",
-                            "url": "data/earthquakes1965-2014.csv",
-                            "tableStyle": {
-                                "dataVariable": "Total damage ('000 $)",
-                                "regionVariable": "Country iso",
-                                "regionType": "CNT3",
-                                "displayTime" : 527040
-                            }
-                        },
-                        {
-                            "name": "Floods",
-                            "type": "csv",
-                            "url": "data/floods1965-2014.csv",
-                            "tableStyle": {
-                                "dataVariable": "Total damage ('000 $)",
-                                "regionVariable": "Country iso",
-                                "regionType": "CNT3",
-                                "displayTime" : 527040
-                            }
-                        },
-                        {
-                            "name": "Landslides (due to precipitation)",
-                            "type": "csv",
-                            "url": "data/landslides1965-2014.csv",
-                            "tableStyle": {
-                                "dataVariable": "Total damage ('000 $)",
-                                "regionVariable": "Country iso",
-                                "regionType": "CNT3",
-                                "displayTime" : 527040
-                            }
-                        },
-                        {
-                            "name": "Tsunamis",
-                            "type": "csv",
-                            "url": "data/tsunamis1965-2014.csv",
-                            "tableStyle": {
-                                "dataVariable": "Total damage ('000 $)",
-                                "regionVariable": "Country iso",
-                                "regionType": "CNT3",
-                                "displayTime" : 527040
-                            }
-                        }
-                    ]
-                }
-            ]
-        },
-        {
-            "type": "group",
-            "name": "Exposure",
-            "isOpen": true,
-            "preserveOrder": true,
-            "items": [
-                {
-                    "type": "group",
-                    "name": "Disaster event",
+                    "name": "Disaster Exposure",
                     "preserveOrder": true,
                     "items": [
                         {
@@ -346,138 +85,404 @@
                 },
                 {
                     "type": "group",
-                    "name": "Social",
+                    "name": "Historical Events",
                     "preserveOrder": true,
                     "items": [
                         {
-                            "name": "All perils (N/A)",
-                            "rectangle": [
-                                -180,
-                                -70.3994689733719,
-                                180.000000000002,
-                                70.93928113025771
-                            ],
-                            "type": "wms",
-                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:cy_physexp"
-                        },
-                        {
-                            "name": "Cyclones",
-                            "rectangle": [
-                                -180,
-                                -90,
-                                179.99999999985602,
-                                83.99999999993042
-                            ],
-                            "type": "wms",
-                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:cy_physexp"
-                        },
-                        {
-                            "name": "Cyclones surges",
-                            "rectangle": [
-                                -180,
-                                -90,
-                                179.99999999985602,
-                                83.99999999993042
-                            ],
-                            "type": "wms",
-                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:cs_physexp"
-                        },
-                        {
-                            "name": "Earthquakes",
-                            "rectangle": [
-                                -180,
-                                -90,
-                                179.99999999985602,
-                                83.99999999993042
-                            ],
-                            "type": "wms",
-                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:eq_physexp"
-                        },
-                        {
-                            "name": "Floods",
-                            "rectangle": [
-                                -180,
-                                -90,
-                                179.99999999985602,
-                                83.99999999993042
-                            ],
-                            "type": "wms",
-                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:fl_physexp"
-                        },
-                        {
-                            "name": "Landslides (due to precipitation)",
-                            "rectangle": [
-                                -180,
-                                -89.9999999999281,
-                                179.99999999985602,
-                                89.99166666666659
-                            ],
-                            "type": "wms",
-                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:ls_physexp2"
-                        },
-                        {
-                            "name": "Tsunamis",
-                            "rectangle": [
-                                -180,
-                                -90,
-                                179.99999999985602,
-                                83.99999999993042
-                            ],
-                            "type": "wms",
-                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:ts_physexp"
-                        },
-                        {
-                            "name": "Urban exposure",
-                            "rectangle": [
-                                -158.25,
-                                -46.8833351135254,
-                                178.458343505859,
-                                69.3666687011719
-                            ],
-                            "type": "wms",
-                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:xx0707feet"
-                        },
-                        {
-                            "name": "Population density",
-                            "rectangle": [
-                                -180,
-                                -90,
-                                179.99999999985602,
-                                83.99999999993042
-                            ],
-                            "type": "wms",
-                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:population"
-                        },
-                        {
-                            "name": "Exposed population (N/A)",
+                            "name": "All perils",
                             "type": "csv",
-                            "url": "test/countries.csv",
+                            "url": "data/allperils1965-2014.csv",
                             "tableStyle": {
-                                "dataVariable": "ITU-T Telephone Code"
+                                "dataVariable": "Occurrence",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
                             }
                         },
                         {
-                            "name": "Social expenditure (N/A)",
+                            "name": "Cyclones",
                             "type": "csv",
-                            "url": "test/countries.csv",
+                            "url": "data/cyclones1965-2014.csv",
                             "tableStyle": {
-                                "dataVariable": "ITU-T Telephone Code"
+                                "dataVariable": "Occurrence",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Cyclone storm surges (N/A)",
+                            "type": "csv",
+                            "url": "data/cyclones1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Occurrence",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Earthquakes",
+                            "type": "csv",
+                            "url": "data/earthquakes1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Occurrence",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Floods",
+                            "type": "csv",
+                            "url": "data/floods1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Occurrence",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Landslides (due to precipitation)",
+                            "type": "csv",
+                            "url": "data/landslides1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Occurrence",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Tsunamis",
+                            "type": "csv",
+                            "url": "data/tsunamis1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Occurrence",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
                             }
                         }
                     ]
                 },
                 {
                     "type": "group",
-                    "name": "Economic",
+                    "name": "Human Impact",
+                    "preserveOrder": true,
+                    "items": [
+                        {
+                            "name": "All perils",
+                            "type": "csv",
+                            "url": "data/allperils1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total affected",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Cyclones",
+                            "type": "csv",
+                            "url": "data/cyclones1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total affected",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Cyclone storm surges (N/A)",
+                            "type": "csv",
+                            "url": "data/cyclones1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total affected",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Earthquakes",
+                            "type": "csv",
+                            "url": "data/earthquakes1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total affected",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Floods",
+                            "type": "csv",
+                            "url": "data/floods1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total affected",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Landslides (due to precipitation)",
+                            "type": "csv",
+                            "url": "data/landslides1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total affected",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Tsunamis",
+                            "type": "csv",
+                            "url": "data/tsunamis1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total affected",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "group",
+                    "name": "Economic Impact",
+                    "preserveOrder": true,
+                    "items": [
+                        {
+                            "name": "All perils",
+                            "type": "csv",
+                            "url": "data/allperils1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total damage ('000 $)",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Cyclones",
+                            "type": "csv",
+                            "url": "data/cyclones1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total damage ('000 $)",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Cyclone storm surges (N/A)",
+                            "type": "csv",
+                            "url": "data/cyclones1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total damage ('000 $)",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Earthquakes",
+                            "type": "csv",
+                            "url": "data/earthquakes1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total damage ('000 $)",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Floods",
+                            "type": "csv",
+                            "url": "data/floods1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total damage ('000 $)",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Landslides (due to precipitation)",
+                            "type": "csv",
+                            "url": "data/landslides1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total damage ('000 $)",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        },
+                        {
+                            "name": "Tsunamis",
+                            "type": "csv",
+                            "url": "data/tsunamis1965-2014.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total damage ('000 $)",
+                                "regionVariable": "Country iso",
+                                "regionType": "CNT3",
+                                "displayTime" : 527040
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "type": "group",
+            "name": "Economic Layer",
+            "isOpen": true,
+            "preserveOrder": true,
+            "items": [
+                {
+                    "name": "GDP",
+                    "rectangle": [
+                        -180,
+                        -90,
+                        179.99999999985602,
+                        83.99999999993042
+                    ],
+                    "type": "wms",
+                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                    "layers": "preview:gdp"
+                },
+                {
+                    "name": "GDP per capita (N/A)",
+                    "type": "csv",
+                    "url": "test/countries.csv",
+                    "tableStyle": {
+                        "dataVariable": "ITU-T Telephone Code"
+                    }
+                },
+                {
+                    "name": "Gross fixed capital formation (N/A)",
+                    "type": "csv",
+                    "url": "test/countries.csv",
+                    "tableStyle": {
+                        "dataVariable": "ITU-T Telephone Code"
+                    }
+                },
+                {
+                    "name": "Exposed urban stock (N/A)",
+                    "type": "csv",
+                    "url": "test/countries.csv",
+                    "tableStyle": {
+                        "dataVariable": "ITU-T Telephone Code"
+                    }
+                },
+                {
+                    "name": "Exposed rural stock (N/A)",
+                    "type": "csv",
+                    "url": "test/countries.csv",
+                    "tableStyle": {
+                        "dataVariable": "ITU-T Telephone Code"
+                    }
+                },
+                {
+                    "name": "Gross savings (N/A)",
+                    "type": "csv",
+                    "url": "test/countries.csv",
+                    "tableStyle": {
+                        "dataVariable": "ITU-T Telephone Code"
+                    }
+                },
+                {
+                    "type": "group",
+                    "name": "Insurance",
+                    "preserveOrder": true,
+                    "items": [
+                        {
+                            "name": "General insurance penetration",
+                            "type": "csv",
+                            "url": "data/insurance2013.csv",
+                            "tableStyle": {
+                                "dataVariable": "Non-life penetration",
+                                "regionVariable": "Country code",
+                                "regionType": "CNT2",
+                                "maxDisplayValue": 10,
+                                "colorMap": [
+                                    {"offset": 0.0, "color": "rgba(239,210,193,1.00)"},
+                                    {"offset": 0.2, "color": "rgba(239,210,193,1.00)"},
+                                    {"offset": 0.2, "color": "rgba(221,139,116,1.0)"},
+                                    {"offset": 0.4, "color": "rgba(221,139,116,1.0)"},
+                                    {"offset": 0.4, "color": "rgba(255,127,46,1.0)"},
+                                    {"offset": 0.6, "color": "rgba(255,127,46,1.0)"},
+                                    {"offset": 0.6, "color": "rgba(255,65,43,1.0)"},
+                                    {"offset": 0.8, "color": "rgba(255,65,43,1.0)"},
+                                    {"offset": 0.8, "color": "rgba(111,0,54,1.0)"},
+                                    {"offset": 1.0, "color": "rgba(111,0,54,1.0)"}
+                                ]
+                            }
+                        },
+                        {
+                            "name": "Life insurance penetration",
+                            "type": "csv",
+                            "url": "data/insurance2013.csv",
+                            "tableStyle": {
+                                "dataVariable": "Life penetration",
+                                "regionVariable": "Country code",
+                                "regionType": "CNT2",
+                                "maxDisplayValue": 10
+                            }
+                        },
+                        {
+                            "name": "Total insurance penetration",
+                            "type": "csv",
+                            "url": "data/insurance2013.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total penetration",
+                                "regionVariable": "Country code",
+                                "regionType": "CNT2",
+                                "maxDisplayValue": 15
+                            }
+                        },
+                        {
+                            "name": "General insurance density",
+                            "type": "csv",
+                            "url": "data/insurance2013.csv",
+                            "tableStyle": {
+                                "dataVariable": "Non-life density",
+                                "regionVariable": "Country code",
+                                "regionType": "CNT2",
+                                "maxDisplayValue": 2500
+                            }
+                        },
+                        {
+                            "name": "Life insurance density",
+                            "type": "csv",
+                            "url": "data/insurance2013.csv",
+                            "tableStyle": {
+                                "dataVariable": "Life density",
+                                "regionVariable": "Country code",
+                                "regionType": "CNT2",
+                                "maxDisplayValue": 2500
+                            }
+                        },
+                        {
+                            "name": "Total insurance density",
+                            "type": "csv",
+                            "url": "data/insurance2013.csv",
+                            "tableStyle": {
+                                "dataVariable": "Total density",
+                                "regionVariable": "Country code",
+                                "regionType": "CNT2",
+                                "maxDisplayValue": 5000
+                            }
+                        }
+                    ]
+                },
+                {
+                    "type": "group",
+                    "name": "Economic Exposure",
                     "preserveOrder": true,
                     "items": [
                         {
@@ -563,58 +568,116 @@
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
                             "layers": "preview:ts_ecoexp"
-                        },
+                        }
+                    ]
+                },
+                {
+                    "type": "group",
+                    "name": "Annual Average Loss",
+                    "preserveOrder": true,
+                    "items": [
                         {
-                            "name": "GDP",
+                            "name": "All perils (N/A)",
                             "rectangle": [
                                 -180,
-                                -90,
-                                179.99999999985602,
-                                83.99999999993042
+                                -70.3994689733719,
+                                180.000000000002,
+                                70.93928113025771
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:gdp"
+                            "layers": "preview:cy_aalcret"
                         },
                         {
-                            "name": "GDP per capita (N/A)",
-                            "type": "csv",
-                            "url": "test/countries.csv",
-                            "tableStyle": {
-                                "dataVariable": "ITU-T Telephone Code"
-                            }
+                            "name": "Cyclones",
+                            "rectangle": [
+                                -180,
+                                -76.564826965332,
+                                180.000015258789,
+                                83.6274108886719
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:cy_aalcret"
                         },
                         {
-                            "name": "Gross fixed capital formation (N/A)",
-                            "type": "csv",
-                            "url": "test/countries.csv",
-                            "tableStyle": {
-                                "dataVariable": "ITU-T Telephone Code"
-                            }
+                            "name": "Earthquakes",
+                            "rectangle": [
+                                -180,
+                                -76.564826965332,
+                                180.000015258789,
+                                83.6274108886719
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:eq_aalcret"
                         },
                         {
-                            "name": "Exposed urban stock (N/A)",
-                            "type": "csv",
-                            "url": "test/countries.csv",
-                            "tableStyle": {
-                                "dataVariable": "ITU-T Telephone Code"
-                            }
+                            "name": "Floods (N/A)",
+                            "rectangle": [
+                                -180,
+                                -76.564826965332,
+                                180.000015258789,
+                                83.6274108886719
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:eq_aalcret"
+                        }
+                    ]
+                },
+                {
+                    "type": "group",
+                    "name": "Probable Maximum Loss",
+                    "preserveOrder": true,
+                    "items": [
+                        {
+                            "name": "All perils (N/A)",
+                            "rectangle": [
+                                -180,
+                                -70.3994689733719,
+                                180.000000000002,
+                                70.93928113025771
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:cy_pmlcret"
                         },
                         {
-                            "name": "Exposed rural stock (N/A)",
-                            "type": "csv",
-                            "url": "test/countries.csv",
-                            "tableStyle": {
-                                "dataVariable": "ITU-T Telephone Code"
-                            }
+                            "name": "Cyclones",
+                            "rectangle": [
+                                -180,
+                                -76.564826965332,
+                                180.000015258789,
+                                83.6274108886719
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:cy_pmlcret"
                         },
                         {
-                            "name": "Gross savings (N/A)",
-                            "type": "csv",
-                            "url": "test/countries.csv",
-                            "tableStyle": {
-                                "dataVariable": "ITU-T Telephone Code"
-                            }
+                            "name": "Earthquakes",
+                            "rectangle": [
+                                -180,
+                                -76.564826965332,
+                                180.000015258789,
+                                83.6274108886719
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:eq_pmlcret"
+                        },
+                        {
+                            "name": "Floods (N/A)",
+                            "rectangle": [
+                                -180,
+                                -76.564826965332,
+                                180.000015258789,
+                                83.6274108886719
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:eq_pmlcret"
                         }
                     ]
                 }
@@ -622,7 +685,7 @@
         },
         {
             "type": "group",
-            "name": "Vulnerability",
+            "name": "Social Layer",
             "isOpen": true,
             "preserveOrder": true,
             "items": [
@@ -889,208 +952,139 @@
                             }
                         }
                     ]
+                },
+                {
+                    "type": "group",
+                    "name": "Social Exposure",
+                    "preserveOrder": true,
+                    "items": [
+                        {
+                            "name": "All perils (N/A)",
+                            "rectangle": [
+                                -180,
+                                -70.3994689733719,
+                                180.000000000002,
+                                70.93928113025771
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:cy_physexp"
+                        },
+                        {
+                            "name": "Cyclones",
+                            "rectangle": [
+                                -180,
+                                -90,
+                                179.99999999985602,
+                                83.99999999993042
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:cy_physexp"
+                        },
+                        {
+                            "name": "Cyclones surges",
+                            "rectangle": [
+                                -180,
+                                -90,
+                                179.99999999985602,
+                                83.99999999993042
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:cs_physexp"
+                        },
+                        {
+                            "name": "Earthquakes",
+                            "rectangle": [
+                                -180,
+                                -90,
+                                179.99999999985602,
+                                83.99999999993042
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:eq_physexp"
+                        },
+                        {
+                            "name": "Floods",
+                            "rectangle": [
+                                -180,
+                                -90,
+                                179.99999999985602,
+                                83.99999999993042
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:fl_physexp"
+                        },
+                        {
+                            "name": "Landslides (due to precipitation)",
+                            "rectangle": [
+                                -180,
+                                -89.9999999999281,
+                                179.99999999985602,
+                                89.99166666666659
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:ls_physexp2"
+                        },
+                        {
+                            "name": "Tsunamis",
+                            "rectangle": [
+                                -180,
+                                -90,
+                                179.99999999985602,
+                                83.99999999993042
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:ts_physexp"
+                        },
+                        {
+                            "name": "Urban exposure",
+                            "rectangle": [
+                                -158.25,
+                                -46.8833351135254,
+                                178.458343505859,
+                                69.3666687011719
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:xx0707feet"
+                        },
+                        {
+                            "name": "Population density",
+                            "rectangle": [
+                                -180,
+                                -90,
+                                179.99999999985602,
+                                83.99999999993042
+                            ],
+                            "type": "wms",
+                            "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
+                            "layers": "preview:population"
+                        },
+                        {
+                            "name": "Exposed population (N/A)",
+                            "type": "csv",
+                            "url": "test/countries.csv",
+                            "tableStyle": {
+                                "dataVariable": "ITU-T Telephone Code"
+                            }
+                        },
+                        {
+                            "name": "Social expenditure (N/A)",
+                            "type": "csv",
+                            "url": "test/countries.csv",
+                            "tableStyle": {
+                                "dataVariable": "ITU-T Telephone Code"
+                            }
+                        }
+                    ]
                 }
             ]
-        },
-        {
-            "type": "group",
-            "name": "Insurance",
-            "preserveOrder": true,
-            "items": [
-                {
-                    "name": "General insurance penetration",
-                    "type": "csv",
-                    "url": "data/insurance2013.csv",
-                    "tableStyle": {
-                        "dataVariable": "Non-life penetration",
-                        "regionVariable": "Country code",
-                        "regionType": "CNT2",
-                        "maxDisplayValue": 10,
-                        "colorMap": [
-                            {"offset": 0.0, "color": "rgba(239,210,193,1.00)"},
-                            {"offset": 0.2, "color": "rgba(239,210,193,1.00)"},
-                            {"offset": 0.2, "color": "rgba(221,139,116,1.0)"},
-                            {"offset": 0.4, "color": "rgba(221,139,116,1.0)"},
-                            {"offset": 0.4, "color": "rgba(255,127,46,1.0)"},
-                            {"offset": 0.6, "color": "rgba(255,127,46,1.0)"},
-                            {"offset": 0.6, "color": "rgba(255,65,43,1.0)"},
-                            {"offset": 0.8, "color": "rgba(255,65,43,1.0)"},
-                            {"offset": 0.8, "color": "rgba(111,0,54,1.0)"},
-                            {"offset": 1.0, "color": "rgba(111,0,54,1.0)"}
-                        ]
-                    }
-                },
-                {
-                    "name": "Life insurance penetration",
-                    "type": "csv",
-                    "url": "data/insurance2013.csv",
-                    "tableStyle": {
-                        "dataVariable": "Life penetration",
-                        "regionVariable": "Country code",
-                        "regionType": "CNT2",
-                        "maxDisplayValue": 10
-                    }
-                },
-                {
-                    "name": "Total insurance penetration",
-                    "type": "csv",
-                    "url": "data/insurance2013.csv",
-                    "tableStyle": {
-                        "dataVariable": "Total penetration",
-                        "regionVariable": "Country code",
-                        "regionType": "CNT2",
-                        "maxDisplayValue": 15
-                    }
-                },
-                {
-                    "name": "General insurance density",
-                    "type": "csv",
-                    "url": "data/insurance2013.csv",
-                    "tableStyle": {
-                        "dataVariable": "Non-life density",
-                        "regionVariable": "Country code",
-                        "regionType": "CNT2",
-                        "maxDisplayValue": 2500
-                    }
-                },
-                {
-                    "name": "Life insurance density",
-                    "type": "csv",
-                    "url": "data/insurance2013.csv",
-                    "tableStyle": {
-                        "dataVariable": "Life density",
-                        "regionVariable": "Country code",
-                        "regionType": "CNT2",
-                        "maxDisplayValue": 2500
-                    }
-                },
-                {
-                    "name": "Total insurance density",
-                    "type": "csv",
-                    "url": "data/insurance2013.csv",
-                    "tableStyle": {
-                        "dataVariable": "Total density",
-                        "regionVariable": "Country code",
-                        "regionType": "CNT2",
-                        "maxDisplayValue": 5000
-                    }
-                }
-            ]
-        },
-        {
-            "type": "group",
-            "name": "Annual Average Loss",
-            "preserveOrder": true,
-            "items": [
-                {
-                    "name": "All perils (N/A)",
-                    "rectangle": [
-                        -180,
-                        -70.3994689733719,
-                        180.000000000002,
-                        70.93928113025771
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:cy_aalcret"
-                },
-                {
-                    "name": "Cyclones",
-                    "rectangle": [
-                        -180,
-                        -76.564826965332,
-                        180.000015258789,
-                        83.6274108886719
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:cy_aalcret"
-                },
-                {
-                    "name": "Earthquakes",
-                    "rectangle": [
-                        -180,
-                        -76.564826965332,
-                        180.000015258789,
-                        83.6274108886719
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:eq_aalcret"
-                },
-                {
-                    "name": "Floods (N/A)",
-                    "rectangle": [
-                        -180,
-                        -76.564826965332,
-                        180.000015258789,
-                        83.6274108886719
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:eq_aalcret"
-                }
-            ]
-        },
-        {
-            "type": "group",
-            "name": "Probable Maximum Loss",
-            "preserveOrder": true,
-            "items": [
-                {
-                    "name": "All perils (N/A)",
-                    "rectangle": [
-                        -180,
-                        -70.3994689733719,
-                        180.000000000002,
-                        70.93928113025771
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:cy_pmlcret"
-                },
-                {
-                    "name": "Cyclones",
-                    "rectangle": [
-                        -180,
-                        -76.564826965332,
-                        180.000015258789,
-                        83.6274108886719
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:cy_pmlcret"
-                },
-                {
-                    "name": "Earthquakes",
-                    "rectangle": [
-                        -180,
-                        -76.564826965332,
-                        180.000015258789,
-                        83.6274108886719
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:eq_pmlcret"
-                },
-                {
-                    "name": "Floods (N/A)",
-                    "rectangle": [
-                        -180,
-                        -76.564826965332,
-                        180.000015258789,
-                        83.6274108886719
-                    ],
-                    "type": "wms",
-                    "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:eq_pmlcret"
-                }
-            ]
-        },
-        {
-            "type": "group",
-            "name": "Average Loss Ratio",
-            "preserveOrder": true
         }
     ]
 }
