@@ -22,7 +22,7 @@
                     "preserveOrder": true,
                     "items": [
                         {
-                            "name": "All perils",
+                            "name": "All perils (pw)",
                             "rectangle": [
                                 -180,
                                 -89.99999999999997,
@@ -34,7 +34,7 @@
                             "layers": "preview:ml_risk"
                         },
                         {
-                            "name": "Cyclones",
+                            "name": "Cyclones (pw)",
                             "rectangle": [
                                 -180,
                                 -89.99999999999997,
@@ -46,7 +46,7 @@
                             "layers": "preview:cy_risk"
                         },
                         {
-                            "name": "Earthquakes",
+                            "name": "Earthquakes (pw)",
                             "rectangle": [
                                 -180,
                                 -90.00000000001461,
@@ -58,7 +58,7 @@
                             "layers": "preview:eq_risk"
                         },
                         {
-                            "name": "Floods",
+                            "name": "Floods (pw)",
                             "rectangle": [
                                 -180,
                                 -89.99999999999372,
@@ -70,7 +70,7 @@
                             "layers": "preview:fl_risk"
                         },
                         {
-                            "name": "Landslides (due to precipitation)",
+                            "name": "Landslides (due to precipitation) (pw)",
                             "rectangle": [
                                 -180,
                                 -89.99999999992872,
@@ -111,7 +111,7 @@
                             }
                         },
                         {
-                            "name": "Cyclone storm surges (N/A)",
+                            "name": "Cyclone storm surges (n/a)",
                             "type": "csv",
                             "url": "data/cyclones1965-2014.csv",
                             "tableStyle": {
@@ -195,7 +195,7 @@
                             }
                         },
                         {
-                            "name": "Cyclone storm surges (N/A)",
+                            "name": "Cyclone storm surges (n/a)",
                             "type": "csv",
                             "url": "data/cyclones1965-2014.csv",
                             "tableStyle": {
@@ -279,7 +279,7 @@
                             }
                         },
                         {
-                            "name": "Cyclone storm surges (N/A)",
+                            "name": "Cyclone storm surges (n/a)",
                             "type": "csv",
                             "url": "data/cyclones1965-2014.csv",
                             "tableStyle": {
@@ -344,7 +344,7 @@
             "preserveOrder": true,
             "items": [
                 {
-                    "name": "GDP",
+                    "name": "GDP (pw)",
                     "rectangle": [
                         -180,
                         -90,
@@ -356,7 +356,7 @@
                     "layers": "preview:gdp"
                 },
                 {
-                    "name": "GDP per capita (N/A)",
+                    "name": "GDP per capita (n/a)",
                     "type": "csv",
                     "url": "test/countries.csv",
                     "tableStyle": {
@@ -364,7 +364,7 @@
                     }
                 },
                 {
-                    "name": "Gross fixed capital formation (N/A)",
+                    "name": "Gross fixed capital formation (n/a)",
                     "type": "csv",
                     "url": "test/countries.csv",
                     "tableStyle": {
@@ -372,7 +372,7 @@
                     }
                 },
                 {
-                    "name": "Exposed urban stock (N/A)",
+                    "name": "Exposed urban stock (n/a)",
                     "type": "csv",
                     "url": "test/countries.csv",
                     "tableStyle": {
@@ -380,7 +380,7 @@
                     }
                 },
                 {
-                    "name": "Exposed rural stock (N/A)",
+                    "name": "Exposed rural stock (n/a)",
                     "type": "csv",
                     "url": "test/countries.csv",
                     "tableStyle": {
@@ -388,7 +388,7 @@
                     }
                 },
                 {
-                    "name": "Gross savings (N/A)",
+                    "name": "Gross savings (n/a)",
                     "type": "csv",
                     "url": "test/countries.csv",
                     "tableStyle": {
@@ -486,7 +486,7 @@
                     "preserveOrder": true,
                     "items": [
                         {
-                            "name": "All perils (N/A)",
+                            "name": "All perils (n/a) (pw)",
                             "rectangle": [
                                 -180,
                                 -70.3994689733719,
@@ -498,7 +498,7 @@
                             "layers": "preview:cy_ecoexp"
                         },
                         {
-                            "name": "Cyclones",
+                            "name": "Cyclones (pw)",
                             "rectangle": [
                                 -180,
                                 -90,
@@ -510,7 +510,7 @@
                             "layers": "preview:cy_ecoexp"
                         },
                         {
-                            "name": "Cyclones surges",
+                            "name": "Cyclones surges (pw)",
                             "rectangle": [
                                 -180,
                                 -90,
@@ -522,7 +522,7 @@
                             "layers": "preview:cs_ecoexp"
                         },
                         {
-                            "name": "Earthquakes",
+                            "name": "Earthquakes (pw)",
                             "rectangle": [
                                 -180,
                                 -90,
@@ -534,7 +534,7 @@
                             "layers": "preview:eq_ecoexp"
                         },
                         {
-                            "name": "Floods",
+                            "name": "Floods (pw)",
                             "rectangle": [
                                 -180,
                                 -90,
@@ -546,7 +546,7 @@
                             "layers": "preview:fl_ecoexp"
                         },
                         {
-                            "name": "Landslides (due to precipitation)",
+                            "name": "Landslides (due to precipitation) (pw)",
                             "rectangle": [
                                 -180,
                                 -89.9999999999281,
@@ -558,7 +558,7 @@
                             "layers": "preview:ls_ecoexp2"
                         },
                         {
-                            "name": "Tsunamis",
+                            "name": "Tsunamis (pw)",
                             "rectangle": [
                                 -180,
                                 -90,
@@ -577,7 +577,7 @@
                     "preserveOrder": true,
                     "items": [
                         {
-                            "name": "All perils (N/A)",
+                            "name": "All perils (n/a) (pw)",
                             "rectangle": [
                                 -180,
                                 -70.3994689733719,
@@ -589,7 +589,7 @@
                             "layers": "preview:cy_aalcret"
                         },
                         {
-                            "name": "Cyclones",
+                            "name": "Cyclones (pw)",
                             "rectangle": [
                                 -180,
                                 -76.564826965332,
@@ -601,7 +601,7 @@
                             "layers": "preview:cy_aalcret"
                         },
                         {
-                            "name": "Earthquakes",
+                            "name": "Earthquakes (pw)",
                             "rectangle": [
                                 -180,
                                 -76.564826965332,
@@ -613,7 +613,7 @@
                             "layers": "preview:eq_aalcret"
                         },
                         {
-                            "name": "Floods (N/A)",
+                            "name": "Floods (n/a) (pw)",
                             "rectangle": [
                                 -180,
                                 -76.564826965332,
@@ -632,7 +632,7 @@
                     "preserveOrder": true,
                     "items": [
                         {
-                            "name": "All perils (N/A)",
+                            "name": "All perils (n/a) (pw)",
                             "rectangle": [
                                 -180,
                                 -70.3994689733719,
@@ -644,7 +644,7 @@
                             "layers": "preview:cy_pmlcret"
                         },
                         {
-                            "name": "Cyclones",
+                            "name": "Cyclones (pw)",
                             "rectangle": [
                                 -180,
                                 -76.564826965332,
@@ -656,7 +656,7 @@
                             "layers": "preview:cy_pmlcret"
                         },
                         {
-                            "name": "Earthquakes",
+                            "name": "Earthquakes (pw)",
                             "rectangle": [
                                 -180,
                                 -76.564826965332,
@@ -668,7 +668,7 @@
                             "layers": "preview:eq_pmlcret"
                         },
                         {
-                            "name": "Floods (N/A)",
+                            "name": "Floods (n/a) (pw)",
                             "rectangle": [
                                 -180,
                                 -76.564826965332,
@@ -959,7 +959,7 @@
                     "preserveOrder": true,
                     "items": [
                         {
-                            "name": "All perils (N/A)",
+                            "name": "All perils (n/a) (pw)",
                             "rectangle": [
                                 -180,
                                 -70.3994689733719,
@@ -971,7 +971,7 @@
                             "layers": "preview:cy_physexp"
                         },
                         {
-                            "name": "Cyclones",
+                            "name": "Cyclones (pw)",
                             "rectangle": [
                                 -180,
                                 -90,
@@ -983,7 +983,7 @@
                             "layers": "preview:cy_physexp"
                         },
                         {
-                            "name": "Cyclones surges",
+                            "name": "Cyclones surges (pw)",
                             "rectangle": [
                                 -180,
                                 -90,
@@ -995,7 +995,7 @@
                             "layers": "preview:cs_physexp"
                         },
                         {
-                            "name": "Earthquakes",
+                            "name": "Earthquakes (pw)",
                             "rectangle": [
                                 -180,
                                 -90,
@@ -1007,7 +1007,7 @@
                             "layers": "preview:eq_physexp"
                         },
                         {
-                            "name": "Floods",
+                            "name": "Floods (pw)",
                             "rectangle": [
                                 -180,
                                 -90,
@@ -1019,7 +1019,7 @@
                             "layers": "preview:fl_physexp"
                         },
                         {
-                            "name": "Landslides (due to precipitation)",
+                            "name": "Landslides (due to precipitation) (pw)",
                             "rectangle": [
                                 -180,
                                 -89.9999999999281,
@@ -1031,7 +1031,7 @@
                             "layers": "preview:ls_physexp2"
                         },
                         {
-                            "name": "Tsunamis",
+                            "name": "Tsunamis (pw)",
                             "rectangle": [
                                 -180,
                                 -90,
@@ -1043,7 +1043,7 @@
                             "layers": "preview:ts_physexp"
                         },
                         {
-                            "name": "Urban exposure",
+                            "name": "Urban exposure (pw)",
                             "rectangle": [
                                 -158.25,
                                 -46.8833351135254,
@@ -1055,7 +1055,7 @@
                             "layers": "preview:xx0707feet"
                         },
                         {
-                            "name": "Population density",
+                            "name": "Population density (pw)",
                             "rectangle": [
                                 -180,
                                 -90,
@@ -1067,7 +1067,7 @@
                             "layers": "preview:population"
                         },
                         {
-                            "name": "Exposed population (N/A)",
+                            "name": "Exposed population (n/a)",
                             "type": "csv",
                             "url": "test/countries.csv",
                             "tableStyle": {
@@ -1075,7 +1075,7 @@
                             }
                         },
                         {
-                            "name": "Social expenditure (N/A)",
+                            "name": "Social expenditure (n/a)",
                             "type": "csv",
                             "url": "test/countries.csv",
                             "tableStyle": {
