@@ -31,7 +31,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:ml_risk"
+                            "layers": "preview:ml_risk",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Cyclones (pw)",
@@ -43,7 +47,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:cy_risk"
+                            "layers": "preview:cy_risk",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Earthquakes (pw)",
@@ -55,7 +63,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:eq_risk"
+                            "layers": "preview:eq_risk",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Floods (pw)",
@@ -67,7 +79,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:fl_risk"
+                            "layers": "preview:fl_risk",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Landslides (due to precipitation) (pw)",
@@ -79,7 +95,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:ls_risk"
+                            "layers": "preview:ls_risk",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         }
                     ]
                 },
@@ -353,7 +373,11 @@
                     ],
                     "type": "wms",
                     "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                    "layers": "preview:gdp"
+                    "layers": "preview:gdp",
+                    "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                 },
                 {
                     "name": "GDP per capita (n/a)",
@@ -495,7 +519,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:cy_ecoexp"
+                            "layers": "preview:cy_ecoexp",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Cyclones (pw)",
@@ -507,7 +535,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:cy_ecoexp"
+                            "layers": "preview:cy_ecoexp",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Cyclones surges (pw)",
@@ -519,7 +551,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:cs_ecoexp"
+                            "layers": "preview:cs_ecoexp",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Earthquakes (pw)",
@@ -531,7 +567,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:eq_ecoexp"
+                            "layers": "preview:eq_ecoexp",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Floods (pw)",
@@ -543,7 +583,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:fl_ecoexp"
+                            "layers": "preview:fl_ecoexp",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Landslides (due to precipitation) (pw)",
@@ -555,7 +599,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:ls_ecoexp2"
+                            "layers": "preview:ls_ecoexp2",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Tsunamis (pw)",
@@ -567,7 +615,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:ts_ecoexp"
+                            "layers": "preview:ts_ecoexp",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         }
                     ]
                 },
@@ -586,7 +638,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:cy_aalcret"
+                            "layers": "preview:cy_aalcret",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Cyclones (pw)",
@@ -598,7 +654,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:cy_aalcret"
+                            "layers": "preview:cy_aalcret",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Earthquakes (pw)",
@@ -610,7 +670,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:eq_aalcret"
+                            "layers": "preview:eq_aalcret",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Floods (n/a) (pw)",
@@ -622,7 +686,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:eq_aalcret"
+                            "layers": "preview:eq_aalcret",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         }
                     ]
                 },
@@ -641,7 +709,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:cy_pmlcret"
+                            "layers": "preview:cy_pmlcret",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Cyclones (pw)",
@@ -653,7 +725,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:cy_pmlcret"
+                            "layers": "preview:cy_pmlcret",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Earthquakes (pw)",
@@ -665,7 +741,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:eq_pmlcret"
+                            "layers": "preview:eq_pmlcret",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Floods (n/a) (pw)",
@@ -677,7 +757,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:eq_pmlcret"
+                            "layers": "preview:eq_pmlcret",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         }
                     ]
                 }
@@ -968,7 +1052,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:cy_physexp"
+                            "layers": "preview:cy_physexp",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Cyclones (pw)",
@@ -980,7 +1068,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:cy_physexp"
+                            "layers": "preview:cy_physexp",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Cyclones surges (pw)",
@@ -992,7 +1084,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:cs_physexp"
+                            "layers": "preview:cs_physexp",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Earthquakes (pw)",
@@ -1004,7 +1100,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:eq_physexp"
+                            "layers": "preview:eq_physexp",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Floods (pw)",
@@ -1016,7 +1116,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:fl_physexp"
+                            "layers": "preview:fl_physexp",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Landslides (due to precipitation) (pw)",
@@ -1028,7 +1132,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:ls_physexp2"
+                            "layers": "preview:ls_physexp2",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Tsunamis (pw)",
@@ -1040,7 +1148,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:ts_physexp"
+                            "layers": "preview:ts_physexp",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Urban exposure (pw)",
@@ -1052,7 +1164,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:xx0707feet"
+                            "layers": "preview:xx0707feet",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Population density (pw)",
@@ -1064,7 +1180,11 @@
                             ],
                             "type": "wms",
                             "url": "http://preview.grid.unep.ch:8080/geoserver/wms",
-                            "layers": "preview:population"
+                            "layers": "preview:population",
+                            "minScaleDenominator": 10000000,
+                            "parameters": {
+                                "tiled": false
+                            }
                         },
                         {
                             "name": "Exposed population (n/a)",
